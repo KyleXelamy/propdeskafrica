@@ -10,6 +10,7 @@ import {
   IllustrationEmptyFile,
   IllustrationUsers,
   IllustrationSearch,
+  type Props as IllustrationProps,
 } from "@/components/illustrations"
 
 interface EmptyStateProps {

@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
   if (neonConfigured()) {
     try {
       const sql = getDb()
-      const rows = await sql.unsafe(`select id from public.patches`) as any[]
+      const rows = await (sql as any).unsafe(`select id from public.patches`) as unknown as any[]
       for (const r of rows) applied.add(r.id)
     } catch {/* ignore */}
   } else {
@@ -92,7 +92,7 @@ async function applyPatch(patch: { id: string; description: string; sql?: string
     const sqlText = await readFile(filePath, "utf8")
     if (neonConfigured()) {
       const sql = getDb()
-      await sql.unsafe(sqlText)
+      await (sql as any).unsafe(sqlText)
     } else {
       const supa = await createClient()
       // Service-role would be needed; we fall back to rpc for raw SQL
@@ -104,11 +104,11 @@ async function applyPatch(patch: { id: string; description: string; sql?: string
   // Record it in the patches table
   if (neonConfigured()) {
     const sql = getDb()
-    await sql.unsafe(
+    await (sql as any).unsafe(
       `insert into public.patches (id, description, kind, sql, applied_by) values ($1, $2, $3, $4, 'migrator') on conflict (id) do nothing`,
       [patch.id, patch.description, "schema", patch.sql ?? null],
     )
-    await sql.unsafe(`select public.bump_schema_version($1)`, [patch.id])
+    await (sql as any).unsafe(`select public.bump_schema_version($1)`, [patch.id])
   } else {
     const supa = await createClient()
     await supa.from("patches").upsert({

@@ -371,7 +371,7 @@ export function DocumentUploadForm() {
                 min={0}
                 max={365}
                 value={formData.reminder_days_before}
-                onChange={(e) => handleChange("reminder_days_before", Number(e.target.value) || 30)}
+                onChange={(e) => handleChange("reminder_days_before", String(Number(e.target.value) || 30))}
                 disabled={!formData.expiry_date}
               />
             </div>

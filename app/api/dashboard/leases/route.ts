@@ -31,7 +31,7 @@ export const GET = withAuth(async (_req, { supabase, userId }) => {
 
   if (error) return successResponse([]) // never 500 on this — UI degrades gracefully
 
-  const rows = (data || []).map((t) => {
+  const rows = (data || []).map((t: any) => {
     const end = new Date(t.lease_end_date)
     const days = Math.ceil((end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
     return {

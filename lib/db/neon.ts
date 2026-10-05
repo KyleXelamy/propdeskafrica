@@ -91,7 +91,7 @@ export async function tx<T extends readonly unknown[] = any[]>(
   queries: [...{ [K in keyof T]: any }],
 ): Promise<T> {
   const sql = getDb()
-  return (await sql.transaction(queries as any)) as T
+  return (await sql.transaction(queries as any)) as unknown as T
 }
 
 /**

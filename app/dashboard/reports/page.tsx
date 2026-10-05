@@ -69,13 +69,13 @@ export default async function ReportsPage() {
   const netIncomeChange = pct(currentNetIncome, previousNetIncome)
 
   const totalProperties = properties?.length || 0
-  const occupiedProperties = properties?.filter((p) => p.status === "occupied").length || 0
+  const occupiedProperties = properties?.filter((p: any) => p.status === "occupied").length || 0
   const occupancyRate = totalProperties > 0 ? (occupiedProperties / totalProperties) * 100 : 0
 
-  const activeTenants = tenants?.filter((t) => t.status === "active").length || 0
+  const activeTenants = tenants?.filter((t: any) => t.status === "active").length || 0
 
-  const openMaintenance = maintenanceRequests?.filter((m) => m.status === "open").length || 0
-  const urgentMaintenance = maintenanceRequests?.filter((m) => m.priority === "urgent").length || 0
+  const openMaintenance = maintenanceRequests?.filter((m: any) => m.status === "open").length || 0
+  const urgentMaintenance = maintenanceRequests?.filter((m: any) => m.priority === "urgent").length || 0
 
   const getChangeColor = (value: number) => {
     if (value > 0) return "text-chart-4"

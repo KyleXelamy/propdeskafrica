@@ -26,7 +26,7 @@ export const GET = withAuth(async (_req, { supabase, userId }) => {
       .eq("user_id", userId).eq("priority", "urgent").neq("status", "completed"),
   ])
 
-  const monthlyRevenue = (paidThisMonth.data || []).reduce((s, p) => s + Number(p.amount || 0), 0)
+  const monthlyRevenue = (paidThisMonth.data || []).reduce((s: number, p: any) => s + Number(p.amount || 0), 0)
 
   return successResponse({
     properties: props.count || 0,

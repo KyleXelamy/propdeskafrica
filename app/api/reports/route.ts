@@ -73,15 +73,15 @@ export const GET = withAuth(async (req: NextRequest, { supabase, userId }) => {
   const pct = (curr: number, prev: number) => (prev !== 0 ? ((curr - prev) / Math.abs(prev)) * 100 : 0)
 
   const totalProperties = properties.data?.length || 0
-  const occupiedProperties = properties.data?.filter((p) => p.status === "occupied").length || 0
+  const occupiedProperties = properties.data?.filter((p: any) => p.status === "occupied").length || 0
   const occupancyRate = totalProperties > 0 ? (occupiedProperties / totalProperties) * 100 : 0
-  const activeTenants = tenants.data?.filter((t) => t.status === "active").length || 0
-  const openMaintenance = maintenance.data?.filter((m) => m.status === "open").length || 0
-  const urgentMaintenance = maintenance.data?.filter((m) => m.priority === "urgent").length || 0
+  const activeTenants = tenants.data?.filter((t: any) => t.status === "active").length || 0
+  const openMaintenance = maintenance.data?.filter((m: any) => m.status === "open").length || 0
+  const urgentMaintenance = maintenance.data?.filter((m: any) => m.priority === "urgent").length || 0
 
   // expense breakdown by category
   const byCategory: Record<string, number> = {}
-  ;(currentExpenses.data || []).forEach((e) => {
+  ;(currentExpenses.data || []).forEach((e: any) => {
     const cat = e.category || "other"
     byCategory[cat] = (byCategory[cat] || 0) + Number(e.amount || 0)
   })
@@ -105,13 +105,13 @@ export const GET = withAuth(async (req: NextRequest, { supabase, userId }) => {
   last6.forEach((p) => (byKey[p.key] = p))
   const bucketKey = (iso: string) => iso.slice(0, 7)
 
-  ;(historyPayments.data || []).forEach((p) => {
+  ;(historyPayments.data || []).forEach((p: any) => {
     if (p.status !== "paid" && p.status !== "completed") return
     const slot = byKey[bucketKey(p.due_date)]
     if (!slot) return
     slot.payments += Number(p.amount || 0)
   })
-  ;(historyExpenses.data || []).forEach((e) => {
+  ;(historyExpenses.data || []).forEach((e: any) => {
     const slot = byKey[bucketKey(e.expense_date)]
     if (!slot) return
     slot.expenses += Number(e.amount || 0)

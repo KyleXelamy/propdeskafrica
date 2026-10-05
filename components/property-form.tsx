@@ -57,7 +57,7 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
         status: formData.status,
         description: formData.description || null,
         amenities: formData.amenities
-          ? formData.amenities.split(",").map((item) => item.trim()).filter(Boolean)
+          ? formData.amenities.split(",").map((item: string) => item.trim()).filter(Boolean)
           : [],
       }
 
