@@ -3,6 +3,7 @@ import { isFromSafaricom, parseBillRef, type C2BConfirmationRequest } from "@/li
 import { neonConfigured, getDb } from "@/lib/db/neon"
 import { reconcile, defaultRules, type C2BTransaction, type RuleDef, type TenantCandidate, type MatchContext } from "@/lib/reconcile"
 import { createClient } from "@/lib/supabase/server"
+import { createServiceClient, isServiceRoleConfigured } from "@/lib/supabase/service"
 
 /**
  * POST /api/mpesa/c2b/confirmation
@@ -222,11 +223,16 @@ async function persistSupabase(args: {
   result: ReturnType<typeof reconcile>
   billTenantId: string | null
 }) {
-  // Fallback for Supabase-only deployments. Service role key would be needed
-  // for inserts on behalf of users from a public callback. This stub writes
-  // to a log table that's readable by support; the dashboard reconciles.
-  const supa = await createClient()
-  const { error } = await supa.from("c2b_transactions").upsert({
+  // Public callbacks can't use a user-scoped client. We require the service
+  // role key for this fallback. If it's not configured, log a warning and
+  // skip the writes — the operator should configure service role on Supabase
+  // deploys that depend on C2B.
+  const supa = createServiceClient() ?? (await createClient())
+  const isAdmin = isServiceRoleConfigured()
+  if (!isAdmin) {
+    console.warn("[c2b] SUPABASE_SERVICE_ROLE_KEY not set — callback writes may be blocked by RLS. Set the env var to enable.")
+  }
+  const { error: txnErr } = await supa.from("c2b_transactions").upsert({
     paybill_id: args.owner.paybill_id,
     transaction_type: args.body.TransactionType,
     trans_id: args.body.TransID,
@@ -242,9 +248,41 @@ async function persistSupabase(args: {
     match_confidence: args.result.match_confidence,
     matched_tenant_id: args.result.matched_tenant_id,
     raw: args.body,
-  })
-  if (error) {
-    console.warn("[c2b] supabase insert failed (service role required for callback)", error.message)
+  }, { onConflict: "trans_id" })
+  if (txnErr) {
+    console.warn("[c2b] supabase c2b_transactions insert failed", txnErr.message)
+    return
   }
+  // 2. If matched, also create a rent_payments row
+  if (args.result.matched_tenant_id) {
+    const { error: payErr } = await supa.from("rent_payments").insert({
+      user_id: args.owner.user_id,
+      tenant_id: args.result.matched_tenant_id,
+      amount: Number(args.body.TransAmount),
+      paid_date: new Date().toISOString().slice(0, 10),
+      status: "paid",
+      payment_method: "mpesa_c2b",
+      notes: "Auto-reconciled via " + args.result.match_method + " (TransID " + args.body.TransID + ")",
+    })
+    if (payErr) console.warn("[c2b] rent_payments insert failed", payErr.message)
+  }
+  // 3. Audit
+  const { error: auditErr } = await supa.from("reconciliation_audit").insert({
+    user_id: args.owner.user_id,
+    c2b_transaction_id: args.body.TransID,
+    decision: args.result.matched_tenant_id ? "matched" : "unmatched",
+    matched_tenant_id: args.result.matched_tenant_id,
+    confidence: args.result.match_confidence,
+    notes: args.result.notes,
+  })
+  if (auditErr) console.warn("[c2b] reconciliation_audit insert failed", auditErr.message)
+  // 4. Bump paybill counters via RPC (function we ship in 10-holy-grail.sql)
+  try {
+    const { error: rpcErr } = await supa.rpc("bump_paybill_counters", {
+      p_paybill_id: args.owner.paybill_id,
+      p_matched: !!args.result.matched_tenant_id,
+    })
+    if (rpcErr) console.warn("[c2b] bump_paybill_counters failed", rpcErr.message)
+  } catch {/* RPC not installed in this env — fine */}
   void args.billTenantId
 }
