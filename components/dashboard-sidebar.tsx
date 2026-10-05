@@ -72,16 +72,21 @@ function SidebarContent({ userEmail, userName, companyName, avatarUrl, onNavigat
   const pathname = usePathname()
 
   return (
-    <div className="flex h-full flex-col bg-sidebar border-r border-sidebar-border">
+    <div className="flex h-full min-h-0 flex-col border-r border-sidebar-border bg-sidebar">
       {/* Logo */}
-      <div className="flex h-14 md:h-16 items-center border-b border-sidebar-border px-4 md:px-6">
-        <Building2 className="h-6 w-6 md:h-8 md:w-8 text-sidebar-accent" />
-        <span className="ml-2 min-w-0 truncate text-base font-bold text-sidebar-foreground md:text-lg">{companyName || "I-Manage"}</span>
+      <div className="flex min-h-16 items-center gap-3 border-b border-sidebar-border px-4 md:px-5">
+        <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-sidebar-accent text-sidebar-accent-foreground">
+          <Building2 className="size-5" />
+        </span>
+        <div className="min-w-0">
+          <p className="truncate text-sm font-semibold text-sidebar-foreground">{companyName || "I-Manage"}</p>
+          <p className="truncate text-[11px] uppercase tracking-[0.14em] text-sidebar-foreground/55">Workspace</p>
+        </div>
       </div>
 
       {/* Navigation */}
-      <ScrollArea className="flex-1 px-2 md:px-3 py-3 md:py-4">
-        <nav className="space-y-1">
+      <ScrollArea className="min-h-0 flex-1 px-2 py-3 md:px-3 md:py-4">
+        <nav className="flex flex-col gap-1">
           {navigation.map((item) => {
             const isActive = pathname === item.href
             return (
@@ -90,7 +95,7 @@ function SidebarContent({ userEmail, userName, companyName, avatarUrl, onNavigat
                 href={item.href}
                 onClick={onNavigate}
                 className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2.5 md:py-2 text-sm font-medium transition-colors touch-manipulation",
+                  "flex min-h-10 items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-colors touch-manipulation",
                   isActive
                     ? "bg-sidebar-accent text-sidebar-accent-foreground"
                     : "text-sidebar-foreground hover:bg-sidebar-primary hover:text-sidebar-primary-foreground",
@@ -165,7 +170,7 @@ export function DashboardSidebar({ userEmail, userName, companyName, avatarUrl }
 
       {/* Desktop sidebar */}
       <div className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0">
-        <SidebarContent userEmail={userEmail} userName={userName} avatarUrl={avatarUrl} />
+        <SidebarContent userEmail={userEmail} userName={userName} companyName={companyName} avatarUrl={avatarUrl} />
       </div>
     </>
   )
