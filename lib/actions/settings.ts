@@ -102,6 +102,10 @@ export async function updateProfile(formData: FormData) {
     throw new Error("Failed to update profile")
   }
 
+  if (!profileData.company_name?.trim()) {
+    throw new Error("Workspace name is required")
+  }
+
   if (profileData.company_name) {
     const slug = profileData.company_name.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 80)
     const { data: existingCompany } = await supabase.from("companies").select("id").eq("owner_id", user.id).maybeSingle()

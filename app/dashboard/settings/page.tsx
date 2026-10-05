@@ -17,7 +17,6 @@ import {
   updateNotifications,
   signOutAllDevices,
 } from "@/lib/actions/settings"
-import { AvatarUpload } from "@/components/avatar-upload"
 
 export const dynamic = "force-dynamic"
 
@@ -38,6 +37,7 @@ export default async function SettingsPage() {
     .eq("user_id", user.id)
     .maybeSingle()
 
+  const { data: company } = await supabase.from("companies").select("name").eq("owner_id", user.id).maybeSingle()
   const notificationPreferences = (profile?.notification_preferences as Record<string, boolean> | null) || {}
 
   const [propertiesCount, tenantsCount, paymentsCount] = await Promise.all([
@@ -91,19 +91,6 @@ export default async function SettingsPage() {
         <TabsContent value="profile" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Profile Photo</CardTitle>
-              <CardDescription>Square images work best. Max 5 MB.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <AvatarUpload
-                currentUrl={profile?.avatar_url || null}
-                fallbackName={profile?.full_name || user.email || "User"}
-              />
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
               <CardTitle>Profile Information</CardTitle>
               <CardDescription>Update your personal information and contact details</CardDescription>
             </CardHeader>
@@ -147,8 +134,9 @@ export default async function SettingsPage() {
                     <Input
                       id="company_name"
                       name="company_name"
-                      defaultValue={profile?.company_name || ""}
+                      defaultValue={company?.name || profile?.company_name || ""}
                       placeholder="e.g. Wangari Properties"
+                      required
                     />
                     <p className="text-xs text-muted-foreground">This name appears in your dashboard sidebar and workspace.</p>
                   </div>

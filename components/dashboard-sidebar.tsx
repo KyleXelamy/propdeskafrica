@@ -31,7 +31,7 @@ import {
   Activity,
 } from "lucide-react"
 import { signOut } from "@/lib/actions"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: Home },
@@ -59,7 +59,6 @@ interface SidebarProps {
   userEmail?: string
   userName?: string
   companyName?: string | null
-  avatarUrl?: string | null
 }
 
 function initials(name?: string | null, email?: string): string {
@@ -68,7 +67,7 @@ function initials(name?: string | null, email?: string): string {
   return src.split(/\s+/).filter(Boolean).slice(0, 2).map((s) => s[0]?.toUpperCase() || "").join("") || "?"
 }
 
-function SidebarContent({ userEmail, userName, companyName, avatarUrl, onNavigate }: SidebarProps & { onNavigate?: () => void }) {
+function SidebarContent({ userEmail, userName, companyName, onNavigate }: SidebarProps & { onNavigate?: () => void }) {
   const pathname = usePathname()
 
   return (
@@ -113,7 +112,6 @@ function SidebarContent({ userEmail, userName, companyName, avatarUrl, onNavigat
       <div className="border-t border-sidebar-border p-3 md:p-4">
         <div className="flex items-center gap-3 mb-3">
           <Avatar className="h-8 w-8 flex-shrink-0">
-            <AvatarImage src={avatarUrl || undefined} alt={userName || userEmail || "User"} />
             <AvatarFallback className="text-xs bg-sidebar-accent text-sidebar-accent-foreground">
               {initials(userName, userEmail)}
             </AvatarFallback>
