@@ -16,11 +16,11 @@ const pressLinks = [
 ]
 
 const assets = [
-  { name: "Logo (light + dark, PNG + SVG)", size: "240 KB" },
-  { name: "Brand wordmark", size: "32 KB" },
-  { name: "Founder headshots (Brian Kiarie)", size: "1.8 MB" },
-  { name: "Product screenshots — desktop + mobile", size: "4.2 MB" },
-  { name: "Fact sheet (PDF)", size: "180 KB" },
+  { name: "I-Manage icon (SVG)", size: "Vector", href: "/icon.svg" },
+  { name: "I-Manage icon (PNG)", size: "32 KB", href: "/icon-light-32x32.png" },
+  { name: "Brand guidelines", size: "Text document", href: "/press/brand-guidelines.txt" },
+  { name: "Company fact sheet", size: "Text document", href: "/press/company-fact-sheet.txt" },
+  { name: "Landlord templates collection", size: "12 templates", href: "/templates" },
 ]
 
 export default function PressPage() {
@@ -41,7 +41,7 @@ export default function PressPage() {
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               <Button asChild size="lg" className="rounded-full bg-accent px-7 text-primary hover:bg-accent/90">
-                <Link href="mailto:press@i-manage.app">
+                <Link href="mailto:bknglabs.dev@gmail.com">
                   <Mail className="mr-2 size-4" /> press@i-manage.app
                 </Link>
               </Button>
@@ -123,8 +123,10 @@ export default function PressPage() {
                   <p className="text-sm font-medium">{a.name}</p>
                   <p className="mt-1 text-xs text-muted-foreground">{a.size}</p>
                 </div>
-                <Button variant="ghost" size="sm" className="rounded-full text-primary">
-                  <Download className="mr-2 size-4" /> Download
+                <Button asChild variant="ghost" size="sm" className="rounded-full text-primary">
+                  <a href={a.href} download={a.href.endsWith(".txt") || a.href.endsWith(".svg") && undefined}>
+                    <Download className="mr-2 size-4" /> {a.href === "/templates" ? "Browse" : "Download"}
+                  </a>
                 </Button>
               </li>
             ))}
@@ -132,7 +134,7 @@ export default function PressPage() {
 
           <div className="mt-8 rounded-2xl border border-border bg-card p-6 text-sm text-muted-foreground">
             Need something custom? Email{" "}
-            <Link href="mailto:press@i-manage.app" className="font-medium text-primary underline">
+            <Link href="mailto:bknglabs.dev@gmail.com" className="font-medium text-primary underline">
               press@i-manage.app
             </Link>{" "}
             and we'll get back to you within four hours.

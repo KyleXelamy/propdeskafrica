@@ -13,62 +13,7 @@ export type OpenRole = {
   excerpt: string
 }
 
-export const openRoles: OpenRole[] = [
-  {
-    id: "senior-fullstack-engineer",
-    title: "Senior Full-Stack Engineer",
-    team: "Engineering",
-    location: "Remote · Africa",
-    type: "Full-time",
-    excerpt:
-      "Own meaningful surfaces of the I-Manage platform end-to-end. Next.js, Postgres, Supabase, M-Pesa. Help us scale from thousands to millions of units under management.",
-  },
-  {
-    id: "product-designer",
-    title: "Product Designer",
-    team: "Design",
-    location: "Remote · Africa",
-    type: "Full-time",
-    excerpt:
-      "Lead the visual and interaction design for new landlord and tenant surfaces. You'll work directly with the founders and ship weekly.",
-  },
-  {
-    id: "customer-success-lead",
-    title: "Customer Success Lead",
-    team: "Operations",
-    location: "Nairobi, Kenya",
-    type: "Full-time",
-    excerpt:
-      "Be the human voice of I-Manage for our Pro and Agency landlords. Onboarding, renewals, escalations and the occasional in-person visit.",
-  },
-  {
-    id: "growth-marketer",
-    title: "Growth Marketer",
-    team: "Sales",
-    location: "Hybrid",
-    type: "Full-time",
-    excerpt:
-      "Own acquisition across content, paid, partnerships and lifecycle. You'll have a real budget and be expected to be opinionated about it.",
-  },
-  {
-    id: "mobile-engineer-pwa",
-    title: "Mobile Engineer (PWA)",
-    team: "Engineering",
-    location: "Remote · Africa",
-    type: "Full-time",
-    excerpt:
-      "Push our Progressive Web App to feel native. Offline-first sync, push notifications, biometric auth. Real performance budgets, not vibes.",
-  },
-  {
-    id: "support-engineer-intern",
-    title: "Support Engineer (Internship)",
-    team: "Operations",
-    location: "Lagos, Nigeria",
-    type: "Internship",
-    excerpt:
-      "6-month paid internship. You'll handle first-line support tickets, build macros, and ship one product improvement by the end of the program.",
-  },
-]
+export const openRoles: OpenRole[] = []
 
 export type Testimonial = {
   quote: string

@@ -1,13 +1,12 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { ArrowUpRight, MapPin, Briefcase, Users, Heart } from "lucide-react"
+import { ArrowUpRight, Briefcase, Users, Heart, MapPin } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { openRoles } from "@/lib/content/site"
 
 export const metadata: Metadata = {
   title: "Careers — I-Manage by Siemax Ltd",
   description:
-    "Help us build the calm operating system for ambitious landlords. Open roles in engineering, product, design and operations.",
+    "Learn how I-Manage works and stay in touch for future opportunities. No roles are currently open.",
 }
 
 const benefits = [
@@ -46,8 +45,8 @@ export default function CareersPage() {
               Build software landlords <em className="font-serif font-normal text-accent">actually love.</em>
             </h1>
             <p className="mt-7 max-w-xl text-lg leading-8 text-primary-foreground/70">
-              I-Manage is a small team of engineers, designers and former landlords shipping the property
-              platform we wished existed. We're hiring across engineering, product and operations.
+              I-Manage is a small team at Siemax Ltd building the property platform we wished existed.
+              There are no open roles right now, but this page will be updated when that changes.
             </p>
           </div>
         </div>
@@ -86,43 +85,22 @@ export default function CareersPage() {
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">Open roles</p>
               <h2 className="mt-4 text-3xl font-medium leading-tight tracking-[-0.04em] sm:text-4xl">
-                {openRoles.length} roles open right now.
+                No roles open right now.
               </h2>
             </div>
-            <p className="hidden text-sm text-muted-foreground sm:block">
-              Don't see your role?{" "}
-              <Link href="/contact" className="font-medium text-primary underline">
-                Send us a note →
-              </Link>
+            <p className="max-w-sm text-sm leading-6 text-muted-foreground sm:text-right">
+              We are not hiring at the moment, but we keep this page updated when that changes.
             </p>
           </div>
 
-          <ul className="mt-10 divide-y divide-border rounded-2xl border border-border bg-card">
-            {openRoles.map((role) => (
-              <li key={role.id}>
-                <Link
-                  href={`/careers/${role.id}`}
-                  className="flex flex-col gap-3 p-6 transition-colors hover:bg-muted/40 sm:flex-row sm:items-center sm:justify-between sm:gap-6"
-                >
-                  <div className="flex-1">
-                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-                      {role.team} · {role.type}
-                    </p>
-                    <p className="mt-2 text-lg font-medium leading-tight">{role.title}</p>
-                    <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{role.excerpt}</p>
-                  </div>
-                  <div className="flex shrink-0 items-center gap-4 text-sm text-muted-foreground">
-                    <span className="inline-flex items-center gap-1.5">
-                      <MapPin className="size-3.5" /> {role.location}
-                    </span>
-                    <span className="inline-flex items-center gap-1.5 font-medium text-primary">
-                      Apply <ArrowUpRight className="size-4" />
-                    </span>
-                  </div>
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <div className="mt-10 rounded-2xl border border-border bg-card p-8 sm:p-10">
+            <p className="max-w-2xl text-base leading-7 text-muted-foreground">
+              I-Manage is built by Siemax Ltd. If you have a future opportunity in mind, send a brief note and we will keep it on file for the right opening.
+            </p>
+            <Button asChild className="mt-6 rounded-full">
+              <Link href="/contact">Contact the team <ArrowUpRight data-icon="inline-end" /></Link>
+            </Button>
+          </div>
         </div>
       </section>
 

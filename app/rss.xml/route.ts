@@ -1,6 +1,8 @@
 import { blogPosts } from "@/lib/content/blog"
 
 const SITE = "https://i-manage.app"
+const FEED_TITLE = "I-Manage by Siemax Ltd — Resources"
+const FEED_DESCRIPTION = "Practical property management guides, product updates and operating notes for landlords across Africa."
 
 function escape(str: string) {
   return str
@@ -30,12 +32,15 @@ export async function GET() {
     .join("\n")
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>I-Manage — Resources</title>
+    <title>${escape(FEED_TITLE)}</title>
     <link>${SITE}/resources</link>
-    <description>Field notes, product updates and practical guides for ambitious landlords.</description>
-    <language>en-us</language>
+    <atom:link href="${SITE}/rss.xml" rel="self" type="application/rss+xml" />
+    <description>${escape(FEED_DESCRIPTION)}</description>
+    <language>en-GB</language>
+    <copyright>© ${new Date().getUTCFullYear()} Siemax Ltd</copyright>
+    <ttl>60</ttl>
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
     ${items}
   </channel>
