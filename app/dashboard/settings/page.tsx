@@ -38,6 +38,8 @@ export default async function SettingsPage() {
     .eq("user_id", user.id)
     .maybeSingle()
 
+  const notificationPreferences = (profile?.notification_preferences as Record<string, boolean> | null) || {}
+
   const [propertiesCount, tenantsCount, paymentsCount] = await Promise.all([
     supabase.from("properties").select("id", { count: "exact", head: true }).eq("user_id", user.id),
     supabase.from("tenants").select("id", { count: "exact", head: true }).eq("user_id", user.id),
@@ -274,7 +276,7 @@ export default async function SettingsPage() {
                       <h4 className="font-medium">Rent Payment Alerts</h4>
                       <p className="text-sm text-muted-foreground">Get notified when rent payments are due</p>
                     </div>
-                    <Switch name="rent_alerts" defaultChecked />
+                    <Switch name="rent_alerts" defaultChecked={notificationPreferences.rent_alerts ?? true} />
                   </div>
 
                   <div className="flex items-center justify-between p-4 border rounded-lg gap-3">
@@ -282,7 +284,7 @@ export default async function SettingsPage() {
                       <h4 className="font-medium">Maintenance Requests</h4>
                       <p className="text-sm text-muted-foreground">New maintenance requests from tenants</p>
                     </div>
-                    <Switch name="maintenance_alerts" defaultChecked />
+                    <Switch name="maintenance_alerts" defaultChecked={notificationPreferences.maintenance_alerts ?? true} />
                   </div>
 
                   <div className="flex items-center justify-between p-4 border rounded-lg gap-3">
@@ -290,7 +292,7 @@ export default async function SettingsPage() {
                       <h4 className="font-medium">Lease Expiry Warnings</h4>
                       <p className="text-sm text-muted-foreground">30 days before lease expires</p>
                     </div>
-                    <Switch name="lease_alerts" defaultChecked />
+                    <Switch name="lease_alerts" defaultChecked={notificationPreferences.lease_alerts ?? true} />
                   </div>
 
                   <div className="flex items-center justify-between p-4 border rounded-lg gap-3">
@@ -298,7 +300,7 @@ export default async function SettingsPage() {
                       <h4 className="font-medium">Financial Reports</h4>
                       <p className="text-sm text-muted-foreground">Monthly financial summaries</p>
                     </div>
-                    <Switch name="financial_reports" />
+                    <Switch name="financial_reports" defaultChecked={notificationPreferences.financial_reports ?? false} />
                   </div>
                 </div>
 

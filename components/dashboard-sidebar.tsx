@@ -88,7 +88,7 @@ function SidebarContent({ userEmail, userName, companyName, avatarUrl, onNavigat
       <ScrollArea className="min-h-0 flex-1 px-2 py-3 md:px-3 md:py-4">
         <nav className="flex flex-col gap-1">
           {navigation.map((item) => {
-            const isActive = pathname === item.href
+            const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(`${item.href}/`))
             return (
               <Link
                 key={item.name}
