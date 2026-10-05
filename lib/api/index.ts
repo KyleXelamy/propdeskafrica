@@ -94,6 +94,22 @@ export function successResponse<T>(data: T, status = 200) {
   return NextResponse.json(data, { status })
 }
 
+/** Supabase/PostgREST errors that mean an optional table is not installed yet. */
+export function isMissingTableError(error: unknown): boolean {
+  const candidate = error as { code?: string; message?: string } | null
+  return candidate?.code === "42P01" || candidate?.code === "PGRST205" || /relation .* does not exist|table .* not found|could not find the table/i.test(candidate?.message || "")
+}
+
+/**
+ * Keep optional dashboard surfaces usable while a database setup script is
+ * being applied, but never hide real query failures.
+ */
+export function throwUnlessMissingTable(error: unknown, context: string): void {
+  if (!error || isMissingTableError(error)) return
+  const message = error instanceof Error ? error.message : String((error as { message?: string })?.message || error)
+  throw new Error(`${context}: ${message}`)
+}
+
 /**
  * Whitelist of column names accepted by POST/PUT bodies for a given table.
  * Throws a 400 if the body contains a key that's not in the whitelist.

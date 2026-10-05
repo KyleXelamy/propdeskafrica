@@ -1,4 +1,4 @@
-import { withAuth, successResponse } from "@/lib/api"
+import { withAuth, successResponse, throwUnlessMissingTable } from "@/lib/api"
 import type { NextRequest } from "next/server"
 
 /**
@@ -58,6 +58,14 @@ export const GET = withAuth(async (req: NextRequest, { supabase, userId }) => {
       .gte("expense_date", new Date(Date.UTC(refDate.getUTCFullYear(), refDate.getUTCMonth() - 5, 1)).toISOString())
       .lte("expense_date", lastOfMonth.toISOString()),
   ])
+
+  const queryResults = [
+    currentPayments, prevPayments, currentExpenses, prevExpenses,
+    properties, tenants, maintenance, historyPayments, historyExpenses,
+  ]
+  queryResults.forEach((result, index) => {
+    throwUnlessMissingTable(result.error, `Report query ${index + 1}`)
+  })
 
   const sum = (rows: { amount: number }[] | null, filter?: (r: any) => boolean) =>
     (rows || []).filter((r) => !filter || filter(r)).reduce((s, r) => s + Number(r.amount || 0), 0)

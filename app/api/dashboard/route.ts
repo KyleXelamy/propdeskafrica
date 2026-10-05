@@ -1,4 +1,4 @@
-import { withAuth, successResponse } from "@/lib/api"
+import { withAuth, successResponse, throwUnlessMissingTable } from "@/lib/api"
 
 /**
  * GET /api/dashboard — returns the four top-level stats for the home
@@ -25,6 +25,11 @@ export const GET = withAuth(async (_req, { supabase, userId }) => {
     supabase.from("maintenance_requests").select("id", { count: "exact", head: true })
       .eq("user_id", userId).eq("priority", "urgent").neq("status", "completed"),
   ])
+
+  const queryResults = [props, tenants, maintenance, paidThisMonth, openRequests, urgentRequests]
+  queryResults.forEach((result, index) => {
+    throwUnlessMissingTable(result.error, `Dashboard query ${index + 1}`)
+  })
 
   const monthlyRevenue = (paidThisMonth.data || []).reduce((s: number, p: any) => s + Number(p.amount || 0), 0)
 
