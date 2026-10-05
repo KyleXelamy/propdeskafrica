@@ -1,49 +1,41 @@
-import type { Metadata } from "next"
+"use client"
+
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Wallet, Plus, Copy, RefreshCw, TrendingUp, AlertTriangle } from "lucide-react"
+import { Wallet, TrendingUp, AlertTriangle, Loader2 } from "lucide-react"
 import { LivePaybillFeed } from "@/components/live-paybill-feed"
-
-export const metadata: Metadata = {
-  title: "Paybill — I-Manage",
-  description: "Configure your paybill and till numbers, monitor every payment in real time.",
-}
-
-const paybills = [
-  {
-    id: "PB-001",
-    label: "Karen properties",
-    number: "247247",
-    type: "Paybill",
-    property: "Karen House 1, 2, 3",
-    matched: 412,
-    unmatched: 0,
-    lastPayment: "2 minutes ago",
-  },
-  {
-    id: "PB-002",
-    label: "Riverside",
-    number: "456456",
-    type: "Till",
-    property: "Riverside Apartments",
-    matched: 184,
-    unmatched: 1,
-    lastPayment: "32 minutes ago",
-  },
-  {
-    id: "PB-003",
-    label: "Westlands Studio",
-    number: "789012",
-    type: "Till",
-    property: "Westlands Studio",
-    matched: 86,
-    unmatched: 0,
-    lastPayment: "1 hour ago",
-  },
-]
+import { createClient } from "@/lib/supabase/client"
+import { useEffect, useState } from "react"
 
 export default function PaybillPage() {
+  const [paybills, setPaybills] = useState<any[]>([])
+  const [transactions, setTransactions] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const load = async () => {
+      const supabase = createClient()
+      const [paybillsResult, transactionsResult] = await Promise.all([
+        supabase.from("paybills").select("id, label, number, type, active, created_at").order("created_at", { ascending: false }),
+        supabase.from("c2b_transactions").select("id, paybill_id, amount, match_status, created_at").order("created_at", { ascending: false }),
+      ])
+      if (paybillsResult.error || transactionsResult.error) {
+        setError(paybillsResult.error?.message || transactionsResult.error?.message || "Could not load paybill data")
+      } else {
+        setPaybills(paybillsResult.data || [])
+        setTransactions(transactionsResult.data || [])
+      }
+      setLoading(false)
+    }
+    load()
+  }, [])
+
+  const matched = transactions.filter((t) => t.match_status === "matched")
+  const unmatched = transactions.filter((t) => t.match_status !== "matched")
+  const totalCollected = transactions.reduce((sum, t) => sum + Number(t.amount || 0), 0)
+
   return (
     <div className="space-y-8">
       <header className="flex flex-wrap items-end justify-between gap-4">
@@ -53,9 +45,7 @@ export default function PaybillPage() {
             Configure your Safaricom paybill &amp; till numbers. We detect, match and reconcile every payment.
           </p>
         </div>
-        <Button className="bg-primary hover:bg-primary/90">
-          <Plus className="mr-2 size-4" /> Add paybill
-        </Button>
+        <p className="text-sm text-muted-foreground">Paybill records come from your database.</p>
       </header>
 
       {/* Top stats */}
@@ -63,25 +53,25 @@ export default function PaybillPage() {
         <Card>
           <CardHeader className="pb-2">
             <CardDescription>Payments this month</CardDescription>
-            <CardTitle className="text-3xl">682</CardTitle>
+            <CardTitle className="text-3xl">{transactions.length}</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-xs text-success">+8.2% vs last month</p>
+            <p className="text-xs text-muted-foreground">Recorded transactions</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
             <CardDescription>Auto-matched</CardDescription>
-            <CardTitle className="text-3xl">99.7%</CardTitle>
+            <CardTitle className="text-3xl">{transactions.length ? `${Math.round((matched.length / transactions.length) * 1000) / 10}%` : "0%"}</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-xs text-muted-foreground">680 of 682</p>
+            <p className="text-xs text-muted-foreground">{matched.length} of {transactions.length}</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
             <CardDescription>Total collected</CardDescription>
-            <CardTitle className="text-3xl">KES 3.84M</CardTitle>
+            <CardTitle className="text-3xl">KES {totalCollected.toLocaleString()}</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-xs text-muted-foreground">Across all paybills</p>
@@ -90,7 +80,7 @@ export default function PaybillPage() {
         <Card>
           <CardHeader className="pb-2">
             <CardDescription>Unmatched</CardDescription>
-            <CardTitle className="text-3xl">2</CardTitle>
+            <CardTitle className="text-3xl">{unmatched.length}</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-xs text-warning">Need attention</p>
@@ -134,6 +124,8 @@ export default function PaybillPage() {
       </Card>
 
       {/* Paybills */}
+      {error && <Card className="border-destructive/50 bg-destructive/5"><CardContent className="pt-6 text-sm text-destructive">{error}</CardContent></Card>}
+
       <Card>
         <CardHeader>
           <CardTitle>Your paybills &amp; tills</CardTitle>
@@ -152,7 +144,14 @@ export default function PaybillPage() {
                 </tr>
               </thead>
               <tbody className="divide-y">
-                {paybills.map((p) => (
+                {loading ? (
+                  <tr><td colSpan={5} className="px-4 py-10 text-center"><Loader2 className="mx-auto size-5 animate-spin" /></td></tr>
+                ) : paybills.length === 0 ? (
+                  <tr><td colSpan={5} className="px-4 py-10 text-center text-muted-foreground">No paybills configured yet.</td></tr>
+                ) : paybills.map((p) => {
+                  const paybillTransactions = transactions.filter((t) => t.paybill_id === p.id)
+                  const paybillUnmatched = paybillTransactions.filter((t) => t.match_status !== "matched").length
+                  return (
                   <tr key={p.id} className="hover:bg-muted/30">
                     <td className="px-4 py-4">
                       <div className="flex items-center gap-3">
@@ -163,25 +162,25 @@ export default function PaybillPage() {
                           <p className="text-sm font-semibold">{p.label}</p>
                           <p className="font-mono text-xs text-muted-foreground">
                             {p.type} · {p.number}
-                            <button className="ml-2 inline-flex items-center text-muted-foreground hover:text-primary" aria-label="Copy">
-                              <Copy className="size-3" />
-                            </button>
+
                           </p>
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-4 text-sm">{p.property}</td>
+                    <td className="px-4 py-4 text-sm text-muted-foreground">Configured account</td>
                     <td className="px-4 py-4 text-right">
-                      <p className="text-sm font-semibold">{p.matched}</p>
-                      {p.unmatched > 0 ? (
-                        <p className="text-xs text-warning">{p.unmatched} unmatched</p>
+                      <p className="text-sm font-semibold">{paybillTransactions.length - paybillUnmatched}</p>
+                      {paybillUnmatched > 0 ? (
+                        <p className="text-xs text-warning">{paybillUnmatched} unmatched</p>
                       ) : (
                         <p className="text-xs text-muted-foreground">All matched</p>
                       )}
                     </td>
-                    <td className="px-4 py-4 text-sm text-muted-foreground">{p.lastPayment}</td>
+                    <td className="px-4 py-4 text-sm text-muted-foreground">
+                      {paybillTransactions[0]?.created_at ? new Date(paybillTransactions[0].created_at).toLocaleString() : "No payments"}
+                    </td>
                     <td className="px-4 py-4">
-                      {p.unmatched === 0 ? (
+                      {paybillUnmatched === 0 ? (
                         <Badge className="bg-success/15 text-success">
                           <TrendingUp className="mr-1 size-3" /> Healthy
                         </Badge>
@@ -192,15 +191,12 @@ export default function PaybillPage() {
                       )}
                     </td>
                   </tr>
-                ))}
+                  )
+                })}
               </tbody>
             </table>
           </div>
-          <div className="mt-4 flex items-center justify-end gap-2">
-            <Button variant="outline" size="sm">
-              <RefreshCw className="mr-2 size-3.5" /> Re-sync from Daraja
-            </Button>
-          </div>
+
         </CardContent>
       </Card>
 

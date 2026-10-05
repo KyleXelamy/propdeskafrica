@@ -2,25 +2,15 @@ import type { Metadata } from "next"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Plus, Briefcase, Users, Building2, BarChart3, Mail } from "lucide-react"
+import { Briefcase, Users, Building2, BarChart3, Mail } from "lucide-react"
 
 export const metadata: Metadata = {
   title: "Company — I-Manage",
   description: "Run your agency or company: team, landlords, aggregate reporting.",
 }
 
-const team = [
-{ name: "Your name", role: "Owner", email: "you@example.com", lastSeen: "Just now" },
-    { name: "Your teammate", role: "Manager", email: "teammate@example.com", lastSeen: "2 hours ago" },
-  { name: "Samuel O.", role: "Agent", email: "samuel@siemax.co.ke", lastSeen: "Yesterday" },
-  { name: "Fatma A.", role: "Accountant", email: "fatma@siemax.co.ke", lastSeen: "3 days ago" },
-]
-
-const landlords = [
-  { name: "Highland Estates", units: 212, manager: "Wanjiku M.", share: "60%" },
-  { name: "Coast Living", units: 84, manager: "Samuel O.", share: "25%" },
-  { name: "Kibera Co-op", units: 245, manager: "Wanjiku M.", share: "15%" },
-]
+const team: Array<{ name: string; role: string; email: string; lastSeen: string }> = []
+const landlords: Array<{ name: string; units: number; manager: string; share: string }> = []
 
 export default function CompanyPage() {
   return (
@@ -32,18 +22,16 @@ export default function CompanyPage() {
             Run your agency — team, landlords, aggregate reporting, all in one place.
           </p>
         </div>
-        <Button className="bg-primary hover:bg-primary/90">
-          <Plus className="mr-2 size-4" /> Invite teammate
-        </Button>
+        <p className="text-sm text-muted-foreground">Company records are shown from your workspace database.</p>
       </header>
 
       {/* Top stats */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {[
-          { label: "Landlords under management", value: "3", icon: Building2, sub: "Highland, Coast, Kibera" },
-          { label: "Total units managed", value: "541", icon: BarChart3, sub: "Across 8 cities" },
-          { label: "Active team members", value: "4", icon: Users, sub: "1 owner · 1 mgr · 2 staff" },
-          { label: "Portfolio yield (Q3)", value: "6.4%", icon: Briefcase, sub: "+0.3 pts vs Q2" },
+          { label: "Landlords under management", value: landlords.length, icon: Building2, sub: "From managed_landlords" },
+          { label: "Total units managed", value: landlords.reduce((sum, landlord) => sum + landlord.units, 0), icon: BarChart3, sub: "From workspace records" },
+          { label: "Active team members", value: team.length, icon: Users, sub: "From team_members" },
+          { label: "Portfolio yield", value: "—", icon: Briefcase, sub: "No database calculation available" },
         ].map((s) => (
           <Card key={s.label}>
             <CardHeader className="pb-2">
