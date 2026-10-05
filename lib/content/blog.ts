@@ -24,9 +24,9 @@ export type BlogPost = {
 }
 
 export const authors: Record<string, Author> = {
-  brian: { name: "Brian Kiarie", role: "Founder, Siemax Ltd", initials: "BK" },
+  brian: { name: "Brian Kiarie", role: "Founder, CFO & Operations", initials: "BK" },
   wanjiku: { name: "Wanjiku Mwangi", role: "Head of Product", initials: "WM" },
-  team: { name: "The I-Manage team", role: "Siemax Ltd", initials: "IM" },
+  team: { name: "The I-Manage team", role: "Property operations", initials: "IM" },
 }
 
 export const blogPosts: BlogPost[] = [

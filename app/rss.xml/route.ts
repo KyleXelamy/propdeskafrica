@@ -1,7 +1,7 @@
 import { blogPosts } from "@/lib/content/blog"
 
 const SITE = "https://i-manage.app"
-const FEED_TITLE = "I-Manage by Siemax Ltd — Resources"
+const FEED_TITLE = "I-Manage — Resources"
 const FEED_DESCRIPTION = "Practical property management guides, product updates and operating notes for landlords across Africa."
 
 function escape(value: string) {
@@ -25,7 +25,7 @@ export async function GET() {
     .filter((post) => post.slug && post.title && post.excerpt)
     .map((post) => {
       const url = `${SITE}/resources/${encodeURIComponent(post.slug)}`
-      const author = post.author?.name || "I-Manage by Siemax Ltd"
+      const author = post.author?.name || "I-Manage"
       return `<item>
         <title>${escape(post.title)}</title>
         <link>${url}</link>
@@ -46,7 +46,7 @@ export async function GET() {
     <atom:link href="${SITE}/rss.xml" rel="self" type="application/rss+xml" />
     <description>${escape(FEED_DESCRIPTION)}</description>
     <language>en-GB</language>
-    <copyright>© ${new Date().getUTCFullYear()} Siemax Ltd</copyright>
+    <copyright>© ${new Date().getUTCFullYear()} I-Manage</copyright>
     <ttl>60</ttl>
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
     ${items}

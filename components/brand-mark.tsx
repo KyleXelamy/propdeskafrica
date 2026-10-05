@@ -4,8 +4,8 @@
  * Inline SVG so it can be themed via currentColor and used at any size.
  * Two variants:
  *   - "mark"   — just the I-in-square icon
- *   - "wordmark" — the full "I-Manage" word with a small "by Siemax Ltd"
- *     subtitle underneath. Use on the landing nav and the portal header.
+ *   - "wordmark" — the full "I-Manage" word with an optional descriptor
+ *     underneath. Use on the landing nav and the portal header.
  */
 import Link from "next/link"
 

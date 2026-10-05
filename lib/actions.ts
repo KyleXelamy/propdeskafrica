@@ -81,7 +81,7 @@ export async function signUp(_prevState: any, formData: FormData) {
 
     return {
       success: true,
-      message: "Check your email to verify your account before signing in.",
+      message: "Check your email. Once you confirm, we’ll take you straight into your dashboard.",
     }
   } catch (error) {
     console.error("Sign up error:", error)
