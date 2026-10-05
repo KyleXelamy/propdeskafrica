@@ -2,6 +2,7 @@ import type React from "react"
 import { headers } from "next/headers"
 import { DashboardSidebar } from "@/components/dashboard-sidebar"
 import { NotificationsBell } from "@/components/notifications-bell"
+import { PwaInstallPrompt } from "@/components/pwa-install-prompt"
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 
@@ -41,7 +42,7 @@ export default async function DashboardLayout({
   // Pull avatar/name in the same pass — sidebar needs them on every page.
   const { data: profile } = await supabase
     .from("user_profiles")
-    .select("full_name, avatar_url")
+    .select("full_name, company_name, avatar_url")
     .eq("user_id", user.id)
     .maybeSingle()
 
@@ -50,12 +51,14 @@ export default async function DashboardLayout({
       <DashboardSidebar
         userEmail={user.email || "user@example.com"}
         userName={(profile as any)?.full_name || undefined}
+        companyName={(profile as any)?.company_name || null}
         avatarUrl={(profile as any)?.avatar_url || null}
       />
 
       <div className="flex flex-col flex-1 min-w-0 md:ml-64">
         {/* Top header — notification bell */}
-        <header className="sticky top-0 z-30 flex items-center justify-end gap-2 h-14 px-3 sm:px-4 md:px-6 bg-background/80 backdrop-blur border-b">
+        <header className="sticky top-0 z-30 flex h-14 items-center justify-end gap-3 border-b bg-background/80 px-3 backdrop-blur sm:px-4 md:px-6">
+          <PwaInstallPrompt />
           <NotificationsBell />
         </header>
 

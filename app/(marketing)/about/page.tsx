@@ -5,7 +5,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 
 export const metadata: Metadata = {
-  title: "About — I-Manage by Siemax Ltd",
+  title: "About — I-Manage",
   description:
     "We're building the calm operating system for ambitious landlords and property teams across Africa. Meet the team behind I-Manage.",
 }
@@ -82,19 +82,33 @@ export default function AboutPage() {
           </div>
           <div className="space-y-6 text-lg leading-8 text-muted-foreground">
             <p>
-              I-Manage started as a spreadsheet our founder Brian kept while managing his own rental
-              properties. It worked — but it didn't scale, it didn't remind him about lease renewals,
-              and it definitely didn't collect rent.
+              I-Manage began with a simple question: why should running a property portfolio still feel
+              like chasing spreadsheets and messages? We are building the clearer operating layer that
+              owners and teams can rely on every day.
             </p>
             <p>
-              In 2024 Brian teamed up with engineers and product folks across East Africa to turn that
-              notebook into a real product. Today, landlords in Kenya, Uganda, Tanzania and beyond run
-              thousands of units on I-Manage.
+              The product is founded by Brian Kiarie and Esther Wangari, with a focus on practical tools,
+              local payment habits, and respectful service for property teams.
             </p>
-            <p>
-              We're backed by Siemax Ltd, an independent software house that believes good property
-              software should be affordable, locally relevant, and a pleasure to use.
-            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Founders */}
+      <section className="border-y border-border bg-card py-20 lg:py-24">
+        <div className="container-x">
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">The people behind I-Manage</p>
+          <div className="mt-8 grid gap-4 sm:grid-cols-2">
+            <article className="rounded-2xl border border-border bg-background p-6 sm:p-8">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Founder · CFO &amp; Operations</p>
+              <h2 className="mt-3 text-2xl font-medium tracking-[-0.03em]">Brian Kiarie</h2>
+              <p className="mt-3 text-sm leading-6 text-muted-foreground">Leads the operating model, financial discipline and day-to-day execution behind the product.</p>
+            </article>
+            <article className="rounded-2xl border border-border bg-background p-6 sm:p-8">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Founder</p>
+              <h2 className="mt-3 text-2xl font-medium tracking-[-0.03em]">Esther Wangari</h2>
+              <p className="mt-3 text-sm leading-6 text-muted-foreground">Helps shape the product, customer experience and direction of the platform.</p>
+            </article>
           </div>
         </div>
       </section>
