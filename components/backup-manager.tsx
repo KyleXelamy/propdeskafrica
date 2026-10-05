@@ -9,7 +9,7 @@ import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Download, Upload, Trash2, RefreshCw, FileJson, CheckCircle2, XCircle, AlertTriangle, Database, Clock, HardDrive, FileArchive } from "lucide-react"
+import { Download, Upload, Trash2, RefreshCw, FileJson, CheckCircle2, XCircle, AlertTriangle, Database, Clock, HardDrive, FileArchive, FileText, Save } from "lucide-react"
 
 type Backup = {
   id: string
@@ -58,6 +58,7 @@ export function BackupManager({ initialBackups, appVersion }: { initialBackups: 
   const [importMode, setImportMode] = useState<"skip" | "replace" | "merge">("skip")
   const [autoBackup, setAutoBackup] = useState(false)
   const [autoFrequency, setAutoFrequency] = useState<"daily" | "weekly" | "monthly">("weekly")
+  const [autoSaveStatus, setAutoSaveStatus] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   function createBackup() {
@@ -88,18 +89,25 @@ export function BackupManager({ initialBackups, appVersion }: { initialBackups: 
   }
 
   async function downloadBackup(b: Backup) {
-    if (b.storage_kind === "storage") {
-      alert("Backup is in object storage — coming in a follow-up release.")
-      return
-    }
     const res = await fetch(`/api/backup/${b.id}`)
     if (!res.ok) {
-      alert("Failed to fetch backup")
+      const err = await res.json().catch(() => ({}))
+      alert(`Failed to fetch backup: ${err.error ?? res.statusText}`)
       return
     }
-    const { backup } = await res.json()
+    const data = await res.json()
+    if (data.signed_url) {
+      // Object-storage path: redirect via signed URL
+      const a = document.createElement("a")
+      a.href = data.signed_url
+      a.download = `${b.label.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}.json`
+      a.rel = "noopener"
+      a.click()
+      return
+    }
+    const backup = data.backup
     if (!backup?.payload) {
-      alert("Backup payload unavailable")
+      alert("Backup payload unavailable. Set SUPABASE_SERVICE_ROLE_KEY in production to enable large backup downloads.")
       return
     }
     const blob = new Blob([JSON.stringify(backup.payload, null, 2)], { type: "application/json" })
@@ -318,9 +326,36 @@ export function BackupManager({ initialBackups, appVersion }: { initialBackups: 
                   <SelectItem value="monthly">Monthly</SelectItem>
                 </SelectContent>
               </Select>
+              <div className="flex flex-wrap items-center gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={async () => {
+                    setAutoSaveStatus(null)
+                    const res = await fetch("/api/backup/auto", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ frequency: autoFrequency }),
+                    })
+                    const data = await res.json()
+                    if (!res.ok) {
+                      setAutoSaveStatus(`Failed: ${data.error ?? res.statusText}`)
+                      return
+                    }
+                    setAutoSaveStatus(`Saved settings. Next run will create backup within ${autoFrequency === "daily" ? "24h" : autoFrequency === "weekly" ? "7d" : "30d"}.`)
+                    const list = await fetch("/api/backup/list").then((r) => r.json())
+                    setBackups(list.backups ?? [])
+                  }}
+                >
+                  <Save className="mr-1 size-3" />
+                  Save schedule
+                </Button>
+                {autoSaveStatus && <span className="text-xs text-muted-foreground">{autoSaveStatus}</span>}
+              </div>
               <p className="text-xs text-muted-foreground">
                 <AlertTriangle className="mr-1 inline size-3" />
-                Scheduled backups are recorded as a future capability. For now, run the migration runner with a cron to enable.
+                Trigger <code className="rounded bg-muted px-1">POST /api/backup/auto</code> from Vercel Cron / GitHub Actions on your cadence. Set
+                <code className="ml-1 rounded bg-muted px-1">BACKUP_CRON_SECRET</code> env var to gate the endpoint.
               </p>
             </div>
           )}
@@ -377,15 +412,21 @@ export function BackupManager({ initialBackups, appVersion }: { initialBackups: 
       <Card>
         <CardHeader>
           <CardTitle>What gets backed up</CardTitle>
-          <CardDescription>The exact list of tables included in a full backup.</CardDescription>
+          <CardDescription>The exact list of tables included in a full backup. Click any table for a CSV download.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 gap-2 text-sm sm:grid-cols-3">
-            {Object.keys(KIND_TABLES).map((k) => (
-              <div key={k} className="flex items-center gap-2">
-                <Database className="size-3 text-muted-foreground" />
-                <span className="capitalize">{k}</span>
-              </div>
+            {(["properties", "tenants", "rent_payments", "expenses", "maintenance_requests", "documents", "contacts", "damages", "quotations"] as const).map((t) => (
+              <a
+                key={t}
+                href={`/api/backup/csv/${t}`}
+                className="flex items-center gap-2 rounded-md border px-2 py-1.5 text-xs transition hover:border-accent hover:bg-accent/10"
+                download
+              >
+                <FileText className="size-3 text-muted-foreground" />
+                <span className="capitalize">{t.replace(/_/g, " ")}</span>
+                <FileText className="ml-auto size-3 text-muted-foreground" />
+              </a>
             ))}
           </div>
           <Separator className="my-4" />

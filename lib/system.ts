@@ -52,7 +52,7 @@ export type BackupTable = (typeof BACKUP_TABLES)[number]
  * the `system_version.schema_version` row in the DB. When lower, the
  * patch runner knows there are migrations to apply.
  */
-export const CURRENT_SCHEMA_VERSION = 11
+export const CURRENT_SCHEMA_VERSION = 13
 
 export const APP_VERSION = "5.0.0"
 export const APP_NAME = "I-Manage"
@@ -86,9 +86,11 @@ export const PATCH_LOG: PatchDescriptor[] = [
   { id: "p_2024_07_001", description: "Maintenance reminders", sql: "07-maintenance-reminders.sql", kind: "schema" },
   { id: "p_2024_08_001", description: "Tenant portal (deprecated — superseded by tenant-records)", sql: "08-tenant-portal.sql", kind: "schema", reversible: true },
   { id: "p_2024_09_001", description: "M-Pesa STK Push + transaction log", sql: "09-mpesa.sql", kind: "schema" },
-  { id: "p_2026_10_001", description: "Holy grail: paybills, C2B, quotations, damages, contacts, companies, reconciliation", sql: "10-holy-grail.sql", kind: "schema" },
+  { id: "p_2026_10_001", description: "Holy grail: paybills, C2B, quotations, damages, companies, reconciliation", sql: "10-holy-grail.sql", kind: "schema" },
   { id: "p_2026_10_002", description: "Backup + patch system: backups, backup_runs, restore_runs, system_version, patches", sql: "11-backup-patch.sql", kind: "schema" },
   { id: "p_2026_10_003", description: "Seed system_health() helper", fn: "init-views", kind: "config" },
+  { id: "p_2026_10_004", description: "Auto-backup: per-user schedule + prune_old_backups() function", sql: "12-auto-backup.sql", kind: "config" },
+  { id: "p_2026_10_005", description: "Atomic bump_paybill_counters() RPC for C2B confirmation", sql: "13-paybill-counters.sql", kind: "config" },
 ]
 
 export function describePatches(): Array<{ id: string; description: string; kind: string }> {

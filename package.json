@@ -23,7 +23,9 @@
     "lint": "eslint .",
     "start": "next start",
     "db:migrate": "tsx lib/db/migrate.ts",
-    "db:ping": "tsx -e \"import('./lib/db/neon').then(m => m.pingDb()).then(r => console.log(JSON.stringify(r)))\""
+    "db:ping": "tsx -e \"import('./lib/db/neon').then(m => m.pingDb()).then(r => console.log(JSON.stringify(r)))\"",
+    "prebuild": "node scripts/check-use-client.js",
+    "check:client": "node scripts/check-use-client.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

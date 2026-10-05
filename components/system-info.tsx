@@ -5,13 +5,22 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { RefreshCw, CheckCircle2, Package, ShieldCheck, AlertCircle, Loader2, GitBranch } from "lucide-react"
+import { RefreshCw, CheckCircle2, Package, ShieldCheck, AlertCircle, Loader2, GitBranch, Activity } from "lucide-react"
 
 type HealthData = {
   ok: boolean
   app: string
   version: string
   db: "neon" | "supabase" | "unconfigured"
+  timestamp: string
+}
+
+type PingData = {
+  ok: boolean
+  db: string
+  latency_ms: number
+  schema_version: string
+  db_error?: string
   timestamp: string
 }
 
@@ -30,6 +39,7 @@ type PatchCheck = {
 
 export function SystemInfo({ appVersion, schemaVersion, patches }: { appVersion: string; schemaVersion: number; patches: PatchInfo[] }) {
   const [health, setHealth] = useState<HealthData | null>(null)
+  const [ping, setPing] = useState<PingData | null>(null)
   const [patchCheck, setPatchCheck] = useState<PatchCheck | null>(null)
   const [isRunning, startRunning] = useTransition()
   const [runResult, setRunResult] = useState<string | null>(null)
@@ -37,11 +47,13 @@ export function SystemInfo({ appVersion, schemaVersion, patches }: { appVersion:
   const [showSecret, setShowSecret] = useState(false)
 
   async function refresh() {
-    const [h, pc] = await Promise.all([
-      fetch("/api/system/health").then((r) => r.json()),
-      fetch("/api/system/patches/check").then((r) => r.json()),
+    const [h, p, pc] = await Promise.all([
+      fetch("/api/system/health").then((r) => r.json()).catch(() => null),
+      fetch("/api/system/ping").then((r) => r.json()).catch(() => null),
+      fetch("/api/system/patches/check").then((r) => r.json()).catch(() => null),
     ])
     setHealth(h)
+    setPing(p)
     setPatchCheck(pc)
   }
 
@@ -67,6 +79,26 @@ export function SystemInfo({ appVersion, schemaVersion, patches }: { appVersion:
       const skipped = data.results?.filter((r: any) => r.status === "skipped").length ?? 0
       const failed = data.results?.filter((r: any) => r.status === "failed").length ?? 0
       setRunResult(`Applied ${ok_count}, skipped ${skipped}, failed ${failed}.`)
+      refresh()
+    })
+  }
+
+  function rollbackPatch(patchId: string) {
+    if (!confirm(`Roll back ${patchId}? This will decrement the schema version and remove the patch record.`)) return
+    startRunning(async () => {
+      const headers: Record<string, string> = { "Content-Type": "application/json" }
+      if (secret) headers["x-migration-secret"] = secret
+      const res = await fetch("/api/migrations/rollback", {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ patch_id: patchId, confirm: true }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setRunResult(`Rollback failed: ${data.error ?? res.statusText}`)
+        return
+      }
+      setRunResult(`Rollback of ${patchId} complete. ${data.note}`)
       refresh()
     })
   }
@@ -116,6 +148,13 @@ export function SystemInfo({ appVersion, schemaVersion, patches }: { appVersion:
                 </Badge>
               )}
             </div>
+            {ping && (
+              <p className="mt-1 text-xs text-muted-foreground">
+                <Activity className="mr-1 inline size-3" />
+                DB {ping.latency_ms}ms
+                {ping.db_error ? ` • ${ping.db_error}` : ""}
+              </p>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -215,6 +254,17 @@ export function SystemInfo({ appVersion, schemaVersion, patches }: { appVersion:
                       <Badge variant="secondary">pending</Badge>
                     ) : (
                       <Badge className="bg-emerald-500/10 text-emerald-700">applied</Badge>
+                    )}
+                    {!pending && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => rollbackPatch(p.id)}
+                        disabled={isRunning}
+                        className="h-7 px-2 text-xs"
+                      >
+                        Roll back
+                      </Button>
                     )}
                   </div>
                 </div>
