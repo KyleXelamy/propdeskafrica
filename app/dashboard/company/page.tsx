@@ -10,8 +10,8 @@ export const metadata: Metadata = {
 }
 
 const team = [
-  { name: "Brian Kiarie", role: "Owner", email: "brian@siemax.co.ke", lastSeen: "Just now" },
-  { name: "Wanjiku M.", role: "Manager", email: "wanjiku@siemax.co.ke", lastSeen: "2 hours ago" },
+{ name: "Your name", role: "Owner", email: "you@example.com", lastSeen: "Just now" },
+    { name: "Your teammate", role: "Manager", email: "teammate@example.com", lastSeen: "2 hours ago" },
   { name: "Samuel O.", role: "Agent", email: "samuel@siemax.co.ke", lastSeen: "Yesterday" },
   { name: "Fatma A.", role: "Accountant", email: "fatma@siemax.co.ke", lastSeen: "3 days ago" },
 ]

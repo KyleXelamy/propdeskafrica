@@ -10,29 +10,20 @@ function safeNextPath(value: string | null): string {
 /**
  * Email-verification and OAuth callback. Exchanges the `code` query
  * parameter for a session and redirects appropriately:
- *   - If this looks like an email-verification (no explicit `next`):
- *       → /auth/login?verified=true   (so the user sees a friendly notice)
- *   - Otherwise (OAuth, password recovery, magic links, etc.):
- *       → the URL passed in `next`.
+ *   - Email verification exchanges the code and sends the user directly to the dashboard.
+ *   - Other flows use the safe `next` path when provided.
  */
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get("code")
   const next = requestUrl.searchParams.get("next")
-  // Heuristic: Supabase's email verification link has no `next` param and
-  // its redirectTo points at /auth/callback. Treat that as a verification.
-  const isVerification = !next
-
+  // Supabase's confirmation link returns a one-time code. Exchanging it here
+  // creates the session cookie, so verified users arrive already signed in.
   if (code) {
     const supabase = await createClient()
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
-      if (isVerification) {
-        return NextResponse.redirect(
-          new URL("/auth/login?verified=true", requestUrl.origin),
-        )
-      }
-      return NextResponse.redirect(new URL(safeNextPath(next), requestUrl.origin))
+      return NextResponse.redirect(new URL(next ? safeNextPath(next) : "/dashboard", requestUrl.origin))
     }
   }
 

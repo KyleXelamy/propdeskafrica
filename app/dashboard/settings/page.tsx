@@ -440,9 +440,7 @@ export default async function SettingsPage() {
 
       <footer className="pt-6 mt-8 border-t border-border text-center text-[11px] text-muted-foreground space-y-1">
         <p>
-          <span className="font-semibold text-foreground">I-Manage</span>
-          <span className="mx-1.5 opacity-60">·</span>
-          by Siemax Ltd
+  <span className="font-semibold text-foreground">I-Manage</span>
           <span className="mx-1.5 opacity-60">·</span>
           © {new Date().getFullYear()}
         </p>

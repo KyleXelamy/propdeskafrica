@@ -18,15 +18,15 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "I-Manage — by Siemax Ltd",
+    default: "I-Manage — Property operations",
     template: "%s | I-Manage",
   },
   description:
-    "I-Manage by Siemax Ltd — the operating system for landlords and property agencies. Track properties, tenants, rent, expenses, maintenance, quotations and documents in one place.",
+    "I-Manage — the operating system for landlords and property agencies. Track properties, tenants, rent, expenses, maintenance, quotations and documents in one place.",
   applicationName: "I-Manage",
   authors: [{ name: "Brian Kiarie", url: "https://www.linkedin.com/in/brian-kiarie-00b3a3391" }],
   creator: "Brian Kiarie",
-  publisher: "Siemax Ltd",
+  publisher: "I-Manage",
   keywords: [
     "property management",
     "rental management",
@@ -34,8 +34,7 @@ export const metadata: Metadata = {
     "property management agency",
     "paybill integration",
     "I-Manage",
-    "Siemax",
-  ],
+    ],
   generator: "Next.js",
   openGraph: {
     type: "website",
@@ -45,7 +44,7 @@ export const metadata: Metadata = {
       "Run your rental portfolio with clarity. M-Pesa paybill + STK Push rent collection, tenant records, quotations, maintenance workflows and live financial reports.",
     siteName: "I-Manage",
     locale: "en_US",
-    images: [{ url: "/og-default.png", width: 1200, height: 630, alt: "I-Manage — by Siemax Ltd" }],
+    images: [{ url: "/og-default.png", width: 1200, height: 630, alt: "I-Manage — Property operations" }],
   },
   twitter: {
     card: "summary_large_image",
