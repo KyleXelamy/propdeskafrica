@@ -37,7 +37,12 @@ export default async function SettingsPage() {
     .eq("user_id", user.id)
     .maybeSingle()
 
-  const { data: company } = await supabase.from("companies").select("name").eq("owner_id", user.id).maybeSingle()
+  const { data: company } = await supabase
+    .from("companies")
+    .select("name")
+    .eq("owner_id", user.id)
+    .maybeSingle()
+  const workspaceName = company?.name || profile?.company_name || ""
   const notificationPreferences = (profile?.notification_preferences as Record<string, boolean> | null) || {}
 
   const [propertiesCount, tenantsCount, paymentsCount] = await Promise.all([
@@ -134,7 +139,7 @@ export default async function SettingsPage() {
                     <Input
                       id="company_name"
                       name="company_name"
-                      defaultValue={company?.name || profile?.company_name || ""}
+                      defaultValue={workspaceName}
                       placeholder="e.g. Wangari Properties"
                       required
                     />
