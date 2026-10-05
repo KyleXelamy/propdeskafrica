@@ -1,5 +1,3 @@
-"use client"
-
 import Link from "next/link"
 import {
   ArrowRight, ArrowUpRight, BarChart3, Banknote, Building2, Check, ChevronRight, CircleDollarSign,
