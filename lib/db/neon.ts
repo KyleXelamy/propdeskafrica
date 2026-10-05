@@ -21,7 +21,9 @@ import { neon, neonConfig, type NeonQueryFunction } from "@neondatabase/serverle
 let cachedSql: NeonQueryFunction<false, false> | null = null
 
 export function getDbUrl(): string | null {
-  return process.env.DATABASE_URL || null
+  // Vercel’s managed Postgres integration exposes POSTGRES_URL rather than
+  // DATABASE_URL. Keep DATABASE_URL supported for local and legacy installs.
+  return process.env.DATABASE_URL || process.env.POSTGRES_URL || process.env.POSTGRES_PRISMA_URL || null
 }
 
 export function neonConfigured(): boolean {

@@ -67,8 +67,14 @@ export function SystemInfo({ appVersion, schemaVersion, patches }: { appVersion:
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({}),
       })
+      const data = await res.json().catch(() => null)
       if (res.ok) {
-        setRunResult("Your workspace is being kept up to date automatically.")
+        const failed = data?.results?.filter((r: any) => r.status === "failed") ?? []
+        setRunResult(
+          failed.length
+            ? `Workspace setup needs attention. ${failed[0]?.error ?? "Please try again."}`
+            : "Your workspace is being kept up to date automatically.",
+        )
         await refresh()
       }
     }
@@ -90,8 +96,14 @@ export function SystemInfo({ appVersion, schemaVersion, patches }: { appVersion:
       }
       const ok_count = data.results?.filter((r: any) => r.status === "applied").length ?? 0
       const skipped = data.results?.filter((r: any) => r.status === "skipped").length ?? 0
-      const failed = data.results?.filter((r: any) => r.status === "failed").length ?? 0
-      setRunResult(`Applied ${ok_count}, skipped ${skipped}, failed ${failed}.`)
+      const failedResults = data.results?.filter((r: any) => r.status === "failed") ?? []
+      const failed = failedResults.length
+      const firstFailure = failedResults[0]?.error
+      setRunResult(
+        failed > 0
+          ? `Setup could not finish (${failed} item${failed === 1 ? "" : "s"}). ${firstFailure ?? "Please try again."}`
+          : `Workspace is up to date. ${ok_count} update${ok_count === 1 ? "" : "s"} applied.`,
+      )
       refresh()
     })
   }
