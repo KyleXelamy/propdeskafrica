@@ -577,6 +577,7 @@ export type Template = {
   downloads: number
   format: "PDF" | "DOCX" | "CSV"
   region: string
+  downloadPath?: string
 }
 
 export const templates: Template[] = [

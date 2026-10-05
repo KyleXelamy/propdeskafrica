@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Loader2, CheckCircle2 } from "lucide-react"
+import { BRAND } from "@/lib/brand"
 
 type FormState = { status: "idle" | "success" | "error"; message?: string }
 
@@ -31,9 +32,10 @@ export function ContactForm() {
         }
         setState({
           status: "success",
-          message: body?.message || "Thanks — we'll be in touch within one business day.",
+          message: body?.message || `Your email app is ready. Press Send to contact ${BRAND.company}.`,
         })
         form.reset()
+        if (body?.mailto) window.location.assign(body.mailto)
       } catch (err) {
         setState({ status: "error", message: "Network error. Please try again." })
       }

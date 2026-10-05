@@ -1,0 +1,2 @@
+full_name,first_name,last_name,email,phone,national_id,property_name,lease_start_date,lease_end_date,monthly_rent,deposit_amount,status
+Example Tenant,Example,Tenant,tenant@example.com,0700000000,,Example Unit,2026-01-01,2026-12-31,35000,70000,active

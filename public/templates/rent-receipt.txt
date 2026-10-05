@@ -1,0 +1,12 @@
+RENT PAYMENT RECEIPT
+
+Receipt no.: __________________ Date received: __________
+Received from: ______________________________
+Property / unit: ____________________________
+Rent period: ________________________________
+Amount received (KES): ______________________
+Payment method: Cash / Bank / M-Pesa / Other
+Reference: __________________________________
+
+Received by: __________________ Signature: __________
+This receipt confirms the amount recorded above only.

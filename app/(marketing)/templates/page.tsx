@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { Download, Search } from "lucide-react"
 import { templates } from "@/lib/content/marketing"
+import { templateDownloadPath } from "@/lib/brand"
 
 export const metadata: Metadata = {
   title: "Templates — I-Manage by Siemax Ltd",
@@ -27,8 +28,7 @@ export default function TemplatesPage() {
             Free downloads. Real paperwork.
           </h1>
           <p className="mt-6 max-w-xl text-lg leading-8 text-primary-foreground/70">
-            Lease agreements, inspection checklists, notices and CSV templates. Reviewed by lawyers,
-            used by thousands of landlords.
+            Lease agreements, inspection checklists, notices and CSV templates prepared for East African property teams. Adapt them to your situation before use.
           </p>
         </div>
       </section>
@@ -81,12 +81,13 @@ export default function TemplatesPage() {
                       <span className="text-xs text-muted-foreground">
                         {t.downloads.toLocaleString()} downloads
                       </span>
-                      <button
-                        type="button"
+                      <a
+                        href={t.downloadPath ?? templateDownloadPath(t.slug)}
+                        download
                         className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
                       >
                         <Download className="size-3.5" /> Download
-                      </button>
+                      </a>
                     </div>
                   </li>
                 ))}
