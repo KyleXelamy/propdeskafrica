@@ -26,8 +26,8 @@ export async function createClient() {
   const cookieStore = await cookies()
 
   if (!isSupabaseConfigured) {
-    console.warn("Supabase environment variables are not set. Using dummy client.")
-    return dummyClient(cookieStore) as any
+    console.error("[supabase] Missing server environment variables")
+    return unavailableClient() as any
   }
 
   return createServerClient(
@@ -53,17 +53,18 @@ export async function createClient() {
   )
 }
 
-function dummyClient(cookieStore: any) {
+function unavailableClient() {
+  const unavailable = { message: "Supabase is not configured" }
   return {
     auth: {
-      getUser: () => Promise.resolve({ data: { user: null }, error: null }),
-      getSession: () => Promise.resolve({ data: { session: null }, error: null }),
+      getUser: () => Promise.resolve({ data: { user: null }, error: unavailable }),
+      getSession: () => Promise.resolve({ data: { session: null }, error: unavailable }),
     },
     from: () => ({
-      select: () => ({ eq: () => Promise.resolve({ data: [], error: null }) }),
-      insert: () => Promise.resolve({ data: null, error: null }),
-      update: () => ({ eq: () => Promise.resolve({ data: null, error: null }) }),
-      delete: () => ({ eq: () => Promise.resolve({ error: null }) }),
+      select: () => ({ eq: () => Promise.resolve({ data: null, error: unavailable }) }),
+      insert: () => Promise.resolve({ data: null, error: unavailable }),
+      update: () => ({ eq: () => Promise.resolve({ data: null, error: unavailable }) }),
+      delete: () => ({ eq: () => Promise.resolve({ error: unavailable }) }),
     }),
   }
 }

@@ -10,8 +10,8 @@ export const isSupabaseConfigured =
 // Browser client for client components. Cookies are handled by @supabase/ssr under the hood.
 export function createClient() {
   if (!isSupabaseConfigured) {
-    console.warn("Supabase environment variables are not set. Using dummy client.")
-    return dummyClient() as any
+    console.error("[supabase] Missing browser environment variables")
+    return unavailableClient() as any
   }
   return createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -24,24 +24,25 @@ export function createClient() {
 export const supabase = createClient()
 
 // ---- Dummy client used when env vars are missing during local dev ----
-function dummyClient() {
+function unavailableClient() {
+  const unavailable = { message: "Supabase is not configured" }
   return {
     auth: {
-      getUser: () => Promise.resolve({ data: { user: null }, error: null }),
-      getSession: () => Promise.resolve({ data: { session: null }, error: null }),
+      getUser: () => Promise.resolve({ data: { user: null }, error: unavailable }),
+      getSession: () => Promise.resolve({ data: { session: null }, error: unavailable }),
       signInWithPassword: () =>
         Promise.resolve({ data: null, error: { message: "Supabase not configured" } }),
       signUp: () => Promise.resolve({ data: null, error: { message: "Supabase not configured" } }),
-      signOut: () => Promise.resolve({ error: null }),
+      signOut: () => Promise.resolve({ error: unavailable }),
       onAuthStateChange: () => ({
         data: { subscription: { unsubscribe: () => {} } },
       }),
     },
     from: () => ({
-      select: () => ({ eq: () => Promise.resolve({ data: [], error: null }) }),
-      insert: () => Promise.resolve({ data: null, error: null }),
-      update: () => ({ eq: () => Promise.resolve({ data: null, error: null }) }),
-      delete: () => ({ eq: () => Promise.resolve({ error: null }) }),
+      select: () => ({ eq: () => Promise.resolve({ data: null, error: unavailable }) }),
+      insert: () => Promise.resolve({ data: null, error: unavailable }),
+      update: () => ({ eq: () => Promise.resolve({ data: null, error: unavailable }) }),
+      delete: () => ({ eq: () => Promise.resolve({ error: unavailable }) }),
     }),
     storage: {
       from: () => ({

@@ -1,4 +1,4 @@
-import { withAuth, successResponse } from "@/lib/api"
+import { withAuth, successResponse, errorResponse, isMissingTableError } from "@/lib/api"
 
 /**
  * GET /api/dashboard/leases
@@ -29,7 +29,10 @@ export const GET = withAuth(async (_req, { supabase, userId }) => {
     .lte("lease_end_date", cutoff.toISOString().slice(0, 10))
     .order("lease_end_date", { ascending: true })
 
-  if (error) return successResponse([]) // never 500 on this — UI degrades gracefully
+  if (error) {
+    if (isMissingTableError(error)) return successResponse([])
+    return errorResponse(error.message, 500)
+  }
 
   const rows = (data || []).map((t: any) => {
     const end = new Date(t.lease_end_date)
