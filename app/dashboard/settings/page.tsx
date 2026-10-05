@@ -17,7 +17,6 @@ import {
   updateNotifications,
   signOutAllDevices,
 } from "@/lib/actions/settings"
-import { AvatarUpload } from "@/components/avatar-upload"
 
 export const dynamic = "force-dynamic"
 
@@ -37,6 +36,9 @@ export default async function SettingsPage() {
     .select("*")
     .eq("user_id", user.id)
     .maybeSingle()
+
+  const { data: company } = await supabase.from("companies").select("name").eq("owner_id", user.id).maybeSingle()
+  const notificationPreferences = (profile?.notification_preferences as Record<string, boolean> | null) || {}
 
   const [propertiesCount, tenantsCount, paymentsCount] = await Promise.all([
     supabase.from("properties").select("id", { count: "exact", head: true }).eq("user_id", user.id),
@@ -89,19 +91,6 @@ export default async function SettingsPage() {
         <TabsContent value="profile" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Profile Photo</CardTitle>
-              <CardDescription>Square images work best. Max 5 MB.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <AvatarUpload
-                currentUrl={profile?.avatar_url || null}
-                fallbackName={profile?.full_name || user.email || "User"}
-              />
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
               <CardTitle>Profile Information</CardTitle>
               <CardDescription>Update your personal information and contact details</CardDescription>
             </CardHeader>
@@ -145,8 +134,9 @@ export default async function SettingsPage() {
                     <Input
                       id="company_name"
                       name="company_name"
-                      defaultValue={profile?.company_name || ""}
+                      defaultValue={company?.name || profile?.company_name || ""}
                       placeholder="e.g. Wangari Properties"
+                      required
                     />
                     <p className="text-xs text-muted-foreground">This name appears in your dashboard sidebar and workspace.</p>
                   </div>
@@ -274,7 +264,7 @@ export default async function SettingsPage() {
                       <h4 className="font-medium">Rent Payment Alerts</h4>
                       <p className="text-sm text-muted-foreground">Get notified when rent payments are due</p>
                     </div>
-                    <Switch name="rent_alerts" defaultChecked />
+                    <Switch name="rent_alerts" defaultChecked={notificationPreferences.rent_alerts ?? true} />
                   </div>
 
                   <div className="flex items-center justify-between p-4 border rounded-lg gap-3">
@@ -282,7 +272,7 @@ export default async function SettingsPage() {
                       <h4 className="font-medium">Maintenance Requests</h4>
                       <p className="text-sm text-muted-foreground">New maintenance requests from tenants</p>
                     </div>
-                    <Switch name="maintenance_alerts" defaultChecked />
+                    <Switch name="maintenance_alerts" defaultChecked={notificationPreferences.maintenance_alerts ?? true} />
                   </div>
 
                   <div className="flex items-center justify-between p-4 border rounded-lg gap-3">
@@ -290,7 +280,7 @@ export default async function SettingsPage() {
                       <h4 className="font-medium">Lease Expiry Warnings</h4>
                       <p className="text-sm text-muted-foreground">30 days before lease expires</p>
                     </div>
-                    <Switch name="lease_alerts" defaultChecked />
+                    <Switch name="lease_alerts" defaultChecked={notificationPreferences.lease_alerts ?? true} />
                   </div>
 
                   <div className="flex items-center justify-between p-4 border rounded-lg gap-3">
@@ -298,7 +288,7 @@ export default async function SettingsPage() {
                       <h4 className="font-medium">Financial Reports</h4>
                       <p className="text-sm text-muted-foreground">Monthly financial summaries</p>
                     </div>
-                    <Switch name="financial_reports" />
+                    <Switch name="financial_reports" defaultChecked={notificationPreferences.financial_reports ?? false} />
                   </div>
                 </div>
 

@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { createClient } from "@/lib/supabase/client"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -15,49 +16,6 @@ type Rule = {
   description: string
 }
 
-const seed: Rule[] = [
-  {
-    id: "r-1",
-    name: "Account reference (UUID or short code)",
-    match_by: "account_ref",
-    priority: 100,
-    active: true,
-    description: "Match by the BillRefNumber Daraja sends — usually a tenant UUID or short code.",
-  },
-  {
-    id: "r-2",
-    name: "Phone number match",
-    match_by: "phone",
-    priority: 80,
-    active: true,
-    description: "Match the customer MSISDN to a tenant's stored phone number (last 9 digits).",
-  },
-  {
-    id: "r-3",
-    name: "Amount vs tenant expected rent",
-    match_by: "amount_tenant",
-    priority: 60,
-    active: true,
-    description: "Match the payment amount against each tenant's expected monthly rent (±2% / ±50 KES).",
-  },
-  {
-    id: "r-4",
-    name: "Amount vs property rent (single tenant)",
-    match_by: "amount_property",
-    priority: 40,
-    active: true,
-    description: "If a property has exactly one active tenant and the amount matches the property rent.",
-  },
-  {
-    id: "r-5",
-    name: "Closest amount heuristic",
-    match_by: "closest_amount",
-    priority: 20,
-    active: false,
-    description: "Last-resort: pick the tenant whose expected rent is closest to the payment (>85% closeness).",
-  },
-]
-
 const methodLabel: Record<Rule["match_by"], string> = {
   account_ref: "Account ref",
   phone: "Phone",
@@ -67,10 +25,27 @@ const methodLabel: Record<Rule["match_by"], string> = {
 }
 
 export function ReconciliationRules() {
-  const [rules, setRules] = useState(seed)
+  const [rules, setRules] = useState<Rule[]>([])
+  const [loading, setLoading] = useState(true)
 
-  function toggle(id: string) {
-    setRules((prev) => prev.map((r) => (r.id === id ? { ...r, active: !r.active } : r)))
+  useEffect(() => {
+    const load = async () => {
+      const { data } = await createClient()
+        .from("reconciliation_rules")
+        .select("id, name, match_by, priority, active, config")
+        .order("priority", { ascending: false })
+      setRules((data || []).map((rule: any) => ({ ...rule, description: rule.config?.description || "Configured database rule" })))
+      setLoading(false)
+    }
+    load()
+  }, [])
+
+  async function toggle(id: string) {
+    const rule = rules.find((item) => item.id === id)
+    if (!rule) return
+    const active = !rule.active
+    const { error } = await createClient().from("reconciliation_rules").update({ active }).eq("id", id)
+    if (!error) setRules((prev) => prev.map((r) => (r.id === id ? { ...r, active } : r)))
   }
 
   function move(id: string, dir: -1 | 1) {
@@ -92,6 +67,9 @@ export function ReconciliationRules() {
   }
 
   const sorted = [...rules].sort((a, b) => b.priority - a.priority)
+
+  if (loading) return <p className="text-sm text-muted-foreground">Loading rules…</p>
+  if (sorted.length === 0) return <p className="rounded-lg border border-dashed p-6 text-sm text-muted-foreground">No reconciliation rules have been configured.</p>
 
   return (
     <ol className="space-y-2">

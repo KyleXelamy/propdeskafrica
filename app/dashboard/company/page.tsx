@@ -1,28 +1,32 @@
 import type { Metadata } from "next"
-import { Button } from "@/components/ui/button"
+import { createClient } from "@/lib/supabase/server"
+import { redirect } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Plus, Briefcase, Users, Building2, BarChart3, Mail } from "lucide-react"
+import { Briefcase, Users, Building2, BarChart3, Mail } from "lucide-react"
 
 export const metadata: Metadata = {
   title: "Company — I-Manage",
   description: "Run your agency or company: team, landlords, aggregate reporting.",
 }
 
-const team = [
-{ name: "Your name", role: "Owner", email: "you@example.com", lastSeen: "Just now" },
-    { name: "Your teammate", role: "Manager", email: "teammate@example.com", lastSeen: "2 hours ago" },
-  { name: "Samuel O.", role: "Agent", email: "samuel@siemax.co.ke", lastSeen: "Yesterday" },
-  { name: "Fatma A.", role: "Accountant", email: "fatma@siemax.co.ke", lastSeen: "3 days ago" },
-]
+export default async function CompanyPage() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect("/auth/login")
 
-const landlords = [
-  { name: "Highland Estates", units: 212, manager: "Wanjiku M.", share: "60%" },
-  { name: "Coast Living", units: 84, manager: "Samuel O.", share: "25%" },
-  { name: "Kibera Co-op", units: 245, manager: "Wanjiku M.", share: "15%" },
-]
+  const { data: company } = await supabase.from("companies").select("id, name, type").eq("owner_id", user.id).maybeSingle()
+  const [{ data: team }, { data: landlords }] = company
+    ? await Promise.all([
+        supabase.from("team_members").select("id, name, email, role, accepted_at").eq("company_id", company.id).order("name"),
+        supabase.from("managed_landlords").select("id, name, units, manager, revenue_share, status").eq("company_id", company.id).order("name"),
+      ])
+    : [{ data: [] }, { data: [] }]
 
-export default function CompanyPage() {
+  const members = team || []
+  const managedLandlords = landlords || []
+  const totalUnits = managedLandlords.reduce((sum, landlord) => sum + Number(landlord.units || 0), 0)
+
   return (
     <div className="space-y-8">
       <header className="flex flex-wrap items-end justify-between gap-4">
@@ -32,18 +36,16 @@ export default function CompanyPage() {
             Run your agency — team, landlords, aggregate reporting, all in one place.
           </p>
         </div>
-        <Button className="bg-primary hover:bg-primary/90">
-          <Plus className="mr-2 size-4" /> Invite teammate
-        </Button>
+        <p className="text-sm text-muted-foreground">Company records are shown from your workspace database.</p>
       </header>
 
       {/* Top stats */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {[
-          { label: "Landlords under management", value: "3", icon: Building2, sub: "Highland, Coast, Kibera" },
-          { label: "Total units managed", value: "541", icon: BarChart3, sub: "Across 8 cities" },
-          { label: "Active team members", value: "4", icon: Users, sub: "1 owner · 1 mgr · 2 staff" },
-          { label: "Portfolio yield (Q3)", value: "6.4%", icon: Briefcase, sub: "+0.3 pts vs Q2" },
+          { label: "Landlords under management", value: managedLandlords.length, icon: Building2, sub: company ? "From managed_landlords" : "No company workspace" },
+          { label: "Total units managed", value: totalUnits, icon: BarChart3, sub: "From workspace records" },
+          { label: "Active team members", value: members.length, icon: Users, sub: company ? "From team_members" : "No company workspace" },
+          { label: "Portfolio yield", value: "—", icon: Briefcase, sub: "No database calculation available" },
         ].map((s) => (
           <Card key={s.label}>
             <CardHeader className="pb-2">
@@ -68,9 +70,6 @@ export default function CompanyPage() {
               <CardTitle>Team</CardTitle>
               <CardDescription>Everyone with access to your I-Manage workspace.</CardDescription>
             </div>
-            <Button variant="outline" size="sm">
-              Manage roles
-            </Button>
           </div>
         </CardHeader>
         <CardContent>
@@ -85,7 +84,7 @@ export default function CompanyPage() {
                 </tr>
               </thead>
               <tbody className="divide-y">
-                {team.map((m) => (
+                {members.length === 0 ? <tr><td colSpan={4} className="px-4 py-8 text-center text-sm text-muted-foreground">No team members are stored for this workspace.</td></tr> : members.map((m) => (
                   <tr key={m.email} className="hover:bg-muted/30">
                     <td className="px-4 py-4">
                       <div className="flex items-center gap-3">
@@ -103,7 +102,7 @@ export default function CompanyPage() {
                         <Mail className="size-3" /> {m.email}
                       </span>
                     </td>
-                    <td className="px-4 py-4 text-sm text-muted-foreground">{m.lastSeen}</td>
+                    <td className="px-4 py-4 text-sm text-muted-foreground">{m.accepted_at ? new Date(m.accepted_at).toLocaleDateString() : "Invitation pending"}</td>
                   </tr>
                 ))}
               </tbody>
@@ -120,17 +119,17 @@ export default function CompanyPage() {
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 sm:grid-cols-3">
-            {landlords.map((l) => (
+            {managedLandlords.length === 0 ? <p className="col-span-full rounded-lg border border-dashed p-6 text-sm text-muted-foreground">No managed landlords are stored for this workspace.</p> : managedLandlords.map((l) => (
               <div key={l.name} className="rounded-2xl border bg-card p-5">
                 <p className="text-base font-semibold">{l.name}</p>
-                <p className="mt-1 text-xs text-muted-foreground">Manager: {l.manager}</p>
+                <p className="mt-1 text-xs text-muted-foreground">Manager: {l.manager || "Not assigned"}</p>
                 <div className="mt-5 grid grid-cols-2 gap-3 border-t border-border pt-4">
                   <div>
                     <p className="text-2xl font-bold">{l.units}</p>
                     <p className="text-xs text-muted-foreground">Units</p>
                   </div>
                   <div>
-                    <p className="text-2xl font-bold">{l.share}</p>
+                    <p className="text-2xl font-bold">{Number(l.revenue_share || 0)}%</p>
                     <p className="text-xs text-muted-foreground">of portfolio</p>
                   </div>
                 </div>

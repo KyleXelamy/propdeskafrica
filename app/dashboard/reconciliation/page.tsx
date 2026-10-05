@@ -11,13 +11,7 @@ export const metadata: Metadata = {
   description: "Per-tenant rules that match incoming paybill payments to the right tenant.",
 }
 
-const recentMatches = [
-  { id: "TX-9081", billRef: "B3F2-9A1C-4D7E", amount: 25000, tenant: "Brian Mwangi", method: "account_ref", confidence: 0.98, status: "matched", time: "2 min ago" },
-  { id: "TX-9080", billRef: "—", amount: 18000, tenant: "—", method: "phone", confidence: 0.92, status: "matched", time: "14 min ago" },
-  { id: "TX-9079", billRef: "—", amount: 32000, tenant: "Aisha Otieno", method: "amount_tenant", confidence: 0.88, status: "matched", time: "23 min ago" },
-  { id: "TX-9078", billRef: "—", amount: 22000, tenant: "—", method: "unmatched", confidence: 0, status: "unmatched", time: "1 hr ago" },
-  { id: "TX-9077", billRef: "C4A1-2B5D", amount: 14000, tenant: "Joseph Kamau", method: "account_ref", confidence: 0.98, status: "matched", time: "2 hr ago" },
-]
+const recentMatches: Array<{ id: string; billRef: string; amount: number; tenant: string; method: string; confidence: number; status: string }> = []
 
 const methodLabel: Record<string, string> = {
   account_ref: "Account ref",
@@ -81,7 +75,7 @@ export default function ReconciliationPage() {
         <Card>
           <CardHeader className="pb-2">
             <CardDescription>Active rules</CardDescription>
-            <CardTitle className="text-3xl">5</CardTitle>
+            <CardTitle className="text-3xl">0</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-xs text-muted-foreground">Default ruleset</p>
