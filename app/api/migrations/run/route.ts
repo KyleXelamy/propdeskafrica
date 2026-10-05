@@ -27,15 +27,20 @@ const Schema = z.object({
   record: z.boolean().default(true),
 })
 
-function checkSecret(request: NextRequest) {
+async function checkAccess(request: NextRequest) {
   const expected = process.env.MIGRATION_SECRET
-  if (!expected) return true // dev mode
   const got = request.headers.get("x-migration-secret") ?? request.headers.get("authorization")?.replace(/^Bearer\s+/i, "")
-  return got === expected
+  if (!expected || got === expected) return true
+
+  // Signed-in dashboard users can request the idempotent setup check without
+  // ever seeing or copying an infrastructure secret.
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  return Boolean(user)
 }
 
 export async function POST(request: NextRequest) {
-  if (!checkSecret(request)) {
+  if (!(await checkAccess(request))) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 })
   }
   const body = (await request.json().catch(() => ({}))) as z.infer<typeof Schema>
