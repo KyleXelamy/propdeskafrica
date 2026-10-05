@@ -1,0 +1,12 @@
+-- =====================================================================
+-- RENTARO DATABASE SETUP
+-- =====================================================================
+-- This file used to contain a hand-rolled schema; the canonical,
+-- consolidated, idempotent setup is now in
+--   supabase-setup/01-create-tables.sql
+-- which you should run in the Supabase SQL Editor.
+--
+-- If you already have a deployment with the old schema, run
+--   supabase-setup/02-add-missing-columns.sql
+-- to add the new columns, RLS policies, and the Storage bucket.
+-- =====================================================================

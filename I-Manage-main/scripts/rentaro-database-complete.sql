@@ -1,0 +1,2 @@
+-- DEPRECATED — see /supabase-setup/01-create-tables.sql for the
+-- canonical, idempotent schema setup.
