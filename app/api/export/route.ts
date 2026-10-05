@@ -1,5 +1,5 @@
 import { withAuth, errorResponse } from "@/lib/api"
-import type { NextRequest } from "next/server"
+import { NextResponse, type NextRequest } from "next/server"
 
 /**
  * GET /api/export?format=json|csv
@@ -73,7 +73,7 @@ export const GET = withAuth(async (req: NextRequest, { supabase, userId }) => {
     addSection("documents", documents.data)
 
     const csv = sections.join("\n\n")
-    return new Response(csv, {
+    return new NextResponse(csv, {
       status: 200,
       headers: {
         "content-type": "text/csv; charset=utf-8",
@@ -106,7 +106,7 @@ export const GET = withAuth(async (req: NextRequest, { supabase, userId }) => {
       documents: documents.data || [],
     },
   }
-  return new Response(JSON.stringify(payload, null, 2), {
+  return new NextResponse(JSON.stringify(payload, null, 2), {
     status: 200,
     headers: {
       "content-type": "application/json",

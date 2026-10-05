@@ -108,7 +108,7 @@ export const POST = withAuth<{ id: string }>(async (req: NextRequest, { supabase
  * DELETE /api/properties/[id]/photos
  * Body: { id: string } — delete one photo row + remove the storage object.
  */
-export const DELETE = withAuth(async (req: NextRequest, _ctx, { supabase, userId, params }) => {
+export const DELETE = withAuth<{ id: string }>(async (req: NextRequest, { supabase, userId }, params) => {
   let body: any = {}
   try { body = await req.json() } catch {}
   if (!body.id || typeof body.id !== "string") throw new HttpError("Provide id", 400)
@@ -146,7 +146,7 @@ export const DELETE = withAuth(async (req: NextRequest, _ctx, { supabase, userId
  * Body: { id: string, is_cover?: boolean, caption?: string }
  * Used to toggle "cover" without re-uploading the file.
  */
-export const PATCH = withAuth(async (req: NextRequest, _ctx, { supabase, userId, params }) => {
+export const PATCH = withAuth<{ id: string }>(async (req: NextRequest, { supabase, userId }, params) => {
   let body: any = {}
   try { body = await req.json() } catch {}
   if (!body.id || typeof body.id !== "string") throw new HttpError("Provide id", 400)

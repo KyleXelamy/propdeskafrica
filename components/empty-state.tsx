@@ -10,12 +10,11 @@ import {
   IllustrationEmptyFile,
   IllustrationUsers,
   IllustrationSearch,
-  type Props as IllustrationProps,
 } from "@/components/illustrations"
 
 interface EmptyStateProps {
   icon?: LucideIcon
-  illustration?: React.FC<IllustrationProps>
+  illustration?: keyof typeof illustrationMap
   title: string
   description: string
   action?: {
