@@ -48,7 +48,7 @@ export default async function SettingsPage() {
     <div className="space-y-6 pt-2 md:pt-0">
       <div>
         <h1 className="text-2xl md:text-3xl font-bold text-foreground">Settings</h1>
-        <p className="text-sm md:text-base text-muted-foreground">Manage your account preferences and security settings</p>
+        <p className="text-sm md:text-base text-muted-foreground">Manage your account, workspace name, preferences and security</p>
       </div>
 
       <Tabs defaultValue="profile" className="space-y-4">
@@ -141,13 +141,14 @@ export default async function SettingsPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="company_name">Company/Agency Name</Label>
+                    <Label htmlFor="company_name">Workspace name</Label>
                     <Input
                       id="company_name"
                       name="company_name"
                       defaultValue={profile?.company_name || ""}
-                      placeholder="Enter company name"
+                      placeholder="e.g. Wangari Properties"
                     />
+                    <p className="text-xs text-muted-foreground">This name appears in your dashboard sidebar and workspace.</p>
                   </div>
                 </div>
 
