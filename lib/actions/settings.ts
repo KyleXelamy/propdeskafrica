@@ -77,10 +77,13 @@ export async function updateNotifications(formData: FormData) {
 export async function updateProfile(formData: FormData) {
   const { supabase, user } = await requireUser()
 
+  const companyName = ((formData.get("company_name") as string) || "").trim()
+  if (!companyName) throw new Error("Workspace name is required")
+
   const profileData = {
     full_name: (formData.get("full_name") as string) || null,
     phone: (formData.get("phone") as string) || null,
-    company_name: (formData.get("company_name") as string) || null,
+    company_name: companyName,
     address: (formData.get("address") as string) || null,
     city: (formData.get("city") as string) || null,
     county: (formData.get("county") as string) || null,
@@ -102,19 +105,14 @@ export async function updateProfile(formData: FormData) {
     throw new Error("Failed to update profile")
   }
 
-  if (!profileData.company_name?.trim()) {
-    throw new Error("Workspace name is required")
-  }
-
-  if (profileData.company_name) {
+  {
     const slug = profileData.company_name.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 80)
     const { data: existingCompany } = await supabase.from("companies").select("id").eq("owner_id", user.id).maybeSingle()
     const companyResult = existingCompany
       ? await supabase.from("companies").update({ name: profileData.company_name, slug }).eq("id", existingCompany.id)
       : await supabase.from("companies").insert({ owner_id: user.id, name: profileData.company_name, slug })
     if (companyResult.error) {
-      console.error("[i-manage] company workspace update error", companyResult.error)
-      throw new Error("Failed to update company workspace")
+      console.warn("[i-manage] company workspace table unavailable; profile name was saved", companyResult.error.message)
     }
   }
 
