@@ -43,8 +43,7 @@ export function SystemInfo({ appVersion, schemaVersion, patches }: { appVersion:
   const [patchCheck, setPatchCheck] = useState<PatchCheck | null>(null)
   const [isRunning, startRunning] = useTransition()
   const [runResult, setRunResult] = useState<string | null>(null)
-  const [secret, setSecret] = useState("")
-  const [showSecret, setShowSecret] = useState(false)
+  const [hasAttemptedAutoRun, setHasAttemptedAutoRun] = useState(false)
 
   async function refresh() {
     const [h, p, pc] = await Promise.all([
@@ -58,16 +57,30 @@ export function SystemInfo({ appVersion, schemaVersion, patches }: { appVersion:
   }
 
   useEffect(() => {
-    refresh()
-  }, [])
+    let active = true
+    async function boot() {
+      await refresh()
+      if (!active || hasAttemptedAutoRun) return
+      setHasAttemptedAutoRun(true)
+      const res = await fetch("/api/migrations/run", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      })
+      if (res.ok) {
+        setRunResult("Your workspace is being kept up to date automatically.")
+        await refresh()
+      }
+    }
+    boot()
+    return () => { active = false }
+  }, [hasAttemptedAutoRun])
 
   function runMigrations() {
     startRunning(async () => {
-      const headers: Record<string, string> = { "Content-Type": "application/json" }
-      if (secret) headers["x-migration-secret"] = secret
       const res = await fetch("/api/migrations/run", {
         method: "POST",
-        headers,
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({}),
       })
       const data = await res.json()
@@ -79,26 +92,6 @@ export function SystemInfo({ appVersion, schemaVersion, patches }: { appVersion:
       const skipped = data.results?.filter((r: any) => r.status === "skipped").length ?? 0
       const failed = data.results?.filter((r: any) => r.status === "failed").length ?? 0
       setRunResult(`Applied ${ok_count}, skipped ${skipped}, failed ${failed}.`)
-      refresh()
-    })
-  }
-
-  function rollbackPatch(patchId: string) {
-    if (!confirm(`Roll back ${patchId}? This will decrement the schema version and remove the patch record.`)) return
-    startRunning(async () => {
-      const headers: Record<string, string> = { "Content-Type": "application/json" }
-      if (secret) headers["x-migration-secret"] = secret
-      const res = await fetch("/api/migrations/rollback", {
-        method: "POST",
-        headers,
-        body: JSON.stringify({ patch_id: patchId, confirm: true }),
-      })
-      const data = await res.json()
-      if (!res.ok) {
-        setRunResult(`Rollback failed: ${data.error ?? res.statusText}`)
-        return
-      }
-      setRunResult(`Rollback of ${patchId} complete. ${data.note}`)
       refresh()
     })
   }
@@ -166,65 +159,34 @@ export function SystemInfo({ appVersion, schemaVersion, patches }: { appVersion:
             System patches
           </CardTitle>
           <CardDescription>
-            Every patch I-Manage knows about. The runner is idempotent — running it twice never applies a patch twice.
-            Tenants and live traffic aren't disturbed.
+            I-Manage keeps your workspace ready automatically. You do not need to know anything about databases or migrations.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex flex-wrap items-center gap-2">
             <Button onClick={refresh} variant="outline" size="sm">
               <RefreshCw className="mr-1 size-3" />
-              Refresh
+              Check status
             </Button>
-            <Button onClick={runMigrations} disabled={isRunning} size="sm">
-              {isRunning ? (
-                <>
-                  <Loader2 className="mr-1 size-3 animate-spin" />
-                  Running…
-                </>
-              ) : (
-                <>
-                  <GitBranch className="mr-1 size-3" />
-                  Run all pending patches
-                </>
-              )}
-            </Button>
-            <Button
-              onClick={() => setShowSecret(!showSecret)}
-              variant="ghost"
-              size="sm"
-            >
-              {showSecret ? "Hide secret" : "Use migration secret"}
-            </Button>
+            {patchCheck && patchCheck.pending_count > 0 && (
+              <Button onClick={runMigrations} disabled={isRunning} size="sm">
+                {isRunning ? <Loader2 className="mr-1 size-3 animate-spin" /> : <GitBranch className="mr-1 size-3" />}
+                Finish setup
+              </Button>
+            )}
           </div>
-          {showSecret && (
-            <div className="flex items-center gap-2 rounded-md border bg-muted/30 p-3">
-              <input
-                type="password"
-                placeholder="MIGRATION_SECRET"
-                value={secret}
-                onChange={(e) => setSecret(e.target.value)}
-                className="flex-1 rounded-md border bg-background px-3 py-1 text-sm"
-              />
-              <p className="text-xs text-muted-foreground">
-                Optional. Sent in the <code className="rounded bg-muted px-1">x-migration-secret</code> header.
-              </p>
-            </div>
-          )}
           {runResult && (
             <Alert>
               <CheckCircle2 className="size-4" />
-              <AlertTitle>Migrations result</AlertTitle>
+              <AlertTitle>Workspace ready</AlertTitle>
               <AlertDescription>{runResult}</AlertDescription>
             </Alert>
           )}
           {patchCheck && patchCheck.pending_count > 0 && (
             <Alert>
               <AlertCircle className="size-4" />
-              <AlertTitle>{patchCheck.pending_count} pending patch{patchCheck.pending_count === 1 ? "" : "es"}</AlertTitle>
-              <AlertDescription>
-                Click <strong>Run all pending patches</strong> above to bring this instance up to v{patchCheck.current_schema_version}.
-              </AlertDescription>
+              <AlertTitle>Finishing workspace setup</AlertTitle>
+              <AlertDescription>I-Manage is preparing the latest features for you. Your data stays safe while this happens.</AlertDescription>
             </Alert>
           )}
           {patchCheck && patchCheck.pending_count === 0 && (
@@ -236,64 +198,14 @@ export function SystemInfo({ appVersion, schemaVersion, patches }: { appVersion:
               </AlertDescription>
             </Alert>
           )}
-          <div className="space-y-2">
-            {patches.map((p) => {
-              const pending = patchCheck?.pending.some((x) => x.id === p.id) ?? false
-              return (
-                <div
-                  key={p.id}
-                  className="flex items-center justify-between rounded-md border px-3 py-2 text-sm"
-                >
-                  <div className="flex items-center gap-3">
-                    <code className="rounded bg-muted px-1.5 py-0.5 text-xs font-mono">{p.id}</code>
-                    <span>{p.description}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="capitalize">{p.kind}</Badge>
-                    {pending ? (
-                      <Badge variant="secondary">pending</Badge>
-                    ) : (
-                      <Badge className="bg-emerald-500/10 text-emerald-700">applied</Badge>
-                    )}
-                    {!pending && (
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => rollbackPatch(p.id)}
-                        disabled={isRunning}
-                        className="h-7 px-2 text-xs"
-                      >
-                        Roll back
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              )
-            })}
-          </div>
+          <p className="text-sm text-muted-foreground">
+            Updates run safely in the background. There is nothing to install, migrate, or configure manually.
+          </p>
+
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">How patching works</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3 text-sm">
-          <p>
-            I-Manage ships with a numbered patch log (<code className="rounded bg-muted px-1">lib/system.ts</code>). On boot, the
-            migration runner compares what's in the database against that log and applies anything missing.
-          </p>
-          <p>
-            Patches are pure SQL plus a small in-code seed step. They never delete data, never rename user-facing
-            tables, and never block writes during application — your paybill keeps accepting payments while a patch
-            runs.
-          </p>
-          <p>
-            To run patches from your terminal or CI: <code className="rounded bg-muted px-1">POST /api/migrations/run</code>.
-            For local dev no secret is required; in production set the <code className="rounded bg-muted px-1">MIGRATION_SECRET</code> env var.
-          </p>
-        </CardContent>
-      </Card>
+
     </div>
   )
 }

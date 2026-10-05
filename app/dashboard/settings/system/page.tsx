@@ -1,4 +1,4 @@
-import { APP_NAME, APP_VERSION, CURRENT_SCHEMA_VERSION, describePatches } from "@/lib/system"
+import { APP_VERSION, CURRENT_SCHEMA_VERSION, describePatches } from "@/lib/system"
 import { SystemInfo } from "@/components/system-info"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Activity, Server, GitMerge } from "lucide-react"
@@ -14,9 +14,9 @@ export default async function SystemPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-semibold tracking-tight">System info & patches</h1>
+        <h1 className="text-3xl font-semibold tracking-tight">Workspace health</h1>
         <p className="mt-1 text-muted-foreground">
-          What version this {APP_NAME} instance is running, what's been applied, and what's pending.
+          I-Manage checks your workspace and keeps it ready automatically.
         </p>
       </div>
 
