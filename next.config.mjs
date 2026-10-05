@@ -31,19 +31,6 @@ const nextConfig = {
   env: {
     APP_COMMIT: process.env.VERCEL_GIT_COMMIT_SHA ?? "dev",
   },
-  // Webpack tuning for App Router stability. The big one: this prevents
-  // Next from emitting a "use client" manifest for a page that doesn't
-  // actually use any client features, which is what was breaking the
-  // Vercel build for app/(marketing)/page.tsx.
-  webpack(config, { isServer }) {
-    if (!isServer) {
-      // Client bundle: ensure single source of truth for lucide
-      config.resolve.alias = {
-        ...(config.resolve.alias ?? {}),
-      }
-    }
-    return config
-  },
 }
 
 export default nextConfig
