@@ -1,4 +1,4 @@
-import { withAuth, successResponse, errorResponse, pickFields, blankToNull, toNumberOrNull, HttpError } from "@/lib/api"
+import { withAuth, successResponse, errorResponse, pickFields, blankToNull, toNumberOrNull, HttpError, isMissingTableError } from "@/lib/api"
 import type { NextRequest } from "next/server"
 
 const PROPERTY_FIELDS = [
@@ -35,8 +35,11 @@ export const GET = withAuth(async (req: NextRequest, { supabase, userId }) => {
   if (type) query = query.eq("type", type)
 
   const { data, error } = await query
-  if (error) return errorResponse(error.message, 500)
-  return successResponse(data)
+  if (error) {
+    if (isMissingTableError(error)) return successResponse([])
+    return errorResponse(error.message, 500)
+  }
+  return successResponse(data || [])
 })
 
 export const POST = withAuth(async (req: NextRequest, { supabase, userId }) => {

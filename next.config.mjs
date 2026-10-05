@@ -23,11 +23,8 @@ const nextConfig = {
   // Transpile the workspace packages so server components can import
   // shared utilities without webpack alias quirks.
   transpilePackages: ["@/lib", "@/components"],
-  // Production source maps bloat Vercel builds. Skip them.
   productionBrowserSourceMaps: false,
-  // Power features we actually use.
   poweredByHeader: false,
-  // Allow the build to complete when the env doesn't have every secret.
   env: {
     APP_COMMIT: process.env.VERCEL_GIT_COMMIT_SHA ?? "dev",
   },

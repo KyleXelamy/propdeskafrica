@@ -33,7 +33,7 @@ export const POST = withAuth(async (req, { supabase, userId }, params) => {
     return errorResponse("Cannot look up users — service role required", 500)
   }
   const matched = (userList?.users || []).find(
-    (u) => (u.email || "").toLowerCase() === email,
+    (u: any) => (u.email || "").toLowerCase() === email,
   )
   if (!matched) {
     throw new HttpError(

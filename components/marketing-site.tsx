@@ -6,6 +6,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { BrandWordmark } from "@/components/brand-mark"
 import { MegaMenu, type MegaSection } from "@/components/mega-menu"
+import { BRAND } from "@/lib/brand"
 
 const navSections: MegaSection[] = [
   {
@@ -193,6 +194,8 @@ export function MarketingFooter() {
             <Link href="/press">Press</Link>
             <Link href="/security">Security</Link>
             <Link href="/contact">Contact</Link>
+            <a href={`mailto:${BRAND.supportEmail}`}>{BRAND.supportEmail}</a>
+            <a href={BRAND.supportPhoneHref}>{BRAND.supportPhone}</a>
           </div>
         </div>
         <div>

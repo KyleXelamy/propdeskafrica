@@ -1,0 +1,9 @@
+PROPERTY EXPENSE LOG
+
+Date        Property        Category        Vendor        Amount KES        Receipt ref
+__________  ______________  ______________  ____________  ________________  ____________
+__________  ______________  ______________  ____________  ________________  ____________
+__________  ______________  ______________  ____________  ________________  ____________
+
+Categories: maintenance, utilities, insurance, taxes, management, marketing, legal, security, cleaning, repairs, supplies, travel, other.
+Prepared by: __________________ Month: __________

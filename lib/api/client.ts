@@ -1,5 +1,3 @@
-import type { ApiError } from "./types"
-
 interface ApiCallOptions {
   method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH"
   body?: unknown

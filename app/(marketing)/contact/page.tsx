@@ -3,6 +3,7 @@ import Link from "next/link"
 import { ArrowUpRight, Mail, MessageSquare, MapPin, Phone } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ContactForm } from "@/components/contact-form"
+import { BRAND } from "@/lib/brand"
 
 export const metadata: Metadata = {
   title: "Contact — I-Manage by Siemax Ltd",
@@ -14,22 +15,22 @@ const channels = [
   {
     icon: Mail,
     label: "General",
-    value: "hello@i-manage.app",
-    href: "mailto:hello@i-manage.app",
+    value: BRAND.supportEmail,
+    href: `mailto:${BRAND.supportEmail}`,
     note: "For sales questions, partnerships and feedback.",
   },
   {
     icon: MessageSquare,
     label: "Support",
-    value: "support@i-manage.app",
-    href: "mailto:support@i-manage.app",
+    value: BRAND.supportEmail,
+    href: `mailto:${BRAND.supportEmail}`,
     note: "For existing customers — Pro & Agency get priority.",
   },
   {
     icon: Phone,
     label: "Phone",
-    value: "+254 700 000 000",
-    href: "tel:+254700000000",
+    value: BRAND.supportPhone,
+    href: BRAND.supportPhoneHref,
     note: "Mon–Fri, 9am–5pm EAT. For urgent issues only.",
   },
   {

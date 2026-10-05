@@ -28,7 +28,7 @@ const neonDb: Db = {
     // by id instead.
     const keyCol = table === "user_profiles" ? "id" : "user_id"
     try {
-      const rows = await sql.unsafe(`select * from public.${table} where ${keyCol} = $1`, [userId]) as any[]
+      const rows = await (sql as any).unsafe(`select * from public.${table} where ${keyCol} = $1`, [userId]) as any[]
       return rows.map(sanitiseRow)
     } catch (err) {
       console.warn(`[backup] neon select failed for ${table}`, err)
@@ -39,7 +39,7 @@ const neonDb: Db = {
     const sql = getDb()
     const keyCol = table === "user_profiles" ? "id" : "user_id"
     try {
-      const rows = await sql.unsafe(`select count(*)::int as n from public.${table} where ${keyCol} = $1`, [userId]) as any[]
+      const rows = await (sql as any).unsafe(`select count(*)::int as n from public.${table} where ${keyCol} = $1`, [userId]) as any[]
       return rows[0]?.n ?? 0
     } catch {
       return 0
@@ -55,7 +55,7 @@ const neonDb: Db = {
       const safe = { ...row, user_id: userId }
       try {
         if (onConflict === "skip") {
-          const result = await sql.unsafe(
+          const result = await (sql as any).unsafe(
             `insert into public.${table} (${Object.keys(safe).map((k) => `"${k}"`).join(",")})
              values (${Object.keys(safe).map((_, i) => `$${i + 1}`).join(",")})
              on conflict do nothing`,
@@ -63,7 +63,7 @@ const neonDb: Db = {
           ) as any
           inserted += result.length ?? 1
         } else if (onConflict === "replace") {
-          const result = await sql.unsafe(
+          const result = await (sql as any).unsafe(
             `insert into public.${table} (${Object.keys(safe).map((k) => `"${k}"`).join(",")})
              values (${Object.keys(safe).map((_, i) => `$${i + 1}`).join(",")})
              on conflict (id) do update set ${Object.keys(safe)
@@ -75,7 +75,7 @@ const neonDb: Db = {
           updated += result.length ?? 1
         } else {
           // merge
-          const result = await sql.unsafe(
+          const result = await (sql as any).unsafe(
             `insert into public.${table} (${Object.keys(safe).map((k) => `"${k}"`).join(",")})
              values (${Object.keys(safe).map((_, i) => `$${i + 1}`).join(",")})
              on conflict (id) do update set ${Object.keys(safe)
@@ -98,7 +98,7 @@ const neonDb: Db = {
     const sql = getDb()
     const keyCol = table === "user_profiles" ? "id" : "user_id"
     try {
-      await sql.unsafe(`delete from public.${table} where ${keyCol} = $1`, [userId])
+      await (sql as any).unsafe(`delete from public.${table} where ${keyCol} = $1`, [userId])
     } catch (err) {
       console.warn(`[backup] delete failed for ${table}`, err)
     }

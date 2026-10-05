@@ -7,7 +7,7 @@
  */
 import type { CSSProperties } from "react"
 
-interface Props {
+export interface Props {
   className?: string
   style?: CSSProperties
   title?: string

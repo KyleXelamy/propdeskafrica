@@ -10,48 +10,15 @@ export const metadata: Metadata = {
   description: "Track contractor quotes side by side. Approve, convert to invoices, pay.",
 }
 
-const sample = [
-  {
-    id: "QT-1042",
-    title: "Replace burst water heater — Karen House 1",
-    property: "Karen House 1",
-    contractor: "AquaFix Plumbing",
-    amount: 18500,
-    status: "Pending",
-    requested: "2026-09-22",
-    variants: 3,
-  },
-  {
-    id: "QT-1041",
-    title: "Repaint exterior — Riverside Apt 4B",
-    property: "Riverside Apartments",
-    contractor: "Prime Paints Ltd",
-    amount: 42000,
-    status: "Approved",
-    requested: "2026-09-18",
-    variants: 2,
-  },
-  {
-    id: "QT-1040",
-    title: "Fix geyser thermostat — Westlands Studio",
-    property: "Westlands Studio",
-    contractor: "AquaFix Plumbing",
-    amount: 9200,
-    status: "Rejected",
-    requested: "2026-09-15",
-    variants: 1,
-  },
-  {
-    id: "QT-1039",
-    title: "Replace broken gate motor — Multitone B",
-    property: "Multitone Estate",
-    contractor: "GateCo Kenya",
-    amount: 38000,
-    status: "Paid",
-    requested: "2026-09-10",
-    variants: 2,
-  },
-]
+const quotations: Array<{
+  id: string
+  title: string
+  property: string
+  contractor: string
+  amount: number
+  status: string
+  variants: number
+}> = []
 
 const statusIcon: Record<string, React.ComponentType<{ className?: string }>> = {
   Pending: Clock,
@@ -87,28 +54,28 @@ export default function QuotationsPage() {
         <Card>
           <CardHeader className="pb-2">
             <CardDescription>Pending approval</CardDescription>
-            <CardTitle className="text-3xl">5</CardTitle>
+            <CardTitle className="text-3xl">0</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-xs text-muted-foreground">Total value: KES 84,200</p>
+            <p className="text-xs text-muted-foreground">No pending requests</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
             <CardDescription>Approved this month</CardDescription>
-            <CardTitle className="text-3xl">12</CardTitle>
+            <CardTitle className="text-3xl">0</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-xs text-muted-foreground">Total value: KES 312,400</p>
+            <p className="text-xs text-muted-foreground">No approvals recorded</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
             <CardDescription>Avg. time to approval</CardDescription>
-            <CardTitle className="text-3xl">14h</CardTitle>
+            <CardTitle className="text-3xl">—</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-xs text-muted-foreground">From request to decision</p>
+            <p className="text-xs text-muted-foreground">Available after your first request</p>
           </CardContent>
         </Card>
       </div>
@@ -129,8 +96,17 @@ export default function QuotationsPage() {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="overflow-hidden rounded-lg border">
-            <table className="w-full">
+          <div className="overflow-x-auto rounded-lg border">
+            {quotations.length === 0 ? (
+              <div className="flex min-h-48 flex-col items-center justify-center px-6 py-10 text-center">
+                <ClipboardList className="size-8 text-muted-foreground/60" aria-hidden="true" />
+                <p className="mt-3 font-medium">No quotations yet</p>
+                <p className="mt-1 max-w-md text-sm text-muted-foreground">
+                  Create a quote request from a maintenance record to start comparing contractor offers.
+                </p>
+              </div>
+            ) : (
+            <table className="min-w-[760px] w-full">
               <thead className="bg-muted/50">
                 <tr className="text-left text-xs uppercase tracking-wider text-muted-foreground">
                   <th className="px-4 py-3">Quote</th>
@@ -141,7 +117,7 @@ export default function QuotationsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y">
-                {sample.map((q) => {
+                {quotations.map((q) => {
                   const Icon = statusIcon[q.status]
                   return (
                     <tr key={q.id} className="hover:bg-muted/30">
@@ -166,6 +142,7 @@ export default function QuotationsPage() {
                 })}
               </tbody>
             </table>
+            )}
           </div>
         </CardContent>
       </Card>

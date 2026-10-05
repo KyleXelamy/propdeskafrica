@@ -37,8 +37,8 @@ export default async function NotesPage() {
     console.error("[i-manage] notes fetch error", error)
   }
 
-  const pinnedNotes = notes?.filter((note) => note.is_pinned) || []
-  const regularNotes = notes?.filter((note) => !note.is_pinned) || []
+  const pinnedNotes = notes?.filter((note: any) => note.is_pinned) || []
+  const regularNotes = notes?.filter((note: any) => !note.is_pinned) || []
 
   const getCategoryColor = (category: string) => {
     switch (category) {
@@ -143,7 +143,7 @@ export default async function NotesPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-primary">
-              {notes?.filter((note) => {
+              {notes?.filter((note: any) => {
                 const noteDate = new Date(note.created_at)
                 const weekAgo = new Date()
                 weekAgo.setDate(weekAgo.getDate() - 7)
@@ -161,7 +161,7 @@ export default async function NotesPage() {
             <h2 className="text-xl font-semibold text-foreground">Pinned Notes</h2>
           </div>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {pinnedNotes.map((note) => (
+            {pinnedNotes.map((note: any) => (
               <NoteCard key={note.id} note={note} />
             ))}
           </div>
@@ -172,7 +172,7 @@ export default async function NotesPage() {
         <h2 className="text-xl font-semibold text-foreground">All Notes</h2>
         {regularNotes.length > 0 ? (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {regularNotes.map((note) => (
+            {regularNotes.map((note: any) => (
               <NoteCard key={note.id} note={note} />
             ))}
           </div>

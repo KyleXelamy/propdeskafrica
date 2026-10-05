@@ -45,9 +45,22 @@ export async function POST(request: NextRequest) {
       name: `${payload.first_name} ${payload.last_name}`,
     })
 
+    const subject = `[I-Manage] ${payload.topic} — ${payload.first_name} ${payload.last_name}`
+    const emailBody = [
+      `Name: ${payload.first_name} ${payload.last_name}`,
+      `Email: ${payload.email}`,
+      `Company / portfolio: ${payload.company || "Not provided"}`,
+      `Topic: ${payload.topic}`,
+      "",
+      "Message:",
+      payload.message,
+    ].join("\n")
+    const mailto = `mailto:bknglabs.dev@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`
+
     return NextResponse.json({
       ok: true,
-      message: "Thanks — we'll be in touch within one business day.",
+      mailto,
+      message: "Your email app is ready with the request filled in. Press Send to contact the I-Manage team.",
     })
   } catch (err) {
     console.error("[api/contact] failed", err)

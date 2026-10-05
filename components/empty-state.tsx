@@ -15,7 +15,7 @@ import {
 
 interface EmptyStateProps {
   icon?: LucideIcon
-  illustration?: React.FC<IllustrationProps>
+  illustration?: keyof typeof illustrationMap
   title: string
   description: string
   action?: {

@@ -14,50 +14,56 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic"
 
-async function loadProperties(): Promise<MapProperty[]> {
-  if (neonConfigured()) {
-    try {
-      const sql = getDb()
-      const rows = await sql`
-        select id, name, address, city, county, latitude, longitude, status, rent_amount
-        from public.properties
-        where latitude is not null and longitude is not null
-        order by created_at desc
-      `
-      return rows.map((r: any) => ({
-        id: r.id,
-        name: r.name,
-        address: r.address,
-        city: r.city,
-        county: r.county,
-        latitude: Number(r.latitude),
-        longitude: Number(r.longitude),
-        status: (r.status as MapProperty["status"]) ?? "unknown",
-        rent_amount: r.rent_amount != null ? Number(r.rent_amount) : undefined,
-      }))
-    } catch (err) {
-      console.warn("[properties map] neon read failed", err)
-    }
+type PropertyRow = {
+  id: string
+  name: string
+  address: string
+  city: string | null
+  county: string | null
+  status: string | null
+  rent_amount: number | string | null
+  latitude?: number | string | null
+  longitude?: number | string | null
+}
+
+function toMapProperty(row: PropertyRow): MapProperty | null {
+  const latitude = Number(row.latitude)
+  const longitude = Number(row.longitude)
+  if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return null
+
+  const status: MapProperty["status"] =
+    row.status === "occupied" ? "rented" : row.status === "vacant" ? "available" : row.status as MapProperty["status"]
+
+  return {
+    id: row.id,
+    name: row.name,
+    address: row.address,
+    city: row.city ?? undefined,
+    county: row.county ?? undefined,
+    latitude,
+    longitude,
+    status: status ?? "unknown",
+    rent_amount: row.rent_amount != null ? Number(row.rent_amount) : undefined,
   }
-  // Supabase fallback
+}
+
+async function loadProperties(): Promise<MapProperty[]> {
   const supa = await createClient()
-  const { data } = await supa
+  const withCoordinates = await supa
     .from("properties")
     .select("id, name, address, city, county, latitude, longitude, status, rent_amount")
     .not("latitude", "is", null)
     .not("longitude", "is", null)
-  if (!data) return []
-  return data.map((r: any) => ({
-    id: r.id,
-    name: r.name,
-    address: r.address,
-    city: r.city,
-    county: r.county,
-    latitude: Number(r.latitude),
-    longitude: Number(r.longitude),
-    status: (r.status as MapProperty["status"]) ?? "unknown",
-    rent_amount: r.rent_amount != null ? Number(r.rent_amount) : undefined,
-  }))
+    .order("created_at", { ascending: false })
+
+  if (!withCoordinates.error) {
+    return (withCoordinates.data ?? []).map((row: PropertyRow) => toMapProperty(row)).filter((row: MapProperty | null): row is MapProperty => row !== null)
+  }
+
+  // Older Supabase schemas may not have geocoding columns yet. Keep the map
+  // usable and let the total-property count still reflect real data.
+  console.warn("[properties map] coordinate columns unavailable; showing empty map", withCoordinates.error.message)
+  return []
 }
 
 export default async function PropertiesMapPage() {

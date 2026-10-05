@@ -18,7 +18,7 @@ export async function GET() {
   try {
     if (neonConfigured()) {
       const sql = getDb()
-      const rows = (await sql.unsafe(`select schema_version::text as v, last_patch_id as p from public.system_version where id = 1`)) as any[]
+      const rows = (await sql.unsafe(`select schema_version::text as v, last_patch_id as p from public.system_version where id = 1`)) as unknown as any[]
       versionInfo = rows[0]?.v
       dbOk = true
     } else {

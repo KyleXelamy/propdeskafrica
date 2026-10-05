@@ -1,0 +1,2 @@
+name,address,city,county,type,bedrooms,bathrooms,rent_amount,deposit_amount,size_sqft,status,description
+Example Unit,12 Example Road,Nairobi,Nairobi,apartment,2,1.0,35000,70000,850,available,Replace this row with your property data

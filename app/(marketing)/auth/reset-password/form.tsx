@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { KeyRound, AlertCircle, Loader2 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
+import type { AuthChangeEvent, Session } from "@supabase/supabase-js"
 
 export function ResetPasswordForm() {
   const router = useRouter()
@@ -30,7 +31,7 @@ export function ResetPasswordForm() {
       setReady(true)
       // No session yet? Force a hash-exchange by listening briefly.
       if (!data.session) {
-        const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+        const { data: sub } = supabase.auth.onAuthStateChange((_event: AuthChangeEvent, session: Session | null) => {
           if (session) {
             setError(null)
             sub.subscription.unsubscribe()

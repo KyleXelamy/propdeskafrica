@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
   if (rollbackSql) {
     if (neonConfigured()) {
       const sql = getDb()
-      await sql.unsafe(rollbackSql)
+      await (sql as any).unsafe(rollbackSql)
       executed = true
     } else {
       const supa = await createClient()
@@ -79,8 +79,8 @@ export async function POST(request: NextRequest) {
   // Remove the patch from the log and decrement schema version
   if (neonConfigured()) {
     const sql = getDb()
-    await sql.unsafe(`delete from public.patches where id = $1`, [patch.id])
-    await sql.unsafe(
+    await (sql as any).unsafe(`delete from public.patches where id = $1`, [patch.id])
+    await (sql as any).unsafe(
       `update public.system_version set schema_version = greatest(schema_version - 1, 0), last_patch_id = null, installed_at = now() where id = 1`,
     )
   } else {

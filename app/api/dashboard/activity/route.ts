@@ -1,4 +1,4 @@
-import { withAuth, successResponse } from "@/lib/api"
+import { withAuth, successResponse, throwUnlessMissingTable } from "@/lib/api"
 
 /**
  * GET /api/dashboard/activity
@@ -28,6 +28,11 @@ export const GET = withAuth(async (_req, { supabase, userId }) => {
       .order("created_at", { ascending: false })
       .limit(5),
   ])
+
+  const queryResults = [payments, expenses, maintenance, notes]
+  queryResults.forEach((result, index) => {
+    throwUnlessMissingTable(result.error, `Activity query ${index + 1}`)
+  })
 
   type ActivityItem = {
     type: "payment" | "expense" | "maintenance" | "note"

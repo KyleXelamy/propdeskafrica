@@ -72,7 +72,7 @@ export async function runMigrations(opts: { silent?: boolean } = {}): Promise<Mi
         // The neon() template literal handles parameter interpolation; for
         // raw SQL strings we use sql.query with no params.
         try {
-          await sql.query(stmt)
+          await (sql as any).query(stmt)
         } catch (e: any) {
           // Many DDL statements are tolerated as already-exists; we record
           // and continue so one file's warning doesn't break the rest.

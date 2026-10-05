@@ -51,9 +51,9 @@ export function Reveal({
     return () => observer.disconnect()
   }, [])
 
-  // @ts-expect-error — JSX accepts a string tag here at runtime
+  const Element = Tag as React.ElementType
   return (
-    <Tag
+    <Element
       ref={ref}
       style={{ transitionDelay: `${delay}ms` }}
       className={cn(
@@ -63,6 +63,6 @@ export function Reveal({
       )}
     >
       {children}
-    </Tag>
+    </Element>
   )
 }

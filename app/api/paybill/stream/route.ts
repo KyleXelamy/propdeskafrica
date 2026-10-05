@@ -116,7 +116,7 @@ async function pollNewTransactions(userId: string, after: string | null): Promis
         params.push(after)
         where += ` and t.trans_id > $2`
       }
-      const rows = (await sql.unsafe(
+      const rows = (await (sql as any).unsafe(
         `select t.trans_id, t.trans_time, t.trans_amount::float8 as trans_amount,
                 t.business_short_code, t.bill_ref_number, t.msisdn,
                 t.first_name, t.last_name, t.match_status, t.match_method,
@@ -127,7 +127,7 @@ async function pollNewTransactions(userId: string, after: string | null): Promis
          order by t.trans_id desc
          limit 20`,
         params,
-      )) as C2BRow[]
+      )) as unknown as C2BRow[]
       return rows
     } catch {
       return []

@@ -17,7 +17,7 @@ export async function GET() {
     try {
       const sql = getDb()
       const rows = await sql.unsafe(`select id from public.patches`)
-      for (const r of rows as any[]) applied.add(r.id)
+      for (const r of rows as unknown as any[]) applied.add(r.id)
     } catch {
       // ignore
     }
