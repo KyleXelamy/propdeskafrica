@@ -11,11 +11,6 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  // Lock the build output so Vercel + local produce the same artifacts.
-  // 'standalone' copies only the runtime + .next/server, which is what
-  // Vercel expects. Without this, the `client-reference-manifest.js`
-  // resolution can break under certain route group configurations.
-  output: "standalone",
   // Cut down barrel imports from lucide-react so the bundler doesn't
   // try to tree-shake from the (marketing) entry on every build.
   experimental: {
@@ -35,19 +30,6 @@ const nextConfig = {
   // Allow the build to complete when the env doesn't have every secret.
   env: {
     APP_COMMIT: process.env.VERCEL_GIT_COMMIT_SHA ?? "dev",
-  },
-  // Webpack tuning for App Router stability. The big one: this prevents
-  // Next from emitting a "use client" manifest for a page that doesn't
-  // actually use any client features, which is what was breaking the
-  // Vercel build for app/(marketing)/page.tsx.
-  webpack(config, { isServer }) {
-    if (!isServer) {
-      // Client bundle: ensure single source of truth for lucide
-      config.resolve.alias = {
-        ...(config.resolve.alias ?? {}),
-      }
-    }
-    return config
   },
 }
 
