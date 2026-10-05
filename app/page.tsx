@@ -28,10 +28,6 @@ export default function MarketingHome() {
         <div className="absolute inset-0 bg-[linear-gradient(110deg,rgba(21,35,29,.98)_12%,rgba(21,35,29,.72)_52%,rgba(21,35,29,.18)),url('https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=2200&q=85')] bg-cover bg-center" />
         <div className="container-x relative grid min-h-[720px] max-w-[1320px] items-end pt-36 pb-20 lg:px-10 lg:pb-28">
           <div className="max-w-3xl">
-            <p className="mb-7 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.25em] text-accent">
-              <span className="h-px w-10 bg-accent" />
-              The holy grail for landlords &amp; agents
-            </p>
             <h1 className="max-w-4xl text-5xl font-medium leading-[.98] tracking-[-0.055em] sm:text-7xl lg:text-[92px]">
               Run your <em className="font-serif font-normal text-accent">entire portfolio</em> from one place.
             </h1>
@@ -84,20 +80,21 @@ export default function MarketingHome() {
               and human sides of property into one thoughtful workspace.
             </p>
           </div>
-          <div className="mt-20 grid gap-px overflow-hidden rounded-3xl bg-border md:grid-cols-3">
+          <div className="mt-12 grid gap-3 md:grid-cols-3">
             {[
-              { icon: Building2, eyebrow: "Portfolio command", title: "Every property. One clear view.", body: "Move from scattered spreadsheets to a live operating picture of your entire portfolio." },
-              { icon: CircleDollarSign, eyebrow: "Cashflow intelligence", title: "Know what is happening with your money.", body: "Track rent, expenses, arrears and performance without waiting for month-end." },
-              { icon: ShieldCheck, eyebrow: "Operational control", title: "Run the day-to-day with confidence.", body: "Keep leases, documents, maintenance and team activity connected and accountable." },
-            ].map(({ icon: Icon, eyebrow, title, body }, i) => (
-              <article key={title} className="bg-background p-8 lg:p-10">
-                <div className="flex items-center justify-between">
-                  <Icon className="size-8 text-primary" strokeWidth={1.5} />
-                  <span className="text-xs text-muted-foreground">0{i + 1}</span>
+              { icon: Building2, eyebrow: "01 · Portfolio", title: "Every property in view.", body: "One live picture of your buildings, units and people." },
+              { icon: CircleDollarSign, eyebrow: "02 · Cashflow", title: "Know what is moving.", body: "Rent, expenses and arrears without the month-end scramble." },
+              { icon: ShieldCheck, eyebrow: "03 · Operations", title: "Keep work accountable.", body: "Leases, maintenance, documents and activity in one thread." },
+            ].map(({ icon: Icon, eyebrow, title, body }) => (
+              <article key={title} className="group rounded-2xl border border-border bg-background p-6 transition-colors hover:border-primary/40 sm:p-7">
+                <div className="flex items-start justify-between gap-4">
+                  <span className="grid size-10 place-items-center rounded-xl bg-secondary text-primary">
+                    <Icon className="size-5" strokeWidth={1.8} />
+                  </span>
+                  <span className="pt-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">{eyebrow}</span>
                 </div>
-                <p className="mt-16 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">{eyebrow}</p>
-                <h3 className="mt-4 text-2xl font-medium leading-tight tracking-[-0.03em]">{title}</h3>
-                <p className="mt-4 text-sm leading-6 text-muted-foreground">{body}</p>
+                <h3 className="mt-8 text-xl font-medium leading-tight tracking-[-0.03em]">{title}</h3>
+                <p className="mt-3 max-w-xs text-sm leading-6 text-muted-foreground">{body}</p>
               </article>
             ))}
           </div>
