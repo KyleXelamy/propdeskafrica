@@ -103,6 +103,7 @@ export async function updateProfile(formData: FormData) {
   }
 
   revalidatePath("/dashboard/settings")
+  revalidatePath("/dashboard")
   return asAction({ success: true })
 }
 

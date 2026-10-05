@@ -219,7 +219,7 @@ export function MarketingFooter() {
         </div>
       </div>
       <div className="mx-auto flex max-w-[1320px] flex-col gap-3 border-t border-primary-foreground/10 px-5 py-6 text-xs text-primary-foreground/40 sm:flex-row sm:justify-between lg:px-10">
-        <span>© {new Date().getFullYear()} Siemax Ltd. All rights reserved.</span>
+        <span>© {new Date().getFullYear()} I-Manage. All rights reserved.</span>
         <span>Built for property owners who think bigger.</span>
       </div>
     </footer>

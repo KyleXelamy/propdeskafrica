@@ -1,6 +1,6 @@
 export const BRAND = {
   product: "I-Manage",
-  company: "Siemax Ltd",
+  company: "I-Manage",
   creator: "Brian Kiarie",
   supportEmail: "bknglabs.dev@gmail.com",
   supportPhone: "0758034649",

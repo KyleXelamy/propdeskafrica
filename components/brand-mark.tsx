@@ -65,7 +65,7 @@ export function BrandWordmark({ href, showSubtitle = true, size = "md", classNam
         <span className={`${titleSize} font-bold tracking-tight`}>I-Manage</span>
         {showSubtitle && (
           <span className={`${subSize} uppercase tracking-[0.18em] text-muted-foreground`}>
-            by Siemax Ltd
+            Property operations
           </span>
         )}
       </span>

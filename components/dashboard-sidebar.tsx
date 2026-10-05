@@ -58,6 +58,7 @@ const navigation = [
 interface SidebarProps {
   userEmail?: string
   userName?: string
+  companyName?: string | null
   avatarUrl?: string | null
 }
 
@@ -67,7 +68,7 @@ function initials(name?: string | null, email?: string): string {
   return src.split(/\s+/).filter(Boolean).slice(0, 2).map((s) => s[0]?.toUpperCase() || "").join("") || "?"
 }
 
-function SidebarContent({ userEmail, userName, avatarUrl, onNavigate }: SidebarProps & { onNavigate?: () => void }) {
+function SidebarContent({ userEmail, userName, companyName, avatarUrl, onNavigate }: SidebarProps & { onNavigate?: () => void }) {
   const pathname = usePathname()
 
   return (
@@ -75,7 +76,7 @@ function SidebarContent({ userEmail, userName, avatarUrl, onNavigate }: SidebarP
       {/* Logo */}
       <div className="flex h-14 md:h-16 items-center border-b border-sidebar-border px-4 md:px-6">
         <Building2 className="h-6 w-6 md:h-8 md:w-8 text-sidebar-accent" />
-        <span className="ml-2 text-base md:text-lg font-bold text-sidebar-foreground">I-Manage</span>
+        <span className="ml-2 min-w-0 truncate text-base font-bold text-sidebar-foreground md:text-lg">{companyName || "I-Manage"}</span>
       </div>
 
       {/* Navigation */}
@@ -137,7 +138,7 @@ function SidebarContent({ userEmail, userName, avatarUrl, onNavigate }: SidebarP
   )
 }
 
-export function DashboardSidebar({ userEmail, userName, avatarUrl }: SidebarProps) {
+export function DashboardSidebar({ userEmail, userName, companyName, avatarUrl }: SidebarProps) {
   const [open, setOpen] = useState(false)
 
   const handleNavigate = () => {
@@ -158,7 +159,7 @@ export function DashboardSidebar({ userEmail, userName, avatarUrl }: SidebarProp
           </Button>
         </SheetTrigger>
         <SheetContent side="left" className="p-0 w-72 sm:w-80">
-          <SidebarContent userEmail={userEmail} userName={userName} avatarUrl={avatarUrl} onNavigate={handleNavigate} />
+          <SidebarContent userEmail={userEmail} userName={userName} companyName={companyName} avatarUrl={avatarUrl} onNavigate={handleNavigate} />
         </SheetContent>
       </Sheet>
 

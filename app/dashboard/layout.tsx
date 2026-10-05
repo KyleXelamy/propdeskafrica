@@ -42,7 +42,7 @@ export default async function DashboardLayout({
   // Pull avatar/name in the same pass — sidebar needs them on every page.
   const { data: profile } = await supabase
     .from("user_profiles")
-    .select("full_name, avatar_url")
+    .select("full_name, company_name, avatar_url")
     .eq("user_id", user.id)
     .maybeSingle()
 
@@ -51,6 +51,7 @@ export default async function DashboardLayout({
       <DashboardSidebar
         userEmail={user.email || "user@example.com"}
         userName={(profile as any)?.full_name || undefined}
+        companyName={(profile as any)?.company_name || null}
         avatarUrl={(profile as any)?.avatar_url || null}
       />
 
