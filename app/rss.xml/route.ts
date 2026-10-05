@@ -4,8 +4,8 @@ const SITE = "https://i-manage.app"
 const FEED_TITLE = "I-Manage by Siemax Ltd — Resources"
 const FEED_DESCRIPTION = "Practical property management guides, product updates and operating notes for landlords across Africa."
 
-function escape(str: string) {
-  return str
+function escape(value: string) {
+  return value
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
@@ -13,26 +13,33 @@ function escape(str: string) {
     .replace(/'/g, "&apos;")
 }
 
+function safeDate(value: string) {
+  const date = new Date(value)
+  return Number.isNaN(date.getTime()) ? new Date(0) : date
+}
+
 export const dynamic = "force-static"
 
 export async function GET() {
   const items = blogPosts
-    .map((p) => {
-      const url = `${SITE}/resources/${p.slug}`
+    .filter((post) => post.slug && post.title && post.excerpt)
+    .map((post) => {
+      const url = `${SITE}/resources/${encodeURIComponent(post.slug)}`
+      const author = post.author?.name || "I-Manage by Siemax Ltd"
       return `<item>
-        <title>${escape(p.title)}</title>
+        <title>${escape(post.title)}</title>
         <link>${url}</link>
-        <guid>${url}</guid>
-        <pubDate>${new Date(p.publishedAt).toUTCString()}</pubDate>
-        <category>${escape(p.category)}</category>
-        <author>${escape(p.author.name)}</author>
-        <description>${escape(p.excerpt)}</description>
+        <guid isPermaLink="true">${url}</guid>
+        <pubDate>${safeDate(post.publishedAt).toUTCString()}</pubDate>
+        <category>${escape(post.category || "Resources")}</category>
+        <dc:creator>${escape(author)}</dc:creator>
+        <description>${escape(post.excerpt)}</description>
       </item>`
     })
     .join("\n")
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
   <channel>
     <title>${escape(FEED_TITLE)}</title>
     <link>${SITE}/resources</link>
