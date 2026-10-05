@@ -24,6 +24,25 @@ create index if not exists properties_landlord_idx
   where landlord_id is not null;
 
 -- ------------------------------------------------------------
+-- property_photos: property gallery metadata
+-- ------------------------------------------------------------
+create table if not exists public.property_photos (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  property_id uuid not null references public.properties(id) on delete cascade,
+  file_url text not null,
+  storage_path text,
+  caption text,
+  display_order integer not null default 0,
+  is_cover boolean not null default false,
+  uploaded_at timestamptz not null default now()
+);
+create index if not exists property_photos_property_idx on public.property_photos(property_id, display_order);
+alter table public.property_photos enable row level security;
+drop policy if exists "property_photos_owner" on public.property_photos;
+create policy "property_photos_owner" on public.property_photos for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
+-- ------------------------------------------------------------
 -- paybills: one per Safaricom account number per workspace
 -- ------------------------------------------------------------
 create table if not exists public.paybills (

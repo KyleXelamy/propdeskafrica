@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { AlertTriangle, CheckCircle2, XCircle, Settings2, ListOrdered } from "lucide-react"
+import Link from "next/link"
 import { ReconciliationRules } from "@/components/reconciliation-rules"
 
 export const metadata: Metadata = {

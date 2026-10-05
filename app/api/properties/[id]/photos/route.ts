@@ -12,7 +12,7 @@ const ALLOWED = new Set(["image/png", "image/jpeg", "image/webp", "image/gif"])
  * Returns the photo gallery for a property (ordered by display_order, then
  * uploaded_at). Each row includes id, file_url, caption, is_cover, etc.
  */
-export const GET = withAuth(async (_req, _ctx, { supabase, userId, params }) => {
+export const GET = withAuth<{ id: string }>(async (_req, { supabase, userId }, params) => {
   const { data, error } = await supabase
     .from("property_photos")
     .select("id, file_url, caption, display_order, is_cover, uploaded_at")
@@ -28,7 +28,7 @@ export const GET = withAuth(async (_req, _ctx, { supabase, userId, params }) => 
  * POST /api/properties/[id]/photos
  * multipart/form-data: `file` (image) + optional `caption` + `isCover` flag.
  */
-export const POST = withAuth(async (req: NextRequest, _ctx, { supabase, userId, params }) => {
+export const POST = withAuth<{ id: string }>(async (req: NextRequest, { supabase, userId }, params) => {
   const form = await req.formData().catch(() => null)
   if (!form) throw new HttpError("Expected multipart/form-data", 400)
   const file = form.get("file")
