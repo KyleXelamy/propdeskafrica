@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Wallet, Plus, Copy, RefreshCw, TrendingUp, AlertTriangle } from "lucide-react"
+import { LivePaybillFeed } from "@/components/live-paybill-feed"
 
 export const metadata: Metadata = {
   title: "Paybill — I-Manage",
@@ -202,6 +203,8 @@ export default function PaybillPage() {
           </div>
         </CardContent>
       </Card>
+
+      <LivePaybillFeed />
     </div>
   )
 }
