@@ -1,6 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server"
 import { withAuth } from "@/lib/api"
-import { neonConfigured, getDb } from "@/lib/db/neon"
 
 /**
  * POST /api/properties/[id]/geocode
@@ -14,22 +13,23 @@ export const runtime = "nodejs"
 
 const NOMINATIM = "https://nominatim.openstreetmap.org/search"
 
-export const POST = withAuth(async (request, { userId }, { id }) => {
-  if (!neonConfigured()) {
-    return NextResponse.json({ error: "Geocoding requires DATABASE_URL" }, { status: 501 })
+export const POST = withAuth(async (_request, { supabase, userId }, { id }) => {
+  const { data: property, error: propertyError } = await supabase
+    .from("properties")
+    .select("id, address, city, county, name")
+    .eq("id", id)
+    .eq("user_id", userId)
+    .maybeSingle()
+
+  if (propertyError) {
+    console.error("[geocode] property lookup failed", propertyError)
+    return NextResponse.json({ error: "Unable to load property" }, { status: 500 })
   }
-  const sql = getDb()
-  const rows = await sql`
-    select id, address, city, county, country, name
-    from public.properties
-    where id = ${id} and user_id = ${userId}
-    limit 1
-  `
-  if (rows.length === 0) {
+  if (!property) {
     return NextResponse.json({ error: "Property not found" }, { status: 404 })
   }
-  const p = rows[0]
-  const query = [p.address, p.city, p.county, p.country].filter(Boolean).join(", ")
+
+  const query = [property.address, property.city, property.county, "Kenya"].filter(Boolean).join(", ")
   if (!query) {
     return NextResponse.json({ error: "Property has no address to geocode" }, { status: 400 })
   }
@@ -60,11 +60,19 @@ export const POST = withAuth(async (request, { userId }, { id }) => {
     if (!isFinite(lat) || !isFinite(lon)) {
       return NextResponse.json({ error: "Invalid Nominatim response" }, { status: 502 })
     }
-    await sql`
-      update public.properties
-      set latitude = ${lat}, longitude = ${lon}, geocoded_at = now()
-      where id = ${id} and user_id = ${userId}
-    `
+    const { error: updateError } = await supabase
+      .from("properties")
+      .update({ latitude: lat, longitude: lon, geocoded_at: new Date().toISOString() })
+      .eq("id", id)
+      .eq("user_id", userId)
+
+    if (updateError) {
+      console.error("[geocode] coordinate update failed", updateError)
+      return NextResponse.json(
+        { error: "Geocoding columns are not available. Run the property geocoding migration first." },
+        { status: 503 },
+      )
+    }
     return NextResponse.json({
       ok: true,
       latitude: lat,
