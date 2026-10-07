@@ -76,7 +76,18 @@ export async function signUp(_prevState: any, formData: FormData) {
     })
 
     if (error) {
-      return { error: error.message }
+      const message = error.message.toLowerCase()
+      if (message.includes("rate limit") || message.includes("over_email_send_rate_limit")) {
+        return {
+          error: "Too many confirmation emails were requested. Please wait a while before trying again, then check your inbox and spam folder.",
+        }
+      }
+      if (message.includes("email_address_not_authorized")) {
+        return {
+          error: "This Supabase project is currently limiting confirmation emails to approved addresses. Please use an approved test address or ask the deployment owner to configure email delivery.",
+        }
+      }
+      return { error: "We could not create your account right now. Please try again later." }
     }
 
     return {

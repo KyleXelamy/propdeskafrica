@@ -28,13 +28,13 @@ export const metadata: Metadata = {
   creator: "Brian Kiarie",
   publisher: "I-Manage",
   keywords: [
-    "property management",
-    "rental management",
+    "property management software",
+    "rental management software",
     "landlord software",
-    "property management agency",
-    "paybill integration",
+    "property management Kenya",
+    "rent collection software",
     "I-Manage",
-    ],
+  ],
   generator: "Next.js",
   openGraph: {
     type: "website",
@@ -82,6 +82,21 @@ export default function RootLayout({
           {children}
           <CookieConsent />
         </ThemeProvider>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "SoftwareApplication",
+              name: "I-Manage",
+              applicationCategory: "BusinessApplication",
+              operatingSystem: "Web",
+              url: siteUrl,
+              description: "Property operations software for landlords and property teams.",
+              publisher: { "@type": "Organization", name: "I-Manage", url: siteUrl },
+            }),
+          }}
+        />
       </body>
     </html>
   )

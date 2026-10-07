@@ -1,4 +1,5 @@
 import type React from "react"
+import type { Metadata } from "next"
 import { headers } from "next/headers"
 import { DashboardSidebar } from "@/components/dashboard-sidebar"
 import { NotificationsBell } from "@/components/notifications-bell"
@@ -6,6 +7,10 @@ import { PwaInstallPrompt } from "@/components/pwa-install-prompt"
 import { TrialBanner } from "@/components/trial-banner"
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
+
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+}
 
 export default async function DashboardLayout({
   children,

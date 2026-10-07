@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next"
 import { blogPosts } from "@/lib/content/blog"
 
-const SITE = "https://bknglabs.dev"
+const SITE = "https://i-manage.app"
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date()
@@ -10,6 +10,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/",
     "/about",
     "/pricing",
+    "/features",
+    "/solutions",
+    "/docs",
     "/contact",
     "/app",
     "/resources",

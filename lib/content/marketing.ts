@@ -255,11 +255,7 @@ export const solutions: Solution[] = [
     audience: "Individual landlords managing their own properties.",
     summary:
       "You're running your properties on weekends and WhatsApp. I-Manage replaces the spreadsheet with one calm workspace — without making you a software expert.",
-    outcomes: [
-      { label: "Time saved per month", value: "12+ hours" },
-      { label: "Late rent reduction", value: "−75%" },
-      { label: "Onboarding time", value: "< 15 min" },
-    ],
+    outcomes: [],
     image: "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=1600&q=80",
   },
   {
@@ -269,11 +265,7 @@ export const solutions: Solution[] = [
     audience: "Property management agencies with their own landlord clients.",
     summary:
       "Run your entire book under one roof with separate landlord accounts, role-based access and SLA-backed support.",
-    outcomes: [
-      { label: "Units under management", value: "50 → 5,000" },
-      { label: "Team time saved", value: "32h / mo" },
-      { label: "Landlord retention", value: "+18 pts" },
-    ],
+    outcomes: [],
     image: "https://images.unsplash.com/photo-1554469384-e58fac16e23a?auto=format&fit=crop&w=1600&q=80",
   },
   {
@@ -283,11 +275,7 @@ export const solutions: Solution[] = [
     audience: "Owners and operators of commercial real estate.",
     summary:
       "Multi-tenant leases, CAM charges, rent escalations, percentage rent and triple-net — handled natively. Xero and QuickBooks sync ready.",
-    outcomes: [
-      { label: "Recovery rate", value: "98%" },
-      { label: "CAM disputes", value: "−60%" },
-      { label: "Audit prep time", value: "−75%" },
-    ],
+    outcomes: [],
     image: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1600&q=80",
   },
   {
@@ -297,11 +285,7 @@ export const solutions: Solution[] = [
     audience: "Airbnb-style and hybrid nightly + monthly operators.",
     summary:
       "Track nightly, weekly and monthly stays in the same workspace. Sync with Booking.com and Airbnb. Reconcile across platforms automatically.",
-    outcomes: [
-      { label: "Average nightly rate", value: "+12%" },
-      { label: "Channel fees saved", value: "KES 80k/yr" },
-      { label: "Reconciliation time", value: "−85%" },
-    ],
+    outcomes: [],
     image: "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=1600&q=80",
   },
   {
