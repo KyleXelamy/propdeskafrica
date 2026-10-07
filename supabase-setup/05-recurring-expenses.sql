@@ -94,16 +94,25 @@ end;
 $$;
 
 -- 3) schedule via pg_cron ---------------------------------------------------
-do $$
-declare
-  existing bigint;
+-- Wrapped so plain Postgres / Neon (no pg_cron) doesn't break the
+-- migration. Use POST /api/cron/run from an external scheduler instead.
+do $pgc$
 begin
-  select jobid into existing from cron.job where jobname = 'recurring_expenses_daily';
-  if existing is not null then perform cron.unschedule(existing); end if;
-end $$;
-
-select cron.schedule(
-  'recurring_expenses_daily',
-  '5 7 * * *',  -- 5 minutes after lease scan
-  $$ select public.run_recurring_expenses(); $$
-);
+  begin
+    create extension if not exists pg_cron;
+  exception when others then
+    raise notice 'pg_cron not available — skipping in-DB schedule. Use /api/cron/run externally.';
+    return;
+  end;
+  if exists (select 1 from cron.job where jobname = 'recurring_expenses_daily') then
+    perform cron.unschedule((select jobid from cron.job where jobname = 'recurring_expenses_daily' limit 1));
+  end if;
+  perform cron.schedule(
+    'recurring_expenses_daily',
+    '5 7 * * *',
+    $sql$ select public.run_recurring_expenses(); $sql$
+  );
+exception when others then
+  raise notice 'pg_cron scheduling failed: %', SQLERRM;
+end
+$pgc$;

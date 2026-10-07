@@ -3,6 +3,7 @@ import { headers } from "next/headers"
 import { DashboardSidebar } from "@/components/dashboard-sidebar"
 import { NotificationsBell } from "@/components/notifications-bell"
 import { PwaInstallPrompt } from "@/components/pwa-install-prompt"
+import { TrialBanner } from "@/components/trial-banner"
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 
@@ -70,6 +71,7 @@ export default async function DashboardLayout({
         <main className="flex-1 relative overflow-y-auto focus:outline-none">
           <div className="py-4 md:py-6">
             <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
+              <TrialBanner />
               {children}
             </div>
           </div>

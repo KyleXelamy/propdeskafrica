@@ -52,7 +52,7 @@ export type BackupTable = (typeof BACKUP_TABLES)[number]
  * the `system_version.schema_version` row in the DB. When lower, the
  * patch runner knows there are migrations to apply.
  */
-export const CURRENT_SCHEMA_VERSION = 13
+export const CURRENT_SCHEMA_VERSION = 15
 
 export const APP_VERSION = "5.0.0"
 export const APP_NAME = "I-Manage"
@@ -91,6 +91,8 @@ export const PATCH_LOG: PatchDescriptor[] = [
   { id: "p_2026_10_003", description: "Seed system_health() helper", fn: "init-views", kind: "config" },
   { id: "p_2026_10_004", description: "Auto-backup: per-user schedule + prune_old_backups() function", sql: "12-auto-backup.sql", kind: "config" },
   { id: "p_2026_10_005", description: "Atomic bump_paybill_counters() RPC for C2B confirmation", sql: "13-paybill-counters.sql", kind: "config" },
+  { id: "p_2026_10_006", description: "Subscriptions: plans + per-user subscription + trial + admin_grant_subscription RPC", sql: "14-subscriptions.sql", kind: "schema" },
+  { id: "p_2026_10_007", description: "Subscription payments: per-user STK push intents for plans", sql: "15-subscription-payments.sql", kind: "schema" },
 ]
 
 export function describePatches(): Array<{ id: string; description: string; kind: string }> {

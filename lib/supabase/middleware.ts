@@ -93,6 +93,27 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
+  // Subscription gate: any authenticated user hitting /dashboard/** (except
+  // /dashboard/billing which is the "your trial ended" page) must have an
+  // active subscription. The check is best-effort — we don't block API
+  // requests here, only UI navigation. We use a one-shot `getUser()`-level
+  // fetch to the subscription_status RPC via a server client. If the
+  // RPC isn't installed yet (migrations not run), we allow the request
+  // through to keep the dev experience smooth.
+  if (user && isDashboard && pathname !== "/dashboard/billing" && !pathname.startsWith("/dashboard/billing/")) {
+    try {
+      const { data: subStatus } = await supabase.rpc("subscription_status" as any, { p_user: user.id } as any)
+      const s = Array.isArray(subStatus) ? subStatus[0] : subStatus
+      if (s && (s as any).is_active === false) {
+        const url = new URL("/dashboard/billing", request.url)
+        url.searchParams.set("reason", (s as any).reason || "expired")
+        return NextResponse.redirect(url)
+      }
+    } catch {
+      // Subscriptions table not installed or RPC missing — let it pass
+    }
+  }
+
   return response
 }
 

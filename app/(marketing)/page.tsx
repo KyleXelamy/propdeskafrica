@@ -56,7 +56,7 @@ export default function MarketingHome() {
       <section className="border-y border-border bg-background py-10">
         <div className="container-x">
           <p className="text-center text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">
-            Trusted by 2,500+ landlords across 12 cities
+            Trusted by 40 landlords across 12 cities
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-x-10 gap-y-4">
             {trustLogos.map((l) => (

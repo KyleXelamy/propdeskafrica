@@ -142,9 +142,9 @@ export default function AboutPage() {
         <div className="container-x">
           <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-4">
             {[
-              { k: "2,500+", v: "Properties under management" },
-              { k: "KES 150M+", v: "Rent processed annually" },
-              { k: "94.8%", v: "Average on-time collection rate" },
+              { k: "40", v: "Properties under management" },
+              { k: "KES 25M", v: "Rent processed annually" },
+              { k: "97%", v: "Average on-time collection rate" },
               { k: "12", v: "Cities served today" },
             ].map((s) => (
               <div key={s.k}>

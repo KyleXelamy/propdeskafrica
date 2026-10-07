@@ -88,16 +88,25 @@ $$;
 -- (covered by app code in lib/api — see POST /api/notifications/scan)
 
 -- 3) schedule via pg_cron ---------------------------------------------------
-do $$
-declare
-  existing bigint;
+-- Wrapped so plain Postgres / Neon (no pg_cron) doesn't break the
+-- migration. Use POST /api/cron/run from an external scheduler instead.
+do $pgc$
 begin
-  select jobid into existing from cron.job where jobname = 'maintenance_reminder_scan_daily';
-  if existing is not null then perform cron.unschedule(existing); end if;
-end $$;
-
-select cron.schedule(
-  'maintenance_reminder_scan_daily',
-  '15 7 * * *', -- 5 min after document scan
-  $$ select public.run_maintenance_reminder_scan(); $$
-);
+  begin
+    create extension if not exists pg_cron;
+  exception when others then
+    raise notice 'pg_cron not available — skipping in-DB schedule. Use /api/cron/run externally.';
+    return;
+  end;
+  if exists (select 1 from cron.job where jobname = 'maintenance_reminder_scan_daily') then
+    perform cron.unschedule((select jobid from cron.job where jobname = 'maintenance_reminder_scan_daily' limit 1));
+  end if;
+  perform cron.schedule(
+    'maintenance_reminder_scan_daily',
+    '15 7 * * *',
+    $sql$ select public.run_maintenance_reminder_scan(); $sql$
+  );
+exception when others then
+  raise notice 'pg_cron scheduling failed: %', SQLERRM;
+end
+$pgc$;

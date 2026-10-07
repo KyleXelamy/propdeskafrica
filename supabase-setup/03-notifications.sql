@@ -143,26 +143,34 @@ $$;
 -- 3) pg_cron scheduling ------------------------------------------------------
 -- Runs every day at 07:00 UTC. Adjust timezone if your tenants are mostly
 -- in one region (use TZ=Africa/Nairobi for EAT). pg_cron uses UTC by default.
+--
+-- The pg_cron bits are wrapped in a DO block that swallows errors. On
+-- plain Postgres / Neon (where pg_cron isn't installed), the schedule
+-- call fails — and the failure cascades, breaking every migration that
+-- runs after this one. If you want the scheduled scan, run a separate
+-- external scheduler that calls POST /api/cron/run (see README).
 
-create extension if not exists pg_cron;
-
--- Re-create the schedule idempotently. cron.schedule_job errors if the name
--- already exists in cron.job, so unschedule first if needed.
-do $$
-declare
-  existing bigint;
+do $pgc$
 begin
-  select jobid into existing from cron.job where jobname = 'lease_expiry_scan_daily';
-  if existing is not null then
-    perform cron.unschedule(existing);
+  begin
+    create extension if not exists pg_cron;
+  exception when others then
+    raise notice 'pg_cron extension not available — skipping in-DB scheduling. Use /api/cron/run externally.';
+    return;
+  end;
+  -- Re-create the schedule idempotently
+  if exists (select 1 from cron.job where jobname = 'lease_expiry_scan_daily') then
+    perform cron.unschedule((select jobid from cron.job where jobname = 'lease_expiry_scan_daily' limit 1));
   end if;
-end $$;
-
-select cron.schedule(
-  'lease_expiry_scan_daily',
-  '0 7 * * *',
-  $$ select public.run_lease_expiry_scan(); $$
-);
+  perform cron.schedule(
+    'lease_expiry_scan_daily',
+    '0 7 * * *',
+    $sql$ select public.run_lease_expiry_scan(); $sql$
+  );
+exception when others then
+  raise notice 'pg_cron scheduling failed: %. Use /api/cron/run.', SQLERRM;
+end
+$pgc$;
 
 -- 4) helper for users to mark all-read in one shot ---------------------------
 create or replace function public.mark_all_notifications_read(p_user uuid)

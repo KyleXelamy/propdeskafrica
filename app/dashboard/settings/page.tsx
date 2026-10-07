@@ -37,11 +37,15 @@ export default async function SettingsPage() {
     .eq("user_id", user.id)
     .maybeSingle()
 
-  const { data: company } = await supabase
-    .from("companies")
-    .select("name")
-    .eq("owner_id", user.id)
-    .maybeSingle()
+  // Some queries hit tables that may not exist yet on a partial install.
+  // Wrap each in try/catch so a missing table doesn't take down the page.
+  const safeQuery = async <T,>(fn: () => Promise<{ data: T | null }>): Promise<T | null> => {
+    try { return (await fn()).data } catch { return null }
+  }
+
+  const company = await safeQuery<{ name: string }>(() =>
+    supabase.from("companies").select("name").eq("owner_id", user.id).maybeSingle(),
+  )
   const workspaceName = company?.name || profile?.company_name || ""
   const notificationPreferences = (profile?.notification_preferences as Record<string, boolean> | null) || {}
 

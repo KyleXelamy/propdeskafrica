@@ -15,13 +15,30 @@ export default async function CompanyPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect("/auth/login")
 
-  const { data: company } = await supabase.from("companies").select("id, name, type").eq("owner_id", user.id).maybeSingle()
-  const [{ data: team }, { data: landlords }] = company
-    ? await Promise.all([
+  // Tolerate missing tables (partial install). Each call returns null on
+  // failure instead of throwing — the UI degrades to an empty workspace.
+  const safeQuery = async <T,>(fn: () => Promise<{ data: T | null }>): Promise<T | null> => {
+    try { return (await fn()).data } catch { return null }
+  }
+
+  const company = await safeQuery<{ id: string; name: string; type: string }>(() =>
+    supabase.from("companies").select("id, name, type").eq("owner_id", user.id).maybeSingle(),
+  )
+
+  let team: any[] = []
+  let landlords: any[] = []
+  if (company) {
+    const [t, l] = await Promise.all([
+      safeQuery<any[]>(() =>
         supabase.from("team_members").select("id, name, email, role, accepted_at").eq("company_id", company.id).order("name"),
+      ),
+      safeQuery<any[]>(() =>
         supabase.from("managed_landlords").select("id, name, units, manager, revenue_share, status").eq("company_id", company.id).order("name"),
-      ])
-    : [{ data: [] }, { data: [] }]
+      ),
+    ])
+    team = t || []
+    landlords = l || []
+  }
 
   const members = team || []
   const managedLandlords = landlords || []

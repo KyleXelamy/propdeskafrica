@@ -24,6 +24,7 @@
     "start": "next start",
     "db:migrate": "tsx lib/db/migrate.ts",
     "db:ping": "tsx -e \"import('./lib/db/neon').then(m => m.pingDb()).then(r => console.log(JSON.stringify(r)))\"",
+    "templates:prebuild": "tsx scripts/prebuild-templates.ts",
     "prebuild": "node scripts/check-use-client.js",
     "check:client": "node scripts/check-use-client.js"
   },
@@ -67,6 +68,7 @@
     "clsx": "^2.1.1",
     "cmdk": "1.0.4",
     "date-fns": "4.1.0",
+    "docx": "^9.9.0",
     "embla-carousel-react": "8.5.1",
     "input-otp": "1.4.1",
     "leaflet": "^1.9.4",

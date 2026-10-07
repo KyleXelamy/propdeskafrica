@@ -1,12 +1,11 @@
-import { NextResponse, type NextRequest } from "next/server"
-import { templates } from "@/lib/content/marketing"
+import { successResponse } from "@/lib/api"
+import { listTemplates } from "@/lib/templates/templates"
 
-export const runtime = "nodejs"
-
-export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url)
-  const category = searchParams.get("category")
-  let items = templates
-  if (category) items = items.filter((t) => t.category.toLowerCase() === category.toLowerCase())
-  return NextResponse.json({ count: items.length, templates: items })
+/**
+ * GET /api/templates
+ * Public list of all available templates. Each entry includes the input
+ * fields so the UI can build a form for them.
+ */
+export async function GET() {
+  return successResponse(listTemplates())
 }
