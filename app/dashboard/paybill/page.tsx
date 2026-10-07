@@ -19,7 +19,7 @@ export default function PaybillPage() {
       const supabase = createClient()
       const [paybillsResult, transactionsResult] = await Promise.all([
         supabase.from("paybills").select("id, label, number, type, active, created_at").order("created_at", { ascending: false }),
-        supabase.from("c2b_transactions").select("id, paybill_id, amount, match_status, created_at").order("created_at", { ascending: false }),
+        supabase.from("c2b_transactions").select("id, paybill_id, trans_amount, match_status, created_at").order("created_at", { ascending: false }),
       ])
       if (paybillsResult.error || transactionsResult.error) {
         setError(paybillsResult.error?.message || transactionsResult.error?.message || "Could not load paybill data")
@@ -34,7 +34,7 @@ export default function PaybillPage() {
 
   const matched = transactions.filter((t) => t.match_status === "matched")
   const unmatched = transactions.filter((t) => t.match_status !== "matched")
-  const totalCollected = transactions.reduce((sum, t) => sum + Number(t.amount || 0), 0)
+  const totalCollected = transactions.reduce((sum, t) => sum + Number(t.trans_amount || 0), 0)
 
   return (
     <div className="space-y-8">
