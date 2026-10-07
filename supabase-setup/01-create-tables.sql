@@ -3,7 +3,7 @@
 -- Run this in: Supabase Dashboard → SQL Editor → New query
 -- =====================================================================
 -- Idempotent: safe to re-run. Each CREATE uses IF NOT EXISTS and each
--- ALTER uses ADD COLUMN IF NOT EXISTS so you can run it on a fresh
+-- ALTER useyyyys ADD COLUMN IF NOT EXISTS so you can run it on a fresh
 -- project OR on an already-deployed project to bring the schema up to
 -- date.
 -- =====================================================================
