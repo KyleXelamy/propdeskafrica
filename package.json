@@ -1,6 +1,7 @@
 {
   "name": "i-manage",
   "version": "1.0.0",
+  "packageManager": "pnpm@10.34.6",
   "private": true,
   "description": "I-Manage by Siemax Ltd — modern property management for landlords and tenants.",
   "author": {
