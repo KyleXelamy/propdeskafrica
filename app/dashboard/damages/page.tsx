@@ -10,44 +10,18 @@ export const metadata: Metadata = {
   description: "Photo-document move-in condition, track damages, settle deposits fairly.",
 }
 
-const damages = [
-  {
-    id: "DMG-204",
-    title: "Cracked bathroom tile — shower floor",
-    property: "Karen House 1",
-    tenant: "Brian Mwangi",
-    severity: "Medium",
-    status: "In repair",
-    reported: "2026-09-12",
-    cost: 4500,
-    photos: 3,
-    location: "Bathroom · shower floor",
-  },
-  {
-    id: "DMG-203",
-    title: "Broken window latch — bedroom 2",
-    property: "Riverside Apartments",
-    tenant: "Aisha Otieno",
-    severity: "Low",
-    status: "Resolved",
-    reported: "2026-09-04",
-    cost: 1800,
-    photos: 2,
-    location: "Bedroom 2",
-  },
-  {
-    id: "DMG-202",
-    title: "Stained carpet — living room",
-    property: "Westlands Studio",
-    tenant: "Joseph Kamau",
-    severity: "High",
-    status: "Deposit deduction",
-    reported: "2026-08-28",
-    cost: 12000,
-    photos: 5,
-    location: "Living room",
-  },
-]
+const damages: Array<{
+  id: string
+  title: string
+  property: string
+  tenant: string
+  severity: string
+  status: string
+  reported: string
+  cost: number
+  photos: number
+  location: string
+}> = []
 
 const severityStyle: Record<string, string> = {
   Low: "bg-muted text-muted-foreground",
@@ -80,10 +54,10 @@ export default function DamagesPage() {
         <Card>
           <CardHeader className="pb-2">
             <CardDescription>Active damages</CardDescription>
-            <CardTitle className="text-3xl">3</CardTitle>
+            <CardTitle className="text-3xl">0</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-xs text-muted-foreground">Across 3 properties</p>
+            <p className="text-xs text-muted-foreground">No records yet</p>
           </CardContent>
         </Card>
         <Card>
