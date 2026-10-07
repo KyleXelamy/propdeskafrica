@@ -101,8 +101,8 @@ export default function BrandPage() {
           </h2>
           <p className="mt-4 text-base text-muted-foreground">
             Email{" "}
-            <Link href="mailto:brand@i-manage.app" className="font-medium text-primary underline">
-              brand@i-manage.app
+            <Link href="mailto:bknglabs.dev@gmail.com" className="font-medium text-primary underline">
+              bknglabs.dev@gmail.com
             </Link>{" "}
             and we'll get back within a day.
           </p>

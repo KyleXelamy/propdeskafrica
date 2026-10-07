@@ -30,7 +30,7 @@ export default function ContactSupportPage() {
             {[
               { icon: BookOpen, title: "Docs first", body: "Most questions are already answered in the docs.", href: "/docs", cta: "Browse docs" },
               { icon: MessageSquare, title: "Community", body: "4,200+ landlords in our Discord. Open 24/7.", href: "/community", cta: "Join the Discord" },
-              { icon: Mail, title: "Email us", body: "We reply within one business day, usually faster.", href: "mailto:support@i-manage.app", cta: "support@i-manage.app" },
+              { icon: Mail, title: "Email us", body: "We reply within one business day, usually faster.", href: "mailto:bknglabs.dev@gmail.com", cta: "bknglabs.dev@gmail.com" },
             ].map((c) => (
               <Link
                 key={c.title}

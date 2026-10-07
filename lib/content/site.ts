@@ -15,44 +15,6 @@ export type OpenRole = {
 
 export const openRoles: OpenRole[] = []
 
-export type Testimonial = {
-  quote: string
-  name: string
-  role: string
-  company: string
-  initials: string
-  location: string
-}
-
-export const testimonials: Testimonial[] = [
-  {
-    quote:
-      "I used to lose a full Saturday every month chasing late rent. I-Manage's M-Pesa reminders do it for me now. The Saturday is mine again.",
-    name: "Brian Kiarie",
-    role: "Landlord",
-    company: "Kiarie Holdings",
-    initials: "BK",
-    location: "Nairobi",
-  },
-  {
-    quote:
-      "We manage 200+ units across three cities. I-Manage is the first tool that gave my property managers a single source of truth without a six-month rollout.",
-    name: "Wanjiru M.",
-    role: "Operations Director",
-    company: "Highland Estates",
-    initials: "WM",
-    location: "Eldoret",
-  },
-  {
-    quote:
-      "Tenants actually like paying through the portal. Our collection rate went from 78% to 96% in our first quarter on the platform.",
-    name: "Samuel O.",
-    role: "Founder",
-    company: "Coast Living",
-    initials: "SO",
-    location: "Mombasa",
-  },
-]
 
 export type CaseStudy = {
   slug: string
@@ -67,46 +29,9 @@ export type CaseStudy = {
   cover: string
 }
 
-export const caseStudies: CaseStudy[] = [
-  {
-    slug: "highland-estates",
-    company: "Highland Estates",
-    industry: "Multi-family residential",
-    units: "212 units",
-    location: "Eldoret, Kenya",
-    summary:
-      "Highland Estates runs a growing portfolio of mid-market family homes. They adopted I-Manage to standardise reporting and replace four different spreadsheets.",
-    results: [
-      { label: "On-time collection", value: "78% → 96%" },
-      { label: "Hours/month saved", value: "32h" },
-      { label: "First-year ROI", value: "5.4×" },
-    ],
-    quote:
-      "I-Manage is the first tool that made reporting something I look forward to sharing with my investors.",
-    quoteAuthor: "Wanjiru M., Operations Director",
-    cover:
-      "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=1600&q=80",
-  },
-  {
-    slug: "coast-living",
-    company: "Coast Living",
-    industry: "Short-stay + long-stay hybrid",
-    units: "84 units",
-    location: "Mombasa, Kenya",
-    summary:
-      "Coast Living operates beach apartments with mixed nightly and monthly tenants. I-Manage's flexible lease model and M-Pesa STK Push fit their cashflow cycle.",
-    results: [
-      { label: "Tenant adoption", value: "92%" },
-      { label: "Support tickets", value: "−41%" },
-      { label: "M-Pesa fee savings", value: "KES 38k / mo" },
-    ],
-    quote:
-      "Our tenants actually prefer paying through the portal — and so do we.",
-    quoteAuthor: "Samuel O., Founder",
-    cover:
-      "https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?auto=format&fit=crop&w=1600&q=80",
-  },
-]
+export const caseStudies: CaseStudy[] = []
+
+
 
 export type ChangelogEntry = {
   version: string

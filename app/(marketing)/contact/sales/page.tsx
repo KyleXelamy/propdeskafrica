@@ -56,8 +56,8 @@ export default function ContactSalesPage() {
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">Direct lines</p>
               <p className="mt-3 flex items-center gap-2 text-foreground">
                 <Mail className="size-4 text-primary" />
-                <Link href="mailto:sales@i-manage.app" className="text-primary underline">
-                  sales@i-manage.app
+                <Link href="mailto:bknglabs.dev@gmail.com" className="text-primary underline">
+                  bknglabs.dev@gmail.com
                 </Link>
               </p>
               <p className="mt-2 flex items-center gap-2 text-foreground">

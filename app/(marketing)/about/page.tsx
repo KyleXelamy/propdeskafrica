@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import { SimpleMarketingPage, MarketingHome } from "@/components/marketing-site"
-import { ArrowUpRight, Sparkles, ShieldCheck, Globe2, Heart, Building2 } from "lucide-react"
+import { ArrowUpRight, Sparkles, ShieldCheck, Globe2, Heart, Building2, Phone, Mail } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 
@@ -98,16 +98,19 @@ export default function AboutPage() {
       <section className="border-y border-border bg-card py-20 lg:py-24">
         <div className="container-x">
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">The people behind I-Manage</p>
-          <div className="mt-8 grid gap-4 sm:grid-cols-2">
-            <article className="rounded-2xl border border-border bg-background p-6 sm:p-8">
+          <div className="mt-8 grid gap-8 lg:grid-cols-[0.7fr_1.3fr]">
+            <div className="overflow-hidden rounded-3xl border border-border bg-background">
+              <img src="/people/brian-kiarie.png" alt="Brian Kiarie, founder of I-Manage" className="aspect-square w-full object-cover" />
+            </div>
+            <article className="rounded-3xl border border-border bg-background p-6 sm:p-8">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Founder · CFO &amp; Operations</p>
-              <h2 className="mt-3 text-2xl font-medium tracking-[-0.03em]">Brian Kiarie</h2>
-              <p className="mt-3 text-sm leading-6 text-muted-foreground">Leads the operating model, financial discipline and day-to-day execution behind the product.</p>
-            </article>
-            <article className="rounded-2xl border border-border bg-background p-6 sm:p-8">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Founder</p>
-              <h2 className="mt-3 text-2xl font-medium tracking-[-0.03em]">Esther Wangari</h2>
-              <p className="mt-3 text-sm leading-6 text-muted-foreground">Helps shape the product, customer experience and direction of the platform.</p>
+              <h2 className="mt-3 text-3xl font-medium tracking-[-0.03em]">Brian Kiarie</h2>
+              <p className="mt-5 text-lg leading-8 text-muted-foreground">“We are building the calm operating layer property teams need to stay on top of the work, the money and the relationships.”</p>
+              <p className="mt-5 text-sm leading-6 text-muted-foreground">Brian leads the operating model, financial discipline and day-to-day execution behind I-Manage.</p>
+              <div className="mt-7 flex flex-wrap gap-4 text-sm text-muted-foreground">
+                <a href="mailto:bknglabs.dev@gmail.com" className="inline-flex items-center gap-2 hover:text-foreground"><Mail className="size-4" /> bknglabs.dev@gmail.com</a>
+                <a href="tel:0758034649" className="inline-flex items-center gap-2 hover:text-foreground"><Phone className="size-4" /> 0758034649</a>
+              </div>
             </article>
           </div>
         </div>

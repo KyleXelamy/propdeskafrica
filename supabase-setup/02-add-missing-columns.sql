@@ -1,5 +1,5 @@
 -- =====================================================================
--- RENTARO — add-missing-columns migration
+-- I-MANAGE — add-missing-columns migration
 -- Run this on a database that already has the OLD schema deployed.
 -- It is idempotent (uses ADD COLUMN IF NOT EXISTS).
 -- =====================================================================

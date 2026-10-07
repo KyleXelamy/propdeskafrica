@@ -107,8 +107,8 @@ export default function StatusPage() {
 
           <p className="mt-10 text-sm text-muted-foreground">
             Need to report something? Email{" "}
-            <Link href="mailto:status@i-manage.app" className="font-medium text-primary underline">
-              status@i-manage.app
+            <Link href="mailto:bknglabs.dev@gmail.com" className="font-medium text-primary underline">
+              bknglabs.dev@gmail.com
             </Link>
             .
           </p>

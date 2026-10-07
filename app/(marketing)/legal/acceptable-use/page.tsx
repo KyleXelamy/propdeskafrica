@@ -24,7 +24,7 @@ export default function AcceptableUsePage() {
           <p>
             These ground rules keep I-Manage working for everyone. By using I-Manage, you agree to
             them. If something on this page confuses you, write to{" "}
-            <Link href="mailto:legal@i-manage.app" className="text-primary underline">legal@i-manage.app</Link>.
+            <Link href="mailto:bknglabs.dev@gmail.com" className="text-primary underline">bknglabs.dev@gmail.com</Link>.
           </p>
 
           <Section title="1. You must not use I-Manage to">
@@ -49,7 +49,7 @@ export default function AcceptableUsePage() {
           <Section title="3. Reporting abuse">
             <p>
               If you suspect another customer is violating these rules, email{" "}
-              <Link href="mailto:abuse@i-manage.app" className="text-primary underline">abuse@i-manage.app</Link>.
+              <Link href="mailto:bknglabs.dev@gmail.com" className="text-primary underline">bknglabs.dev@gmail.com</Link>.
               We investigate every report.
             </p>
           </Section>

@@ -108,7 +108,7 @@ export default function DevelopersPage() {
               <span className="size-2.5 rounded-full bg-destructive" />
               <span className="size-2.5 rounded-full bg-warning" />
               <span className="size-2.5 rounded-full bg-success" />
-              <span className="ml-3 font-mono text-muted-foreground">i-manage.app/api</span>
+              <span className="ml-3 font-mono text-muted-foreground">bknglabs.dev/api</span>
             </div>
             <ul className="divide-y divide-border font-mono text-sm">
               {endpoints.map((e) => (

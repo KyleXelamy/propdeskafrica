@@ -25,7 +25,7 @@ export default function PrivacyPage() {
             I-Manage is operated by Siemax Ltd ("we", "us", "our"). This policy explains what data we
             collect, why we collect it, and what choices you have. We've written it in plain language
             on purpose — if anything is unclear, write to us at{" "}
-            <Link href="mailto:privacy@i-manage.app" className="text-primary underline">privacy@i-manage.app</Link>.
+            <Link href="mailto:bknglabs.dev@gmail.com" className="text-primary underline">bknglabs.dev@gmail.com</Link>.
           </p>
 
           <Section title="1. What we collect">
@@ -67,7 +67,7 @@ export default function PrivacyPage() {
           <Section title="5. Your rights">
             <p>
               You can export, correct or delete your data at any time from <Link href="/dashboard/settings" className="text-primary underline">Settings → Data</Link>.
-              You can also email <Link href="mailto:privacy@i-manage.app" className="text-primary underline">privacy@i-manage.app</Link> and we will respond within
+              You can also email <Link href="mailto:bknglabs.dev@gmail.com" className="text-primary underline">bknglabs.dev@gmail.com</Link> and we will respond within
               7 business days.
             </p>
           </Section>

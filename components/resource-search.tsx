@@ -17,7 +17,7 @@ type SearchItem = {
 
 const PAGES: SearchItem[] = [
   { title: "Pricing", description: "Solo, Pro and Agency plans. Honest pricing, no transaction fees.", href: "/pricing", kind: "Page" },
-  { title: "Customers", description: "Case studies and testimonials from landlords on I-Manage.", href: "/customers", kind: "Page" },
+  { title: "Customers", description: "A transparent look at an early-stage property management platform.", href: "/customers", kind: "Page" },
   { title: "About", description: "The team building I-Manage and the values we ship by.", href: "/about", kind: "Page" },
   { title: "Changelog", description: "Every product update, improvement and fix.", href: "/changelog", kind: "Page" },
   { title: "Careers", description: "Open roles in engineering, design and operations.", href: "/careers", kind: "Page" },

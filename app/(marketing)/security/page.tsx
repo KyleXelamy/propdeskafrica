@@ -38,7 +38,7 @@ const principles = [
   {
     icon: Mail,
     title: "Responsible disclosure",
-    body: "Found a vulnerability? Email security@i-manage.app and we'll respond within 48 hours.",
+    body: "Found a vulnerability? Email bknglabs.dev@gmail.com and we'll respond within 48 hours.",
   },
 ]
 
@@ -132,8 +132,8 @@ export default function SecurityPage() {
               size="lg"
               className="mt-8 rounded-full bg-accent px-7 text-primary hover:bg-accent/90"
             >
-              <Link href="mailto:security@i-manage.app">
-                security@i-manage.app <ArrowUpRight className="ml-1 size-4" />
+              <Link href="mailto:bknglabs.dev@gmail.com">
+                bknglabs.dev@gmail.com <ArrowUpRight className="ml-1 size-4" />
               </Link>
             </Button>
           </div>

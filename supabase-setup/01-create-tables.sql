@@ -1,5 +1,5 @@
 -- =====================================================================
--- RENTARO — Supabase database setup (consolidated)
+-- I-MANAGE — Supabase database setup (consolidated)
 -- Run this in: Supabase Dashboard → SQL Editor → New query
 -- =====================================================================
 -- Idempotent: safe to re-run. Each CREATE uses IF NOT EXISTS and each

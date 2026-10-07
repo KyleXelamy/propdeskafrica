@@ -93,7 +93,7 @@ export default async function RolePage({
             className="mt-6 rounded-full bg-primary px-7 text-primary-foreground hover:bg-primary/90"
           >
             <Link
-              href={`mailto:careers@i-manage.app?subject=${encodeURIComponent(role.title)}`}
+              href={`mailto:bknglabs.dev@gmail.com?subject=${encodeURIComponent(role.title)}`}
             >
               Apply by email <ArrowUpRight data-icon="inline-end" />
             </Link>

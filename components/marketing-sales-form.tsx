@@ -61,7 +61,7 @@ export function MarketingSalesForm() {
         </div>
         <div className="space-y-2">
           <Label htmlFor="email">Work email</Label>
-          <Input id="email" name="email" type="email" required placeholder="you@company.com" />
+          <Input id="email" name="email" type="email" required placeholder="bknglabs.dev@gmail.com" />
         </div>
       </div>
       <div className="space-y-2">

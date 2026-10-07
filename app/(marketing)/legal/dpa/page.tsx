@@ -129,7 +129,7 @@ export default function DPAPage() {
           <Section title="12. Contact">
             <p>
               Questions about this DPA? Email{" "}
-              <Link href="mailto:dpo@i-manage.app" className="text-primary underline">dpo@i-manage.app</Link>.
+              <Link href="mailto:bknglabs.dev@gmail.com" className="text-primary underline">bknglabs.dev@gmail.com</Link>.
             </p>
           </Section>
         </div>

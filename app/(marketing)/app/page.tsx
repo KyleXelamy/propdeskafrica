@@ -36,7 +36,7 @@ const steps = [
   {
     n: "01",
     title: "Open in your browser",
-    body: "Visit i-manage.app on iOS Safari or Android Chrome and sign in.",
+    body: "Visit bknglabs.dev on iOS Safari or Android Chrome and sign in.",
   },
   {
     n: "02",

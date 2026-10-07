@@ -67,7 +67,7 @@ export default function CookiePolicyPage() {
 
           <p className="text-sm text-muted-foreground">
             Questions? Email{" "}
-            <Link href="mailto:privacy@i-manage.app" className="text-primary underline">privacy@i-manage.app</Link>.
+            <Link href="mailto:bknglabs.dev@gmail.com" className="text-primary underline">bknglabs.dev@gmail.com</Link>.
           </p>
         </div>
       </div>

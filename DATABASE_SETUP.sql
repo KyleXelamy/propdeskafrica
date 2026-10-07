@@ -1,5 +1,5 @@
 -- =====================================================================
--- RENTARO DATABASE SETUP
+-- I-MANAGE DATABASE SETUP
 -- =====================================================================
 -- This file used to contain a hand-rolled schema; the canonical,
 -- consolidated, idempotent setup is now in

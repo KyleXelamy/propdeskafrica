@@ -145,7 +145,7 @@ export function TenantForm({ tenant, isEditing = false }: TenantFormProps) {
                 type="email"
                 value={formData.email}
                 onChange={(e) => handleChange("email", e.target.value)}
-                placeholder="john.doe@example.com"
+                placeholder="bknglabs.dev@gmail.com"
               />
             </div>
             <div className="space-y-2">

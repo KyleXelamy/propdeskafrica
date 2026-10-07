@@ -90,7 +90,7 @@ export default function TermsPage() {
           <Section title="9. Contact">
             <p>
               Questions about these terms? Write to{" "}
-              <Link href="mailto:legal@i-manage.app" className="text-primary underline">legal@i-manage.app</Link>.
+              <Link href="mailto:bknglabs.dev@gmail.com" className="text-primary underline">bknglabs.dev@gmail.com</Link>.
             </p>
           </Section>
         </div>

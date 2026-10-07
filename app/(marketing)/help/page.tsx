@@ -52,7 +52,7 @@ const categories = [
       },
       {
         q: "Do you offer a non-profit discount?",
-        a: "Yes — 50% off for registered non-profits and student landlords. Email billing@i-manage.app.",
+        a: "Yes — 50% off for registered non-profits and student landlords. Email bknglabs.dev@gmail.com.",
       },
       {
         q: "How do I cancel?",
@@ -120,8 +120,8 @@ export default function HelpPage() {
                 icon: Mail,
                 title: "Email support",
                 body: "We reply to every email within one business day.",
-                href: "mailto:support@i-manage.app",
-                cta: "support@i-manage.app",
+                href: "mailto:bknglabs.dev@gmail.com",
+                cta: "bknglabs.dev@gmail.com",
               },
             ].map((c) => (
               <Link
