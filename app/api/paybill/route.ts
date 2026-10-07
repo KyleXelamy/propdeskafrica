@@ -20,28 +20,12 @@ const CreateSchema = z.object({
 
 export const runtime = "nodejs"
 
-export const GET = withAuth(async () => {
-  const stub = [
-    {
-      id: "PB-001",
-      label: "Karen properties",
-      number: "247247",
-      type: "paybill",
-      matched: 412,
-      unmatched: 0,
-      last_payment: "2026-10-04T17:38:00Z",
-    },
-    {
-      id: "PB-002",
-      label: "Riverside",
-      number: "456456",
-      type: "till",
-      matched: 184,
-      unmatched: 1,
-      last_payment: "2026-10-04T17:06:00Z",
-    },
-  ]
-  return NextResponse.json({ count: stub.length, paybills: stub })
+export const GET = withAuth(async (_request, { userId }) => {
+  const { createServiceClient } = await import("@/lib/supabase/service")
+  const supabase = createServiceClient()
+  const { data, error } = await supabase.from("paybills").select("id, label, number, type, active, created_at").eq("user_id", userId).order("created_at", { ascending: false })
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  return NextResponse.json({ count: data?.length ?? 0, paybills: data ?? [] })
 })
 
 export const POST = withAuth(async (request, { userId }) => {

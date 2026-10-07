@@ -28,6 +28,7 @@ import {
   Archive,
   Activity,
   CreditCard,
+  Contact,
 
 } from "lucide-react"
 import { signOut } from "@/lib/actions"
@@ -38,6 +39,7 @@ const navigation = [
   { name: "Properties", href: "/dashboard/properties", icon: Building2 },
   { name: "Map", href: "/dashboard/properties/map", icon: Map },
   { name: "Tenants", href: "/dashboard/tenants", icon: Users },
+  { name: "Contacts", href: "/dashboard/contacts", icon: Contact },
   { name: "Finances", href: "/dashboard/finances", icon: DollarSign },
   { name: "Paybill", href: "/dashboard/paybill", icon: Wallet },
   { name: "Reconciliation", href: "/dashboard/reconciliation", icon: GitMerge },
