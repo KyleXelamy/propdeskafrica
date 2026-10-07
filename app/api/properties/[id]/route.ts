@@ -47,12 +47,10 @@ export const PUT = withAuth(async (req, { supabase, userId }, params) => {
   if (fields.rent_amount !== undefined) {
     const n = toNumberOrNull(fields.rent_amount)
     update.rent_amount = n
-    update.monthly_rent = n
   }
   if (fields.monthly_rent !== undefined && fields.rent_amount === undefined) {
     const n = toNumberOrNull(fields.monthly_rent)
     update.rent_amount = n
-    update.monthly_rent = n
   }
   if (fields.deposit_amount !== undefined) update.deposit_amount = toNumberOrNull(fields.deposit_amount)
   if (fields.bedrooms !== undefined) update.bedrooms = toNumberOrNull(fields.bedrooms)

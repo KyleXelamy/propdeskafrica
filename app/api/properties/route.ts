@@ -67,12 +67,10 @@ export const POST = withAuth(async (req: NextRequest, { supabase, userId }) => {
     status: blankToNull(fields.status) || "available",
     description: blankToNull(fields.description),
     rent_amount: rent,
-    monthly_rent: rent,
     deposit_amount: toNumberOrNull(fields.deposit_amount),
     bedrooms: toNumberOrNull(fields.bedrooms),
     bathrooms: toNumberOrNull(fields.bathrooms),
     size_sqft: toNumberOrNull(fields.size_sqft) ?? toNumberOrNull(fields.square_feet),
-    square_feet: toNumberOrNull(fields.square_feet) ?? toNumberOrNull(fields.size_sqft),
     amenities: Array.isArray(fields.amenities) ? fields.amenities : [],
   }
 
