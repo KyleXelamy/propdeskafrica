@@ -27,23 +27,10 @@ export const GET = withAuth(async (request) => {
   const propertyId = searchParams.get("property_id")
   const limit = Math.min(Number(searchParams.get("limit") ?? 50) || 50, 100)
 
-  // In production: query the `quotations` table filtered by userId.
-  // For now we return a stub shape so the dashboard has something to render.
-  const stub = [
-    {
-      id: "QT-1042",
-      title: "Replace burst water heater — Karen House 1",
-      property: "Karen House 1",
-      contractor: "AquaFix Plumbing",
-      amount: 18500,
-      status: status ?? "pending",
-      requested_at: "2026-09-22T08:00:00Z",
-    },
-  ]
-  return NextResponse.json({
-    count: stub.length,
-    quotations: propertyId ? stub.filter((q) => true) : stub.slice(0, limit),
-  })
+  void status
+  void propertyId
+  void limit
+  return NextResponse.json({ count: 0, quotations: [] })
 })
 
 export const POST = withAuth(async (request, { userId }) => {

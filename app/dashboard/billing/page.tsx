@@ -217,7 +217,7 @@ export default async function BillingPage({
         <CardContent className="space-y-2 text-sm">
           <p>
             <span className="font-medium">Paybill:</span> 247247 &middot;{" "}
-            <span className="font-medium">Account:</span> Nomads Ridge Safari Ltd
+            <span className="font-medium">Account:</span> 0758034649
           </p>
           <p className="text-xs text-muted-foreground">
             Or get in touch:{" "}
