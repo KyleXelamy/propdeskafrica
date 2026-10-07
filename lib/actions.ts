@@ -71,7 +71,7 @@ export async function signUp(_prevState: any, formData: FormData) {
       email: email.toString(),
       password: password.toString(),
       options: {
-        emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/auth/callback`,
+        emailRedirectTo: `${process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000")}/auth/callback`,
       },
     })
 
