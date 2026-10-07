@@ -30,7 +30,7 @@ import {
   Archive,
   Activity,
   CreditCard,
-  UserPlus,
+
 } from "lucide-react"
 import { signOut } from "@/lib/actions"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
@@ -54,7 +54,6 @@ const navigation = [
   { name: "Landlords", href: "/dashboard/landlords", icon: Building },
   { name: "Company", href: "/dashboard/company", icon: Briefcase },
   { name: "Billing", href: "/dashboard/billing", icon: CreditCard },
-  { name: "Admin · Grant", href: "/dashboard/admin/grant", icon: UserPlus },
   { name: "Backup", href: "/dashboard/settings/backup", icon: Archive },
   { name: "System", href: "/dashboard/settings/system", icon: Activity },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },

@@ -178,45 +178,7 @@ begin
 end;
 $$;
 
--- 6) helper: admin-grant a subscription ----------------------------------
--- Use this from a SECURITY DEFINER function so admins can grant
--- access without owning the row. The app calls it via the admin UI.
--- The function itself is SECURITY DEFINER so it bypasses RLS.
-create or replace function public.admin_grant_subscription(
-  p_target_user uuid,
-  p_plan text,
-  p_days integer default 30,
-  p_reason text default 'manual grant'
-)
-returns public.subscriptions
-language plpgsql
-security definer
-set search_path = public
-as $$
-declare
-  s public.subscriptions;
-  caller uuid := auth.uid();
-begin
-  -- Only allow if the caller is themselves a super-admin (we use a
-  -- special note: a row in subscriptions with status='comp' or
-  -- a 'superadmin' company role; for now, allow any caller to grant
-  -- so this works in single-tenant dev mode).
-  insert into public.subscriptions (user_id, plan_code, status, current_period_start, current_period_end, notes)
-  values (p_target_user, p_plan, 'active', now(), now() + (p_days || ' days')::interval, p_reason)
-  on conflict (user_id) do update set
-    plan_code = excluded.plan_code,
-    status = 'active',
-    current_period_start = now(),
-    current_period_end = now() + (p_days || ' days')::interval,
-    notes = excluded.notes,
-    updated_at = now()
-  returning * into s;
-  insert into public.subscription_events (user_id, event, to_plan, to_status, days_granted, reason, actor, metadata)
-  values (p_target_user, 'manual_grant', p_plan, 'active', p_days, p_reason, coalesce(caller::text, 'system'),
-          jsonb_build_object('via', 'admin_grant_subscription'));
-  return s;
-end;
-$$;
+-- 6) subscription updates are driven by user payments and system events.
 
 -- 7) trigger: stamp updated_at on subscription changes -------------------
 create or replace function public.subscriptions_touch_updated_at()
