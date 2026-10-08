@@ -77,7 +77,13 @@ export async function signUp(_prevState: any, formData: FormData) {
 
     if (error) {
       const message = error.message.toLowerCase()
-      if (message.includes("rate limit") || message.includes("over_email_send_rate_limit")) {
+      if (message.includes("already registered") || message.includes("already exists")) {
+        return { error: "An account with that email already exists. Try signing in instead." }
+      }
+      if (message.includes("database error") || message.includes("saving new user")) {
+        return { error: "Sign-up is temporarily blocked by the database setup. Please run supabase-setup/00-signup-bootstrap.sql in Supabase SQL Editor." }
+      }
+      if (message.includes("rate limit") || message.includes("over_email_send_rate_limit") || (message.includes("email") && message.includes("rate"))) {
         return {
           error: "Too many confirmation emails were requested. Please wait a while before trying again, then check your inbox and spam folder.",
         }
@@ -87,7 +93,7 @@ export async function signUp(_prevState: any, formData: FormData) {
           error: "This Supabase project is currently limiting confirmation emails to approved addresses. Please use an approved test address or ask the deployment owner to configure email delivery.",
         }
       }
-      return { error: "We could not create your account right now. Please try again later." }
+      return { error: error.message }
     }
 
     return {
