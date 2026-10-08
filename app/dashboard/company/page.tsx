@@ -7,6 +7,7 @@ import { Briefcase, Users, Building2, BarChart3, Mail } from "lucide-react"
 
 export const metadata: Metadata = {
   title: "Company — I-Manage",
+  // naming compnyes is def not my thinkg man , hahahhahah //
   description: "Run your agency or company: team, landlords, aggregate reporting.",
 }
 
@@ -56,6 +57,8 @@ export default async function CompanyPage() {
         <p className="text-sm text-muted-foreground">Company records are shown from your workspace database.</p>
       </header>
 
+        // tired afsccccccccccccccccccccccc //
+
       {/* Top stats */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {[
@@ -72,6 +75,7 @@ export default async function CompanyPage() {
               </div>
               <CardTitle className="text-3xl">{s.value}</CardTitle>
             </CardHeader>
+
             <CardContent>
               <p className="text-xs text-muted-foreground">{s.sub}</p>
             </CardContent>
@@ -88,6 +92,7 @@ export default async function CompanyPage() {
               <CardDescription>Everyone with access to your I-Manage workspace.</CardDescription>
             </div>
           </div>
+
         </CardHeader>
         <CardContent>
           <div className="overflow-hidden rounded-lg border">
@@ -96,6 +101,7 @@ export default async function CompanyPage() {
                 <tr className="text-left text-xs uppercase tracking-wider text-muted-foreground">
                   <th className="px-4 py-3">Name</th>
                   <th className="px-4 py-3">Role</th>
+                  
                   <th className="px-4 py-3">Email</th>
                   <th className="px-4 py-3">Last seen</th>
                 </tr>
@@ -122,16 +128,19 @@ export default async function CompanyPage() {
                     <td className="px-4 py-4 text-sm text-muted-foreground">{m.accepted_at ? new Date(m.accepted_at).toLocaleDateString() : "Invitation pending"}</td>
                   </tr>
                 ))}
+
+                // so am thinking maybe i run away, hahhahhaha,, to wherrrrrreeeeeeee //
               </tbody>
             </table>
-          </div>
+             </div>  
         </CardContent>
       </Card>
 
-      {/* Landlords */}
+      {/* Landlords */}    // make stuff ofr the rich for the rich,, do you get what i mean //
       <Card>
         <CardHeader>
           <CardTitle>Landlords under management</CardTitle>
+          // we all lie sometimes rt,, hahhahahhahha,, i see everything dawg, hhheeehhehee //
           <CardDescription>Each landlord sees only their own data. You see everything.</CardDescription>
         </CardHeader>
         <CardContent>
@@ -158,3 +167,4 @@ export default async function CompanyPage() {
     </div>
   )
 }
+//company page is completely done, i think i need to take a break and go for a walk, hahahhahahha //
