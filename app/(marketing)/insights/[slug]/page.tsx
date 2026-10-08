@@ -77,7 +77,7 @@ We built our own reconciliation engine that runs continuously, not nightly. It:
 - Flags mismatches in a real-time inbox inside the dashboard
 - Auto-emails both parties a confirmation when it resolves
 
-The average resolution time is now under 3 minutes. The average landlord saves KES 38k/month in support time, lost rent, and good-faith refunds.`,
+Clear workflows can help teams resolve issues with less back-and-forth and keep better records.`,
 }
 
 export default async function InsightArticlePage({

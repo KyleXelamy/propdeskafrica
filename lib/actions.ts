@@ -83,8 +83,15 @@ export async function signUp(_prevState: any, formData: FormData) {
       if (message.includes("database error") || message.includes("saving new user")) {
         return { error: "Sign-up is temporarily blocked by the database setup. Please run supabase-setup/00-signup-bootstrap.sql in Supabase SQL Editor." }
       }
-      if (message.includes("email") && message.includes("rate")) {
-        return { error: "Email sending is temporarily rate-limited. Wait a few minutes and try again." }
+      if (message.includes("rate limit") || message.includes("over_email_send_rate_limit") || (message.includes("email") && message.includes("rate"))) {
+        return {
+          error: "Too many confirmation emails were requested. Please wait a while before trying again, then check your inbox and spam folder.",
+        }
+      }
+      if (message.includes("email_address_not_authorized")) {
+        return {
+          error: "This Supabase project is currently limiting confirmation emails to approved addresses. Please use an approved test address or ask the deployment owner to configure email delivery.",
+        }
       }
       return { error: error.message }
     }

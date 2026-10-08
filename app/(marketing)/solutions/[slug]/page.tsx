@@ -63,29 +63,6 @@ export default async function SolutionPage({
         </div>
       </section>
 
-      <section className="bg-background py-20 lg:py-24">
-        <div className="container-x grid gap-12 lg:grid-cols-[1fr_1.4fr]">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">Outcomes</p>
-            <h2 className="mt-4 text-3xl font-medium leading-tight tracking-[-0.04em] sm:text-4xl">
-              What changes for you.
-            </h2>
-            <p className="mt-5 text-base leading-7 text-muted-foreground">
-              We track these for every customer in their first 90 days. The averages are below;
-              your results will depend on your portfolio and adoption.
-            </p>
-          </div>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {s.outcomes.map((o) => (
-              <div key={o.label} className="rounded-2xl border border-border bg-card p-6">
-                <p className="text-3xl font-medium tracking-tight">{o.value}</p>
-                <p className="mt-2 text-sm text-muted-foreground">{o.label}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       <section className="bg-secondary/40 py-20 lg:py-24">
         <div className="container-x max-w-3xl">
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">Why teams switch</p>
@@ -98,7 +75,7 @@ export default async function SolutionPage({
               `Tenant records that actually stay up to date — auto-synced with every payment.`,
               `Reports your accountant will sign off on, with audit log for every change.`,
               `Pricing that doesn't punish you for growing — flat monthly, no per-transaction fee.`,
-              `Real humans on support — average response under 4 hours, all year.`,
+              `Real humans on support — contact us when you need help.`,
             ].map((b) => (
               <li key={b} className="flex items-start gap-3 rounded-2xl border border-border bg-card p-5">
                 <span className="mt-0.5 grid size-6 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground">

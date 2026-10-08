@@ -60,8 +60,7 @@ export default function TermsPage() {
 
           <Section title="5. Service availability">
             <p>
-              We aim for 99.9% uptime but the service is provided "as is". For planned maintenance we
-              give at least 48 hours notice via the dashboard and your registered email.
+The service is provided "as is". We will communicate planned maintenance through the dashboard and your registered email when practical.
             </p>
           </Section>
 

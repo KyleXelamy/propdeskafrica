@@ -52,7 +52,7 @@ const categories = [
       },
       {
         q: "Do you offer a non-profit discount?",
-        a: "Yes — 50% off for registered non-profits and student landlords. Email bknglabs.dev@gmail.com.",
+        a: "Contact us at bknglabs.dev@gmail.com and we can discuss your organisation's needs.",
       },
       {
         q: "How do I cancel?",

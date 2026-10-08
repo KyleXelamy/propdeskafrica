@@ -81,7 +81,7 @@ const faqs = [
   },
   {
     q: "Is there a student or non-profit discount?",
-    a: "We offer a 50% discount for registered non-profits and student landlords managing family property. Reach out via the contact page.",
+    a: "Contact us and we can discuss whether a discounted plan is available for your organisation.",
   },
 ]
 
@@ -121,7 +121,7 @@ export default function PricingPage() {
               >
                 {tier.highlight && (
                   <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-accent px-3 py-1 text-xs font-semibold uppercase tracking-[0.15em] text-accent-foreground">
-                    Most popular
+                    Recommended starting point
                   </span>
                 )}
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">{tier.name}</p>

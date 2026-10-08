@@ -5,17 +5,13 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { features } from "@/lib/content/marketing"
-import { testimonials } from "@/lib/content/site"
+
 import * as Icons from "lucide-react"
 
 const featureIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   Banknote, Users, Wrench, FileText, BarChart3, Receipt, Building2, Layers,
 }
 
-const trustLogos = [
-  "Highland Estates", "Coast Living", "Kibera Co-op", "Riverside Apartments",
-  "Greenfield Group", "Skyline Realty", "Pamoja Property", "Maridadi Homes",
-]
 
 export default function MarketingHome() {
   return (
@@ -52,19 +48,6 @@ export default function MarketingHome() {
         </div>
       </section>
 
-      {/* Trust bar */}
-      <section className="border-y border-border bg-background py-10">
-        <div className="container-x">
-          <p className="text-center text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">
-            Trusted by 40 landlords across 12 cities
-          </p>
-          <div className="mt-7 flex flex-wrap items-center justify-center gap-x-10 gap-y-4">
-            {trustLogos.map((l) => (
-              <span key={l} className="text-sm font-medium text-muted-foreground/80">{l}</span>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* Problem / Solution */}
       <section className="bg-secondary/40 py-24 lg:py-32">
@@ -159,46 +142,6 @@ export default function MarketingHome() {
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section className="bg-primary text-primary-foreground py-24 lg:py-32">
-        <div className="container-x">
-          <div className="grid gap-12 lg:grid-cols-[.85fr_1.15fr] lg:items-end">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-accent">In their words</p>
-              <h2 className="mt-4 text-4xl font-medium leading-tight tracking-[-0.04em] sm:text-6xl">
-                Loved by landlords.
-              </h2>
-            </div>
-            <p className="max-w-md text-base leading-7 text-primary-foreground/65">
-              4.8 / 5 from 800+ reviews. Rated #1 for rent collection in our market.
-            </p>
-          </div>
-          <div className="mt-16 grid gap-5 md:grid-cols-3">
-            {testimonials.map((t) => (
-              <figure key={t.name} className="flex h-full flex-col rounded-3xl border border-primary-foreground/10 bg-primary-foreground/5 p-7">
-                <p className="flex-1 text-sm leading-7 text-primary-foreground/85">&ldquo;{t.quote}&rdquo;</p>
-                <figcaption className="mt-6 flex items-center gap-3 border-t border-primary-foreground/10 pt-5">
-                  <span className="grid size-10 place-items-center rounded-full bg-accent text-sm font-medium text-primary">
-                    {t.initials}
-                  </span>
-                  <div>
-                    <p className="text-sm font-medium text-primary-foreground">{t.name}</p>
-                    <p className="text-xs text-primary-foreground/55">{t.role} · {t.company} · {t.location}</p>
-                  </div>
-                </figcaption>
-              </figure>
-            ))}
-          </div>
-          <div className="mt-12 text-center">
-            <Link
-              href="/customers"
-              className="inline-flex items-center gap-2 rounded-full border border-primary-foreground/20 px-6 py-3 text-sm font-medium hover:bg-primary-foreground/10"
-            >
-              Read customer stories <ArrowRight className="size-4" />
-            </Link>
-          </div>
-        </div>
-      </section>
 
       {/* Pricing teaser */}
       <section className="bg-background py-24 lg:py-32">

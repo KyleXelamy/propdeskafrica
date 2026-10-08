@@ -77,7 +77,7 @@ export default function AboutPage() {
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">Our story</p>
             <h2 className="mt-5 text-4xl font-medium leading-tight tracking-[-0.04em] sm:text-5xl">
-              From a notebook to a national platform.
+              From a practical idea to a useful product.
             </h2>
           </div>
           <div className="space-y-6 text-lg leading-8 text-muted-foreground">
@@ -140,31 +140,13 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Numbers */}
-      <section className="bg-primary text-primary-foreground py-20 lg:py-24">
-        <div className="container-x">
-          <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-4">
-            {[
-              { k: "40", v: "Properties under management" },
-              { k: "KES 25M", v: "Rent processed annually" },
-              { k: "97%", v: "Average on-time collection rate" },
-              { k: "12", v: "Cities served today" },
-            ].map((s) => (
-              <div key={s.k}>
-                <p className="text-4xl font-medium tracking-tight text-accent lg:text-5xl">{s.k}</p>
-                <p className="mt-3 text-sm text-primary-foreground/65">{s.v}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* CTA */}
       <section className="bg-accent text-accent-foreground py-20 lg:py-28">
         <div className="container-x text-center">
           <Building2 className="mx-auto size-10" />
           <h2 className="mx-auto mt-6 max-w-3xl text-4xl font-medium leading-tight tracking-[-0.05em] sm:text-6xl">
-            Join the landlords who run their portfolio like a business.
+            Build a clearer way to manage your work.
           </h2>
           <div className="mt-10 flex flex-col justify-center gap-3 sm:flex-row">
             <Button asChild size="lg" className="rounded-full bg-primary px-7 text-primary-foreground hover:bg-primary/90">

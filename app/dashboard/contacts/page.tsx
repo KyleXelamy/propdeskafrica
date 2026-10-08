@@ -20,7 +20,7 @@ export default function ContactsPage() {
     const supabase = createClient()
     Promise.all([
       supabase.from("contacts").select("id, name, role, email, phone, company"),
-      supabase.from("tenants").select("id, full_name, first_name, last_name, email, phone, emergency_contact_name, emergency_contact_phone, company_name"),
+      supabase.from("tenants").select("id, full_name, first_name, last_name, email, phone, emergency_contact_name, emergency_contact_phone"),
     ]).then(([contactsResult, tenantsResult]) => {
       if (!active) return
       if (contactsResult.error) {
@@ -47,7 +47,7 @@ export default function ContactsPage() {
           role: "tenant",
           email: tenant.email,
           phone: tenant.phone,
-          company: tenant.company_name ?? null,
+          company: null,
           source: "tenant",
         })
         if (tenant.emergency_contact_name || tenant.emergency_contact_phone) {

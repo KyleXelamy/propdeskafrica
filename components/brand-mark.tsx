@@ -2,10 +2,8 @@
  * I-Manage brand mark.
  *
  * Inline SVG so it can be themed via currentColor and used at any size.
- * Two variants:
- *   - "mark"   — just the I-in-square icon
- *   - "wordmark" — the full "I-Manage" word with an optional descriptor
- *     underneath. Use on the landing nav and the portal header.
+ * The mark combines a doorway, skyline, and check shape to represent
+ * property operations that stay clear and in control.
  */
 import Link from "next/link"
 
@@ -25,23 +23,15 @@ export function BrandMark({ size = 32, className }: MarkProps) {
       aria-label="I-Manage"
     >
       <defs>
-        <linearGradient id="im-grad" x1="0" y1="0" x2="1" y2="1">
+        <linearGradient id="i-manage-mark-gradient" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0%" stopColor="hsl(var(--primary))" />
           <stop offset="100%" stopColor="hsl(var(--accent))" />
         </linearGradient>
       </defs>
-      <rect
-        x="2"
-        y="2"
-        width="36"
-        height="36"
-        rx="8"
-        fill="url(#im-grad)"
-      />
-      {/* A stylized "I" — vertical bar with rounded serifs */}
-      <rect x="16" y="10" width="8" height="20" rx="2" fill="white" />
-      <rect x="12" y="10" width="16" height="2.5" rx="1.25" fill="white" />
-      <rect x="12" y="27.5" width="16" height="2.5" rx="1.25" fill="white" />
+      <rect x="2" y="2" width="36" height="36" rx="11" fill="url(#i-manage-mark-gradient)" />
+      <path d="M11 29V17l9-6 9 6v12" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M16 29V21h8v8" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="m13 15 3-2 3 2 3-2 3 2" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   )
 }
