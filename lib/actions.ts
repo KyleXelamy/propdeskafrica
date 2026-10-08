@@ -76,6 +76,16 @@ export async function signUp(_prevState: any, formData: FormData) {
     })
 
     if (error) {
+      const message = error.message.toLowerCase()
+      if (message.includes("already registered") || message.includes("already exists")) {
+        return { error: "An account with that email already exists. Try signing in instead." }
+      }
+      if (message.includes("database error") || message.includes("saving new user")) {
+        return { error: "Sign-up is temporarily blocked by the database setup. Please run supabase-setup/00-signup-bootstrap.sql in Supabase SQL Editor." }
+      }
+      if (message.includes("email") && message.includes("rate")) {
+        return { error: "Email sending is temporarily rate-limited. Wait a few minutes and try again." }
+      }
       return { error: error.message }
     }
 
