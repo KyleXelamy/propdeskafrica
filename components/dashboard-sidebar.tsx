@@ -80,7 +80,7 @@ function SidebarContent({ userEmail, userName, companyName, onNavigate }: Sideba
           <Building2 className="size-5" />
         </span>
         <div className="min-w-0">
-          <p className="truncate text-sm font-semibold text-sidebar-foreground">{companyName || "I-Manage"}</p>
+          <p className="truncate text-sm font-semibold text-sidebar-foreground">{companyName || "PropDesk Africa"}</p>
           <p className="truncate text-[11px] uppercase tracking-[0.14em] text-sidebar-foreground/55">Workspace</p>
         </div>
       </div>

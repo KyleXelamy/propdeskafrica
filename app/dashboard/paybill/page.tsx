@@ -110,7 +110,7 @@ export default function PaybillPage() {
               {
                 n: 3,
                 title: "It just shows up",
-                body: "Payments land in your I-Manage dashboard within 60 seconds, matched to the right tenant, property and lease.",
+                body: "Payments land in your PropDesk Africa dashboard within 60 seconds, matched to the right tenant, property and lease.",
               },
             ].map((s) => (
               <li key={s.n} className="rounded-2xl border bg-card p-6">

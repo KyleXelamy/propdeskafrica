@@ -1,5 +1,5 @@
 /**
- * I-Manage marketing content: features, solutions, docs, templates,
+ * PropDesk Africa marketing content: features, solutions, docs, templates,
  * roadmap, customers detail, etc. Static until we wire up a CMS.
  */
 
@@ -221,7 +221,7 @@ export const features: Feature[] = [
   {
     slug: "developer-api",
     name: "Developer API & webhooks",
-    tagline: "Wire I-Manage into your stack.",
+    tagline: "Wire PropDesk Africa into your stack.",
     summary:
       "Full REST API + signed webhooks for Agency and Enterprise. Build custom integrations, automate workflows, pipe data into your data warehouse.",
     bullets: [
@@ -254,7 +254,7 @@ export const solutions: Solution[] = [
     tagline: "From one unit to ten.",
     audience: "Individual landlords managing their own properties.",
     summary:
-      "You're running your properties on weekends and WhatsApp. I-Manage replaces the spreadsheet with one calm workspace — without making you a software expert.",
+      "You're running your properties on weekends and WhatsApp. PropDesk Africa replaces the spreadsheet with one calm workspace — without making you a software expert.",
     outcomes: [],
     image: "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=1600&q=80",
   },
@@ -291,7 +291,7 @@ export const solutions: Solution[] = [
   {
     slug: "developer",
     name: "For developers",
-    tagline: "Build on I-Manage.",
+    tagline: "Build on PropDesk Africa.",
     audience: "Agencies and SaaS companies integrating property operations.",
     summary:
       "Full REST API, signed webhooks, OAuth and an OpenAPI spec. Build custom tenant experiences, automate workflows and pipe data anywhere.",
@@ -347,15 +347,15 @@ export const docArticles: DocArticle[] = [
   {
     slug: "quickstart",
     category: "getting-started",
-    title: "Quickstart: set up I-Manage in 15 minutes",
+    title: "Quickstart: set up PropDesk Africa in 15 minutes",
     excerpt: "From a fresh account to your first collected rent in under 15 minutes.",
     readingMinutes: 4,
     updated: "2026-09-22",
-    body: `This quickstart walks you through the fastest path to a working I-Manage account. We'll create a property, add a tenant, send a rent invoice and confirm the dashboard reflects it.
+    body: `This quickstart walks you through the fastest path to a working PropDesk Africa account. We'll create a property, add a tenant, send a rent invoice and confirm the dashboard reflects it.
 
 ## Before you start
 
-You'll need an I-Manage account (free tier is fine), a property to manage, and a phone that can take M-Pesa prompts.
+You'll need an PropDesk Africa account (free tier is fine), a property to manage, and a phone that can take M-Pesa prompts.
 
 ## Step 1 — Create a property
 
@@ -373,7 +373,7 @@ Open the tenant's profile and click **Request rent**. Set the amount (KES 25,000
 
 As soon as the tenant enters their PIN, the dashboard updates with a receipt. A copy is emailed to both of you automatically.
 
-That's it — you've collected your first rent. The rest of I-Manage is layering more workflows on top of these same four steps.`,
+That's it — you've collected your first rent. The rest of PropDesk Africa is layering more workflows on top of these same four steps.`,
   },
   {
     slug: "first-property",
@@ -427,7 +427,7 @@ If the tenant abandons at any step, you can resume the flow on their behalf from
     excerpt: "What happens from the moment you click Request rent to the money hitting your account.",
     readingMinutes: 5,
     updated: "2026-09-30",
-    body: `STK Push is Safaricom's recommended way to collect rent programmatically. This guide explains what I-Manage does under the hood.
+    body: `STK Push is Safaricom's recommended way to collect rent programmatically. This guide explains what PropDesk Africa does under the hood.
 
 ## The 30-second version
 
@@ -482,10 +482,10 @@ You can then bulk-invite tenants in a second pass.`,
     slug: "webhooks",
     category: "api",
     title: "Webhooks overview",
-    excerpt: "Receive real-time notifications when things happen in I-Manage.",
+    excerpt: "Receive real-time notifications when things happen in PropDesk Africa.",
     readingMinutes: 6,
     updated: "2026-09-05",
-    body: `Webhooks let you react to events in I-Manage from your own backend. Available on the Agency and Enterprise plans.
+    body: `Webhooks let you react to events in PropDesk Africa from your own backend. Available on the Agency and Enterprise plans.
 
 ## Event types
 
@@ -501,7 +501,7 @@ You can then bulk-invite tenants in a second pass.`,
 
 ## Signing
 
-Every webhook is signed with an HMAC-SHA256 of the body using your endpoint secret. Verify the \`X-I-Manage-Signature\` header before trusting the payload.
+Every webhook is signed with an HMAC-SHA256 of the body using your endpoint secret. Verify the \`X-PropDesk Africa-Signature\` header before trusting the payload.
 
 ## Retries
 
@@ -514,7 +514,7 @@ Failed deliveries (non-2xx) are retried with exponential backoff up to 24 hours.
     excerpt: "Let third-party apps act on a landlord's behalf — with their consent.",
     readingMinutes: 5,
     updated: "2026-08-20",
-    body: `I-Manage supports OAuth 2.0 authorization-code flows for partner integrations.
+    body: `PropDesk Africa supports OAuth 2.0 authorization-code flows for partner integrations.
 
 ## Scopes
 
@@ -549,7 +549,7 @@ Failed deliveries (non-2xx) are retried with exponential backoff up to 24 hours.
 
 ## Setup
 
-Settings → Integrations → Xero → Connect. Authorise I-Manage to read your chart of accounts and create draft invoices. We never post without your approval.`,
+Settings → Integrations → Xero → Connect. Authorise PropDesk Africa to read your chart of accounts and create draft invoices. We never post without your approval.`,
   },
 ]
 
@@ -641,7 +641,7 @@ export const templates: Template[] = [
     slug: "rent-receipt-pdf",
     name: "Rent Receipt (auto-fill)",
     category: "Receipt",
-    description: "PDF receipt that auto-fills from your I-Manage payment record.",
+    description: "PDF receipt that auto-fills from your PropDesk Africa payment record.",
     downloads: 29,
     format: "DOCX",
     region: "Pan-African",
@@ -723,11 +723,11 @@ export const customers: Customer[] = [
     industry: "Multi-family residential",
     units: "212 units",
     location: "Eldoret, Kenya",
-    summary: "A growing portfolio of mid-market family homes adopted I-Manage to standardise reporting and replace four different spreadsheets.",
+    summary: "A growing portfolio of mid-market family homes adopted PropDesk Africa to standardise reporting and replace four different spreadsheets.",
     challenge:
       "Reporting to investors was a manual two-day process every quarter. Maintenance requests were lost in WhatsApp threads. Late rent averaged 22%.",
     solution:
-      "Standardised on I-Manage's Pro plan, rolled out to all 212 units in three weeks, and connected the M-Pesa STK Push flow for every tenant.",
+      "Standardised on PropDesk Africa's Pro plan, rolled out to all 212 units in three weeks, and connected the M-Pesa STK Push flow for every tenant.",
     results: [
       { label: "On-time collection", value: "78% → 96%", detail: "Within two quarters" },
       { label: "Hours/month saved", value: "32h", detail: "Reporting + maintenance routing" },
@@ -735,7 +735,7 @@ export const customers: Customer[] = [
       { label: "Tenant NPS", value: "+24", detail: "Year over year" },
     ],
     quote:
-      "I-Manage is the first tool that made reporting something I look forward to sharing with my investors.",
+      "PropDesk Africa is the first tool that made reporting something I look forward to sharing with my investors.",
     quoteAuthor: "Wanjiru M., Operations Director",
     cover: "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=1600&q=80",
   },
@@ -749,7 +749,7 @@ export const customers: Customer[] = [
     challenge:
       "Reconciling Airbnb, Booking.com and direct bookings across 84 units took a full-time accountant three days every month.",
     solution:
-      "I-Manage's flexible lease model and M-Pesa STK Push fit their cashflow cycle. Channel-manager sync on the roadmap.",
+      "PropDesk Africa's flexible lease model and M-Pesa STK Push fit their cashflow cycle. Channel-manager sync on the roadmap.",
     results: [
       { label: "Tenant adoption", value: "92%", detail: "Of tenants on the portal" },
       { label: "Support tickets", value: "−41%" },
@@ -796,7 +796,7 @@ export const insights: Insight[] = [
   {
     slug: "future-of-rent-collection-africa",
     title: "The future of rent collection in Africa is mobile-first",
-    excerpt: "Why US-built rent platforms keep failing in Africa — and what we learned building I-Manage for it.",
+    excerpt: "Why US-built rent platforms keep failing in Africa — and what we learned building PropDesk Africa for it.",
     readingMinutes: 12,
     publishedAt: "2026-08-30",
     author: "Brian Kiarie",
@@ -817,7 +817,7 @@ export const insights: Insight[] = [
     excerpt: "How nightly reconciliation against Daraja's transaction log saves our landlords KES 38k/month on average.",
     readingMinutes: 7,
     publishedAt: "2026-06-02",
-    author: "The I-Manage team",
+    author: "The PropDesk Africa team",
     cover: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1600&q=80",
   },
 ]

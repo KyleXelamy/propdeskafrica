@@ -29,7 +29,7 @@ export default function MarketingHome() {
               Run your <em className="font-serif font-normal text-accent">entire portfolio</em> from one place.
             </h1>
             <p className="mt-8 max-w-xl text-base leading-7 text-white/70 sm:text-lg">
-              I-Manage is the landlord &amp; agent control room. Properties, tenants, rent, maintenance,
+              PropDesk Africa is the landlord &amp; agent control room. Properties, tenants, rent, maintenance,
               quotations, damages, documents and contacts — every workflow your business does, in one
               workspace. Your tenants just pay your paybill; the rest is yours.
             </p>
@@ -60,7 +60,7 @@ export default function MarketingHome() {
               </h2>
             </div>
             <p className="max-w-md text-base leading-7 text-muted-foreground">
-              From your first unit to your next hundred, I-Manage brings the financial, operational
+              From your first unit to your next hundred, PropDesk Africa brings the financial, operational
               and human sides of property into one thoughtful workspace.
             </p>
           </div>

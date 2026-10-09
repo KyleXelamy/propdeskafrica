@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "packageManager": "pnpm@10.34.6",
   "private": true,
-  "description": "I-Manage by Siemax Ltd — modern property management for landlords and tenants.",
+  "description": "PropDesk Africa by Siemax Ltd — modern property management for landlords and tenants.",
   "author": {
     "name": "Brian Kiarie",
     "url": "https://www.linkedin.com/in/brian-kiarie-00b3a3391",
