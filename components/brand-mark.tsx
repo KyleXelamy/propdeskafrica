@@ -1,5 +1,5 @@
 /**
- * I-Manage brand mark.
+ * PropDesk Africa brand mark.
  *
  * Inline SVG so it can be themed via currentColor and used at any size.
  * The mark combines a doorway, skyline, and check shape to represent
@@ -20,7 +20,7 @@ export function BrandMark({ size = 32, className }: MarkProps) {
       viewBox="0 0 40 40"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
-      aria-label="I-Manage"
+      aria-label="PropDesk Africa"
     >
       <defs>
         <linearGradient id="i-manage-mark-gradient" x1="0" y1="0" x2="1" y2="1">
@@ -52,7 +52,7 @@ export function BrandWordmark({ href, showSubtitle = true, size = "md", classNam
     <span className={`inline-flex items-center gap-2 ${className || ""}`}>
       <BrandMark size={markSize} />
       <span className="flex flex-col leading-tight">
-        <span className={`${titleSize} font-bold tracking-tight`}>I-Manage</span>
+        <span className={`${titleSize} font-bold tracking-tight`}>PropDesk Africa</span>
         {showSubtitle && (
           <span className={`${subSize} uppercase tracking-[0.18em] text-muted-foreground`}>
             Property operations

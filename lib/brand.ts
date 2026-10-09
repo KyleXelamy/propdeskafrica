@@ -1,6 +1,6 @@
 export const BRAND = {
-  product: "I-Manage",
-  company: "I-Manage",
+  product: "PropDesk Africa",
+  company: "PropDesk Africa",
   creator: "Brian Kiarie",
   supportEmail: "bknglabs.dev@gmail.com",
   supportPhone: "0758034649",

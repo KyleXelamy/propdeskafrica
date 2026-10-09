@@ -1,5 +1,5 @@
 /**
- * I-Manage system library.
+ * PropDesk Africa system library.
  *
  * Self-contained backup + patch/update system. No admin panel.
  * The platform can:
@@ -55,7 +55,7 @@ export type BackupTable = (typeof BACKUP_TABLES)[number]
 export const CURRENT_SCHEMA_VERSION = 15
 
 export const APP_VERSION = "5.0.0"
-export const APP_NAME = "I-Manage"
+export const APP_NAME = "PropDesk Africa"
 export const APP_COMMIT = process.env.NEXT_PUBLIC_APP_COMMIT ?? "dev"
 
 export interface PatchDescriptor {
