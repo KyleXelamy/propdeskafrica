@@ -13,18 +13,18 @@ export function supportMailto(subject: string, body: string) {
 
 export function templateDownloadPath(slug: string) {
   const paths: Record<string, string> = {
-    "kenya-residential-lease": "/templates/kenya-residential-lease.txt",
-    "kenya-month-to-month": "/templates/kenya-residential-lease.txt",
-    "uganda-residential-lease": "/templates/kenya-residential-lease.txt",
-    "tanzania-residential-lease": "/templates/kenya-residential-lease.txt",
-    "move-in-inspection": "/templates/move-in-inspection.txt",
-    "move-out-inspection": "/templates/move-out-inspection.txt",
-    "rent-increase-notice": "/templates/rent-increase-notice.txt",
-    "termination-notice": "/templates/termination-notice.txt",
-    "rent-receipt-pdf": "/templates/rent-receipt.txt",
-    "landlord-monthly-checklist": "/templates/landlord-monthly-checklist.txt",
+    "kenya-residential-lease": "/templates/preview/lease.docx",
+    "kenya-month-to-month": "/templates/preview/lease.docx",
+    "uganda-residential-lease": "/templates/preview/lease.docx",
+    "tanzania-residential-lease": "/templates/preview/lease.docx",
+    "move-in-inspection": "/templates/preview/inspection.docx",
+    "move-out-inspection": "/templates/preview/inspection.docx",
+    "rent-increase-notice": "/templates/preview/rent-increase.docx",
+    "termination-notice": "/templates/preview/termination.docx",
+    "rent-receipt-pdf": "/templates/preview/receipt.docx",
+    "landlord-monthly-checklist": "/templates/preview/checklist.docx",
     "csv-property-import": "/templates/property-import.csv",
-    "commercial-lease-kenya": "/templates/kenya-residential-lease.txt",
+    "commercial-lease-kenya": "/templates/preview/lease.docx",
   }
-  return paths[slug] ?? "/templates/complaint-report.txt"
+  return paths[slug] ?? "/templates/preview/complaint.docx"
 }
