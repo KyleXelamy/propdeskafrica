@@ -3,8 +3,8 @@
 -- Subscription plans + per-user subscription state + trial logic
 -- ============================================================
 --
--- Three plans: Solo (KES 990), Pro (KES 2,490), Agency (KES 7,900)
--- 14-day trial auto-applied at signup, can be extended manually
+-- One plan: PropDesk Africa (KES 2,490/month)
+-- 14-day trial auto-applied at signup
 -- (admin tool) for users who pay via bank transfer / direct card.
 
 -- 1) plans table ---------------------------------------------------------
