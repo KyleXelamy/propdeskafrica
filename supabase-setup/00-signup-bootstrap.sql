@@ -1,4 +1,4 @@
--- PROPDESK AFRICA signup bootstrap
+-- I-MANAGE signup bootstrap
 -- Safe to run independently before the rest of the schema setup.
 
 create table if not exists public.user_profiles (

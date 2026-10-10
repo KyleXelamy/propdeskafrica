@@ -212,6 +212,7 @@ export const features: Feature[] = [
       "Role-based access (admin, manager, viewer)",
       "Aggregate cashflow and occupancy",
       "Per-landlord profit & loss",
+      "White-label tenant comms (Agency plan)",
     ],
     icon: "Briefcase",
     image:
@@ -555,138 +556,122 @@ Settings → Integrations → Xero → Connect. Authorise PropDesk Africa to rea
 export type Template = {
   slug: string
   name: string
-  category: "Lease" | "Inspection" | "Notice" | "Receipt" | "Checklist" | "Maintenance" | "Report" | "Log" | "Import" | "Move-in"
+  category: "Lease" | "Inspection" | "Notice" | "Receipt" | "Checklist"
   description: string
-  /**
-   * The law this document actually rests on, shown on the card so nobody
-   * mistakes a Kenyan residential document for one that is valid elsewhere.
-   * Empty for format templates (CSV) that carry no legal content.
-   */
-  legalBasis?: string
+  downloads: number
   format: "PDF" | "DOCX" | "CSV"
   region: string
-  downloadPath: string
+  downloadPath?: string
 }
 
-/**
- * Every entry here points at a file that exists in /public/templates. If you
- * add a template, generate the file too — `npm run templates:prebuild`
- * rebuilds the DOCX set from lib/templates/templates.ts.
- *
- * There are deliberately no download counts here. We do not track real
- * download numbers, and inventing them is not a growth tactic.
- */
 export const templates: Template[] = [
   {
     slug: "kenya-residential-lease",
-    name: "Kenya Residential Tenancy Agreement",
+    name: "Kenya Residential Lease (1-year)",
     category: "Lease",
-    description: "A complete tenancy agreement for a Kenyan home: premises, term, rent, deposit, repairs, access, default and termination. Includes a data-handling clause.",
-    legalBasis: "Rent Restriction Act (Cap 296) · Law of Contract Act (Cap 23) · Distress for Rent Act (Cap 293)",
+    description: "Plain-English residential lease compliant with the Kenya Landlord & Tenant Act.",
+    downloads: 28,
     format: "DOCX",
     region: "Kenya",
-    downloadPath: "/templates/preview/lease.docx",
   },
   {
-    slug: "notice-to-quit",
-    name: "Notice to Quit",
-    category: "Notice",
-    description: "A served notice ending a tenancy, with the grounds stated, the deposit position explained, and a record of how it was served.",
-    legalBasis: "Rent Restriction Act (Cap 296) · Landlord and Tenant Act (Cap 233)",
+    slug: "kenya-month-to-month",
+    name: "Kenya Month-to-Month Agreement",
+    category: "Lease",
+    description: "Short-form lease for month-to-month tenancies.",
+    downloads: 24,
     format: "DOCX",
     region: "Kenya",
-    downloadPath: "/templates/preview/termination.docx",
   },
   {
-    slug: "rent-review-notice",
-    name: "Rent Review Notice",
-    category: "Notice",
-    description: "Written notice of a rent change, stating the basis for the increase and the tenant's right to respond or leave without penalty.",
-    legalBasis: "Rent Restriction Act, s.13(2) (Cap 296)",
+    slug: "uganda-residential-lease",
+    name: "Uganda Residential Lease",
+    category: "Lease",
+    description: "Residential lease template drafted for Ugandan tenancy law.",
+    downloads: 22,
     format: "DOCX",
-    region: "Kenya",
-    downloadPath: "/templates/preview/rent-increase.docx",
+    region: "Uganda",
   },
   {
-    slug: "condition-report",
-    name: "Move-in / Move-out Condition Report",
+    slug: "tanzania-residential-lease",
+    name: "Tanzania Residential Lease",
+    category: "Lease",
+    description: "Bilingual (Swahili + English) residential lease for Tanzania.",
+    downloads: 21,
+    format: "DOCX",
+    region: "Tanzania",
+  },
+  {
+    slug: "move-in-inspection",
+    name: "Move-in Inspection Checklist",
     category: "Inspection",
-    description: "A 22-item joint inspection with photo references and meter readings — the baseline that decides which damage a tenant pays for.",
+    description: "Room-by-room inspection template with photo slots.",
+    downloads: 26,
     format: "DOCX",
-    region: "Kenya",
-    downloadPath: "/templates/preview/inspection.docx",
+    region: "Pan-African",
   },
   {
-    slug: "key-handover",
-    name: "Key and Access Handover Record",
-    category: "Move-in",
-    description: "Every key, remote and access card issued or returned, with meter readings and the custody conditions the tenant signs up to.",
+    slug: "move-out-inspection",
+    name: "Move-out Inspection Checklist",
+    category: "Inspection",
+    description: "Mirror of the move-in template for fair deposit deductions.",
+    downloads: 23,
     format: "DOCX",
-    region: "Kenya",
-    downloadPath: "/templates/preview/key-handover.docx",
+    region: "Pan-African",
   },
   {
-    slug: "rent-receipt",
-    name: "Rent Receipt",
+    slug: "rent-increase-notice",
+    name: "Rent Increase Notice (30-day)",
+    category: "Notice",
+    description: "Politely-worded 30-day notice for rent adjustments.",
+    downloads: 20,
+    format: "DOCX",
+    region: "Pan-African",
+  },
+  {
+    slug: "termination-notice",
+    name: "Termination Notice",
+    category: "Notice",
+    description: "Mutual termination notice template.",
+    downloads: 20,
+    format: "DOCX",
+    region: "Pan-African",
+  },
+  {
+    slug: "rent-receipt-pdf",
+    name: "Rent Receipt (auto-fill)",
     category: "Receipt",
-    description: "Proof of payment the tenant keeps, with the period covered, the M-Pesa reference and the running balance.",
+    description: "PDF receipt that auto-fills from your PropDesk Africa payment record.",
+    downloads: 29,
     format: "DOCX",
     region: "Pan-African",
-    downloadPath: "/templates/preview/receipt.docx",
-  },
-  {
-    slug: "maintenance-request",
-    name: "Maintenance Request",
-    category: "Maintenance",
-    description: "A dated written fault report with access permission and landlord triage — the record a verbal complaint never leaves behind.",
-    format: "DOCX",
-    region: "Pan-African",
-    downloadPath: "/templates/preview/maintenance.docx",
-  },
-  {
-    slug: "complaint-report",
-    name: "Complaint Report",
-    category: "Report",
-    description: "One reference number from intake to close-out, with a safety-critical escalation path and a record of who bore the cost.",
-    format: "DOCX",
-    region: "Pan-African",
-    downloadPath: "/templates/preview/complaint.docx",
   },
   {
     slug: "landlord-monthly-checklist",
     name: "Landlord Monthly Checklist",
     category: "Checklist",
-    description: "A twenty-minute monthly routine: rent collection, property condition, lease diary, KRA and county rates, insurance, data hygiene.",
+    description: "Everything to check, log and reconcile every month.",
+    downloads: 25,
     format: "DOCX",
-    region: "Kenya",
-    downloadPath: "/templates/preview/checklist.docx",
-  },
-  {
-    slug: "expense-log",
-    name: "Expense Log",
-    category: "Log",
-    description: "Per-property expenses with receipt tracking, split between repairs and utility income, ready to support a KRA computation.",
-    format: "DOCX",
-    region: "Kenya",
-    downloadPath: "/templates/preview/expense-log.docx",
+    region: "Pan-African",
   },
   {
     slug: "csv-property-import",
     name: "Property CSV Import Template",
-    category: "Import",
-    description: "Header row plus one worked example, with the exact columns the importer expects.",
+    category: "Receipt",
+    description: "Empty CSV with the right columns for bulk property import.",
+    downloads: 20,
     format: "CSV",
     region: "Pan-African",
-    downloadPath: "/templates/property-import.csv",
   },
   {
-    slug: "csv-tenant-import",
-    name: "Tenant CSV Import Template",
-    category: "Import",
-    description: "Header row plus one worked example, for loading tenants and lease dates in bulk.",
-    format: "CSV",
-    region: "Pan-African",
-    downloadPath: "/templates/tenant-import.csv",
+    slug: "commercial-lease-kenya",
+    name: "Kenya Commercial Lease (3-year)",
+    category: "Lease",
+    description: "Commercial lease template with CAM and escalation clauses.",
+    downloads: 20,
+    format: "DOCX",
+    region: "Kenya",
   },
 ]
 
