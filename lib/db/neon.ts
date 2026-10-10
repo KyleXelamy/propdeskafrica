@@ -1,7 +1,7 @@
 /**
  * Neon Postgres client.
  *
- * I-Manage uses Neon as the primary database (via the @neondatabase/serverless
+ * PropDesk Africa uses Neon as the primary database (via the @neondatabase/serverless
  * HTTP driver). Supabase is retained ONLY for:
  *   - Auth (sessions, cookies, getUser) — see lib/supabase/server.ts
  *   - Storage (avatars, documents, property photos)
@@ -28,83 +28,6 @@ export function getDbUrl(): string | null {
 
 export function neonConfigured(): boolean {
   return Boolean(getDbUrl())
-}
-
-/**
- * Returns the Neon query function (template literal form). Throws a clear
- * error if `DATABASE_URL` is not set.
- *
- * Cached at module scope so the HTTP client is reused across requests in the
- * same server process. Safe to call from server components, server actions,
- * and API route handlers.
- */
-export function getDb(): NeonQueryFunction<false, false> {
-  if (cachedSql) return cachedSql
-  const url = getDbUrl()
-  if (!url) {
-    throw new Error(
-      "DATABASE_URL is not set. Add it to .env.local (Neon connection string " +
-        "from https://console.neon.tech), or unset NEON_ENABLED to fall back to Supabase.",
-    )
-  }
-  // In Node 21 and below we need to provide a WebSocket constructor for any
-  // code path that uses Pool/Client. Our default code only uses the HTTP
-  // `neon()` template form, so this is a no-op for us — but set it for
-  // safety in case a future module uses Pool.
-  if (typeof WebSocket === "undefined") {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    try { neonConfig.webSocketConstructor = require("ws") } catch { /* ignore */ }
-  }
-  cachedSql = neon(url)
-  return cachedSql
-}
-
-/**
- * Run a parameterized query. Returns the rows array. Use this for one-shot
- * SELECT / INSERT / UPDATE / DELETE.
- *
- * Example:
- *   const properties = await query<Property>(
- *     "SELECT * FROM properties WHERE user_id = $1",
- *     [userId],
- *   )
- */
-export async function query<T = any>(
-  text: string,
-  params: any[] = [],
-): Promise<T[]> {
-  // Use the safe parameterized query() API. Avoid string interpolation.
-  const sql = getDb()
-  const result = await sql.query(text, params)
-  return result as unknown as T[]
-}
-
-/**
- * Run multiple statements inside a single non-interactive transaction. All
- * statements execute atomically; on error, all are rolled back.
- *
- * Example:
- *   const [inserted, updated] = await tx([
- *     sql`INSERT INTO ...`,
- *     sql`UPDATE ... SET ...`,
- *   ])
- */
-export async function tx<T extends readonly unknown[] = any[]>(
-  queries: [...{ [K in keyof T]: any }],
-): Promise<T> {
-  const sql = getDb()
-  return (await sql.transaction(queries as any)) as unknown as T
-}
-
-/**
- * Convenience helper for "get one row or null" — saves a [0]?. dance.
- */
-export async function queryOne<T = any>(
-  text: string,
-  params: any[] = [],
-): Promise<T | null> {
-  const rows = await query<T>(text, params)
-  return rows[0] ?? null
 }
 
 /**

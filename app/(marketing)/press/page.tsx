@@ -4,14 +4,14 @@ import { ArrowUpRight, Download, Mail } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export const metadata: Metadata = {
-  title: "Press — I-Manage by Siemax Ltd",
+  title: "Press — PropDesk Africa by Siemax Ltd",
   description:
-    "Press kit, brand assets, coverage and contact for journalists covering I-Manage.",
+    "Press kit, brand assets, coverage and contact for journalists covering PropDesk Africa.",
 }
 
 const assets = [
-  { name: "I-Manage icon (SVG)", size: "Vector logo", href: "/icon.svg", download: true },
-  { name: "I-Manage icon (PNG)", size: "32 × 32 PNG", href: "/icon-light-32x32.png", download: true },
+  { name: "PropDesk Africa icon (SVG)", size: "Vector logo", href: "/icon.svg", download: true },
+  { name: "PropDesk Africa icon (PNG)", size: "32 × 32 PNG", href: "/icon-light-32x32.png", download: true },
   { name: "Brand guidelines", size: "Text document", href: "/press/brand-guidelines.txt", download: true },
   { name: "Company fact sheet", size: "Text document", href: "/press/company-fact-sheet.txt", download: true },
   { name: "Landlord templates", size: "12 downloadable templates", href: "/templates", download: false },
@@ -30,7 +30,7 @@ export default function PressPage() {
               Press, media & brand assets.
             </h1>
             <p className="mt-7 max-w-xl text-lg leading-8 text-primary-foreground/70">
-              Everything you need to write about I-Manage. Reach out — we respond to press inquiries
+              Everything you need to write about PropDesk Africa. Reach out — we respond to press inquiries
               within four hours.
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
@@ -61,7 +61,7 @@ export default function PressPage() {
   { k: "Kenya-first", v: "Built for local property teams" },
   { k: "M-Pesa ready", v: "Designed around familiar payments" },
   { k: "12 templates", v: "Practical landlord resources" },
-  { k: "Siemax Ltd", v: "I-Manage product team" },
+  { k: "Siemax Ltd", v: "PropDesk Africa product team" },
           ].map((s) => (
             <div key={s.k}>
               <p className="text-3xl font-medium tracking-tight sm:text-4xl">{s.k}</p>
@@ -76,14 +76,14 @@ export default function PressPage() {
         <div className="container-x">
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">Media enquiries</p>
           <h2 className="mt-4 max-w-2xl text-3xl font-medium leading-tight tracking-[-0.04em] sm:text-4xl">
-            A clear source for I-Manage information.
+            A clear source for PropDesk Africa information.
           </h2>
           <div className="mt-10 rounded-2xl border border-border bg-card p-6 sm:p-8">
             <p className="max-w-2xl text-base leading-7 text-muted-foreground">
               We are building our press library and do not list third-party coverage until it has been confirmed and published. For current product information, interviews, or approved screenshots, contact the Siemax Ltd team directly.
             </p>
             <Button asChild variant="outline" className="mt-6 rounded-full">
-              <Link href="mailto:bknglabs.dev@gmail.com?subject=I-Manage%20press%20enquiry">
+              <Link href="mailto:bknglabs.dev@gmail.com?subject=PropDesk Africa%20press%20enquiry">
                 Email the press desk <ArrowUpRight data-icon="inline-end" />
               </Link>
             </Button>

@@ -171,7 +171,7 @@ export function SystemInfo({ appVersion, schemaVersion, patches }: { appVersion:
             System patches
           </CardTitle>
           <CardDescription>
-            I-Manage keeps your workspace ready automatically. You do not need to know anything about databases or migrations.
+            PropDesk Africa keeps your workspace ready automatically. You do not need to know anything about databases or migrations.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -198,7 +198,7 @@ export function SystemInfo({ appVersion, schemaVersion, patches }: { appVersion:
             <Alert>
               <AlertCircle className="size-4" />
               <AlertTitle>Finishing workspace setup</AlertTitle>
-              <AlertDescription>I-Manage is preparing the latest features for you. Your data stays safe while this happens.</AlertDescription>
+              <AlertDescription>PropDesk Africa is preparing the latest features for you. Your data stays safe while this happens.</AlertDescription>
             </Alert>
           )}
           {patchCheck && patchCheck.pending_count === 0 && (

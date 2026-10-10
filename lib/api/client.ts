@@ -51,8 +51,4 @@ export async function apiFetch<T = any>(path: string, opts: ApiCallOptions = {})
 }
 
 /** Convenience for delete-with-redirect. Returns true on success. */
-export async function apiDelete(path: string): Promise<void> {
-  await apiFetch(path, { method: "DELETE" })
-}
-
 export type { ApiError as ApiErrorType, ApiCallOptions }

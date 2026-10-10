@@ -31,7 +31,7 @@ export default function DocumentsPage() {
         if (error) throw error
         setDocuments(data || [])
       } catch (err: any) {
-        console.error("[i-manage] documents fetch error", err)
+        console.error("[propdeskafrica] documents fetch error", err)
         setError(err.message || "Failed to load documents")
       } finally {
         setLoading(false)

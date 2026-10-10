@@ -27,7 +27,7 @@ function VerifyEmailContent() {
         <CardContent className="space-y-6">
           <div className="space-y-4 text-center">
             <p className="text-muted-foreground leading-relaxed">
-              Click the link in the email to verify your account and unlock full access to I-Manage.
+              Click the link in the email to verify your account and unlock full access to PropDesk Africa.
             </p>
             <p className="text-sm text-muted-foreground">
               Didn't receive the email? Check your spam folder or the promotions tab.

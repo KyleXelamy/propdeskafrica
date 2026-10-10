@@ -15,7 +15,7 @@ export default function GlobalError({
   useEffect(() => {
     // Forward to whatever observability stack you wire up later
     // (Sentry, PostHog, etc.). For now: console only.
-    console.error("[i-manage] route error", { message: error.message, digest: error.digest })
+    console.error("[propdeskafrica] route error", { message: error.message, digest: error.digest })
   }, [error])
 
   return (

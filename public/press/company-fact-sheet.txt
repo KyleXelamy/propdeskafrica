@@ -1,14 +1,14 @@
-I-MANAGE BY SIEMAX LTD
+PROPDESK AFRICA BY SIEMAX LTD
 Company fact sheet
 
 About
-I-Manage is a property management platform for landlords, property managers and agencies. It brings property records, tenants, rent collection, maintenance, documents and reporting into one workspace.
+PropDesk Africa is a property management platform for landlords, property managers and agencies. It brings property records, tenants, rent collection, maintenance, documents and reporting into one workspace.
 
 Company
 Siemax Ltd
-Product: I-Manage
+Product: PropDesk Africa
 Base: Nairobi, Kenya
-Website: https://i-manage.app
+Website: https://propdeskafrica.com
 
 What the platform helps with
 - Organising properties and tenant records

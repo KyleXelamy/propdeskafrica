@@ -16,8 +16,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { id } = await params
   const role = openRoles.find((r) => r.id === id)
-  if (!role) return { title: "Role — I-Manage Careers" }
-  return { title: `${role.title} — I-Manage Careers`, description: role.excerpt }
+  if (!role) return { title: "Role — PropDesk Africa Careers" }
+  return { title: `${role.title} — PropDesk Africa Careers`, description: role.excerpt }
 }
 
 export default async function RolePage({

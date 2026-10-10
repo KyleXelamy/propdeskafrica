@@ -35,7 +35,7 @@ export default function NoteDetailPage() {
         if (!data) setNotFound(true)
         else setNote(data)
       } catch (err) {
-        console.error("[i-manage] fetch note error", err)
+        console.error("[propdeskafrica] fetch note error", err)
         setNotFound(true)
       } finally {
         setLoading(false)

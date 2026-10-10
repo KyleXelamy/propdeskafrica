@@ -3,8 +3,8 @@ import Link from "next/link"
 import { ArrowUpRight, MessageCircle, Github, Users, Calendar } from "lucide-react"
 
 export const metadata: Metadata = {
-  title: "Community — I-Manage by Siemax Ltd",
-  description: "Join the I-Manage community of landlords, developers and property teams.",
+  title: "Community — PropDesk Africa by Siemax Ltd",
+  description: "Join the PropDesk Africa community of landlords, developers and property teams.",
 }
 
 const channels = [
@@ -26,7 +26,7 @@ const channels = [
     icon: Github,
     name: "GitHub Discussions",
     description: "Developer topics, API questions and OSS integration examples.",
-    href: "https://github.com/Knighty7-ciper/i-manage/discussions",
+    href: "https://github.com/Knighty7-ciper/propdeskafrica/discussions",
     cta: "Browse discussions",
   },
   {

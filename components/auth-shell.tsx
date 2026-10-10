@@ -44,7 +44,7 @@ export function AuthShell({
               {[
                 "Manage tenants, units and leases in one place",
                 "Native M-Pesa rent collection",
-                "Tenant portal — self-service payments & maintenance",
+                "Unlimited units on one flat monthly price",
               ].map((item) => (
                 <li key={item} className="flex items-start gap-3">
                   <span className="mt-1 size-1.5 shrink-0 rounded-full bg-accent" />
@@ -62,7 +62,7 @@ export function AuthShell({
           </div>
 
           <p className="text-xs text-primary-foreground/40">
-            © {new Date().getFullYear()} I-Manage. All rights reserved.
+            © {new Date().getFullYear()} PropDesk Africa. All rights reserved.
           </p>
         </div>
       </aside>

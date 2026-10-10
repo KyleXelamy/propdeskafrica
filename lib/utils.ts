@@ -29,19 +29,6 @@ export function formatCurrency(amount: number | null | undefined, currency = "KE
   }
 }
 
-export function formatKenyaPhone(phone: string): string {
-  if (!phone) return ""
-  const cleaned = phone.replace(/\D/g, "")
-
-  if (cleaned.startsWith("254")) {
-    return `+${cleaned.slice(0, 3)} ${cleaned.slice(3, 6)} ${cleaned.slice(6, 9)} ${cleaned.slice(9)}`
-  } else if (cleaned.startsWith("0")) {
-    return `${cleaned.slice(0, 4)} ${cleaned.slice(4, 7)} ${cleaned.slice(7)}`
-  }
-
-  return phone
-}
-
 /**
  * Safely resolve a tenant's display name from any combination of the
  * `full_name` / `first_name` / `last_name` fields the API may return.
@@ -67,16 +54,6 @@ export function formatDate(d: string | Date | null | undefined, fallback = "—"
   if (!d) return fallback
   try {
     return new Date(d).toLocaleDateString()
-  } catch {
-    return fallback
-  }
-}
-
-/** Human-friendly date + time. */
-export function formatDateTime(d: string | Date | null | undefined, fallback = "—") {
-  if (!d) return fallback
-  try {
-    return new Date(d).toLocaleString()
   } catch {
     return fallback
   }

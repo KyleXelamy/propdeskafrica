@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Plus, ClipboardList, ArrowRight, FileText, CheckCircle2, Clock, XCircle } from "lucide-react"
 
 export const metadata: Metadata = {
-  title: "Quotations — I-Manage",
+  title: "Quotations — PropDesk Africa",
   description: "Track contractor quotes side by side. Approve, convert to invoices, pay.",
 }
 

@@ -4,9 +4,9 @@ import { ArrowUpRight, Briefcase, Users, Heart, MapPin } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export const metadata: Metadata = {
-  title: "Careers — I-Manage by Siemax Ltd",
+  title: "Careers — PropDesk Africa by Siemax Ltd",
   description:
-    "Learn how I-Manage works and stay in touch for future opportunities. No roles are currently open.",
+    "Learn how PropDesk Africa works and stay in touch for future opportunities. No roles are currently open.",
 }
 
 const benefits = [
@@ -45,7 +45,7 @@ export default function CareersPage() {
               Build software landlords <em className="font-serif font-normal text-accent">actually love.</em>
             </h1>
             <p className="mt-7 max-w-xl text-lg leading-8 text-primary-foreground/70">
-              I-Manage is a small team at Siemax Ltd building the property platform we wished existed.
+              PropDesk Africa is a small team at Siemax Ltd building the property platform we wished existed.
               There are no open roles right now, but this page will be updated when that changes.
             </p>
           </div>
@@ -95,7 +95,7 @@ export default function CareersPage() {
 
           <div className="mt-10 rounded-2xl border border-border bg-card p-8 sm:p-10">
             <p className="max-w-2xl text-base leading-7 text-muted-foreground">
-              I-Manage is built by Siemax Ltd. If you have a future opportunity in mind, send a brief note and we will keep it on file for the right opening.
+              PropDesk Africa is built by Siemax Ltd. If you have a future opportunity in mind, send a brief note and we will keep it on file for the right opening.
             </p>
             <Button asChild className="mt-6 rounded-full">
               <Link href="/contact">Contact the team <ArrowUpRight data-icon="inline-end" /></Link>

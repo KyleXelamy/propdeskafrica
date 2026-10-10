@@ -1,5 +1,5 @@
 import { withAuth, successResponse, errorResponse, HttpError } from "@/lib/api"
-import { stkPush, darajaConfigured, normalizePhone } from "@/lib/mpesa/daraja"
+import { stkPush, darajaConfigured, normalizePhone, isValidKenyanPhone } from "@/lib/mpesa/daraja"
 
 /**
  * POST /api/mpesa/stkpush
@@ -21,6 +21,15 @@ export const POST = withAuth(async (req, { supabase, userId }) => {
   if (!tenantId) throw new HttpError("tenant_id required", 400)
   if (!Number.isFinite(amount) || amount < 1) throw new HttpError("amount must be a positive number", 400)
   if (!phone) throw new HttpError("phone required", 400)
+  // Reject bad MSISDNs before spending a Daraja call on them. Without this,
+  // a typo'd or landline number produced an opaque upstream error and a
+  // half-created transaction row instead of a clear 400.
+  if (!isValidKenyanPhone(phone)) {
+    throw new HttpError(
+      "phone must be a Kenyan mobile number in 07XX/01XX or 254 7XX/254 1XX form",
+      400,
+    )
+  }
 
   // Confirm the tenant belongs to the caller
   const { data: tenant, error: tErr } = await supabase

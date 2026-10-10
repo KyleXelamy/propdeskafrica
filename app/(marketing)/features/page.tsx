@@ -5,8 +5,8 @@ import { features } from "@/lib/content/marketing"
 import * as Icons from "lucide-react"
 
 export const metadata: Metadata = {
-  title: "Features — I-Manage by Siemax Ltd",
-  description: "Every feature that makes I-Manage the calm operating system for ambitious landlords.",
+  title: "Features — PropDesk Africa by Siemax Ltd",
+  description: "Every feature that makes PropDesk Africa the calm operating system for ambitious landlords.",
 }
 
 export default function FeaturesHub() {
@@ -22,7 +22,7 @@ export default function FeaturesHub() {
               One product. Every workflow.
             </h1>
             <p className="mt-7 max-w-xl text-lg leading-8 text-primary-foreground/70">
-              From rent collection to maintenance, documents to reports — I-Manage replaces the
+              From rent collection to maintenance, documents to reports — PropDesk Africa replaces the
               spreadsheets, the WhatsApp threads and the Sunday-night reconciliation.
             </p>
           </div>

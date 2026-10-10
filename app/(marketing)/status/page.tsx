@@ -4,9 +4,9 @@ import { ArrowUpRight, CheckCircle2, AlertCircle } from "lucide-react"
 import { systemComponents, statusIncidents } from "@/lib/content/site"
 
 export const metadata: Metadata = {
-  title: "Status — I-Manage by Siemax Ltd",
+  title: "Status — PropDesk Africa by Siemax Ltd",
   description:
-    "Real-time operational status for I-Manage: marketing site, dashboard, M-Pesa integration and webhooks.",
+    "Real-time operational status for PropDesk Africa: marketing site, dashboard, M-Pesa integration and webhooks.",
 }
 
 const allOperational = true

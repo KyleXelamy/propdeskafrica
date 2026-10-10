@@ -7,7 +7,7 @@ export const runtime = "nodejs"
 
 /**
  * GET /api/backup/csv/[table]
- * Export one table as CSV. The CSV is downloaded as `i-manage-{table}-{date}.csv`.
+ * Export one table as CSV. The CSV is downloaded as `propdeskafrica-{table}-{date}.csv`.
  */
 export const GET = withAuth(async (_request, { userId, supabase }, { table }) => {
   if (!table || !(BACKUP_TABLES as readonly string[]).includes(table)) {
@@ -24,7 +24,7 @@ export const GET = withAuth(async (_request, { userId, supabase }, { table }) =>
     status: 200,
     headers: {
       "Content-Type": "text/csv; charset=utf-8",
-      "Content-Disposition": `attachment; filename="i-manage-${table}-${today}.csv"`,
+      "Content-Disposition": `attachment; filename="propdeskafrica-${table}-${today}.csv"`,
       "X-Row-Count": String(rows.length),
       "X-Size-Bytes": String(new TextEncoder().encode(csv).length),
       "X-Size-Human": formatSize(new TextEncoder().encode(csv).length),

@@ -1,5 +1,5 @@
 /**
- * I-Manage blog / resources content. Static until we wire up a CMS later.
+ * PropDesk Africa blog / resources content. Static until we wire up a CMS later.
  * Each post has enough metadata to render both the index and detail pages
  * and to satisfy /api/blog and /api/blog/[slug].
  */
@@ -26,7 +26,7 @@ export type BlogPost = {
 export const authors: Record<string, Author> = {
   brian: { name: "Brian Kiarie", role: "Founder, CFO & Operations", initials: "BK" },
   wanjiku: { name: "Wanjiku Mwangi", role: "Head of Product", initials: "WM" },
-  team: { name: "The I-Manage team", role: "Property operations", initials: "IM" },
+  team: { name: "The PropDesk Africa team", role: "Property operations", initials: "IM" },
 }
 
 export const blogPosts: BlogPost[] = [
@@ -34,7 +34,7 @@ export const blogPosts: BlogPost[] = [
     slug: "automating-mpesa-rent-collection",
     title: "How we automated M-Pesa rent collection (without the headache)",
     excerpt:
-      "STK Push is amazing when it works — and miserable when it doesn't. Here's how I-Manage handles retries, timeouts and reconciliation.",
+      "STK Push is amazing when it works — and miserable when it doesn't. Here's how PropDesk Africa handles retries, timeouts and reconciliation.",
     category: "Product",
     publishedAt: "2026-09-18",
     readingMinutes: 6,
@@ -42,9 +42,9 @@ export const blogPosts: BlogPost[] = [
     cover:
       "https://images.unsplash.com/photo-1556742502-ec7c0e9f34b1?auto=format&fit=crop&w=1600&q=80",
     tags: ["mpesa", "daraja", "payments"],
-    body: `Most landlords we talked to before launching I-Manage had the same story. They would initiate an M-Pesa STK Push, the tenant would get the prompt, enter their PIN… and then the request would either succeed and not reflect anywhere, or quietly fail.
+    body: `Most landlords we talked to before launching PropDesk Africa had the same story. They would initiate an M-Pesa STK Push, the tenant would get the prompt, enter their PIN… and then the request would either succeed and not reflect anywhere, or quietly fail.
 
-In this post we walk through how I-Manage talks to Safaricom's Daraja API and the small details that make the difference between a 99% collection rate and a 60% one.
+In this post we walk through how PropDesk Africa talks to Safaricom's Daraja API and the small details that make the difference between a 99% collection rate and a 60% one.
 
 ## The three failure modes we obsessed over
 

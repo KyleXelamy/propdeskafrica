@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
       name: `${payload.first_name} ${payload.last_name}`,
     })
 
-    const subject = `[I-Manage] ${payload.topic} — ${payload.first_name} ${payload.last_name}`
+    const subject = `[PropDesk Africa] ${payload.topic} — ${payload.first_name} ${payload.last_name}`
     const emailBody = [
       `Name: ${payload.first_name} ${payload.last_name}`,
       `Email: ${payload.email}`,
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       ok: true,
       mailto,
-      message: "Your email app is ready with the request filled in. Press Send to contact the I-Manage team.",
+      message: "Your email app is ready with the request filled in. Press Send to contact the PropDesk Africa team.",
     })
   } catch (err) {
     console.error("[api/contact] failed", err)

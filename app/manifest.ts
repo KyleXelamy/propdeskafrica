@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next"
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "I-Manage — Property Operations",
-    short_name: "I-Manage",
+    name: "PropDesk Africa — Property Operations",
+    short_name: "PropDesk Africa",
     description: "The focused workspace for landlords and property teams.",
     start_url: "/dashboard",
     display: "standalone",

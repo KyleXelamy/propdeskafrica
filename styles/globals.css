@@ -4,16 +4,16 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * I-Manage brand palette
- * - Brand ink:   #15231d (deep forest green, near-black)
- * - Brand lime:  #d9f45b (vibrant lime accent)
- * - Brand cream: #f4f3ed (off-white surface)
- * - Sage:        #45604d / #5d6a5f / #738171 / #9aa59b / #cad1c7
+ * PropDesk Africa brand palette
+ * - Brand ink:   deep navy / near-black
+ * - Brand copper: warm terracotta accent
+ * - Brand cream: off-white surface
+ * - Slate:       restrained blue-grey neutrals
  */
 :root {
   /* surfaces */
   --background: oklch(0.972 0.006 95);            /* #f4f3ed */
-  --foreground: oklch(0.234 0.018 155);           /* #15231d */
+  --foreground: oklch(0.22 0.035 255);              /* deep navy */
 
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.234 0.018 155);
@@ -22,7 +22,7 @@
   --popover-foreground: oklch(0.234 0.018 155);
 
   /* primary = deep forest ink */
-  --primary: oklch(0.234 0.018 155);
+  --primary: oklch(0.22 0.035 255);
   --primary-foreground: oklch(0.972 0.006 95);
 
   /* secondary = sage panel */
@@ -32,7 +32,7 @@
   --muted: oklch(0.94 0.012 145);
   --muted-foreground: oklch(0.485 0.014 155);      /* #5d6a5f */
 
-  --accent: oklch(0.93 0.21 130);                  /* #d9f45b lime */
+  --accent: oklch(0.68 0.14 45);                   /* warm copper */
   --accent-foreground: oklch(0.234 0.018 155);
 
   --destructive: oklch(0.577 0.245 27.325);
@@ -50,7 +50,7 @@
 
   /* brand charts */
   --chart-1: oklch(0.46 0.05 155);                 /* #45604d sage deep */
-  --chart-2: oklch(0.93 0.21 130);                 /* lime */
+  --chart-2: oklch(0.68 0.14 45);                  /* copper */
   --chart-3: oklch(0.234 0.018 155);               /* ink */
   --chart-4: oklch(0.62 0.07 155);                 /* sage mid */
   --chart-5: oklch(0.78 0.16 80);                  /* warm highlight */
@@ -59,9 +59,9 @@
 
   --sidebar: oklch(0.985 0.003 95);
   --sidebar-foreground: oklch(0.234 0.018 155);
-  --sidebar-primary: oklch(0.234 0.018 155);
+  --sidebar-primary: oklch(0.22 0.035 255);
   --sidebar-primary-foreground: oklch(0.972 0.006 95);
-  --sidebar-accent: oklch(0.94 0.012 145);
+  --sidebar-accent: oklch(0.94 0.025 45);
   --sidebar-accent-foreground: oklch(0.234 0.018 155);
   --sidebar-border: oklch(0.9 0.01 145);
   --sidebar-ring: oklch(0.46 0.05 155);

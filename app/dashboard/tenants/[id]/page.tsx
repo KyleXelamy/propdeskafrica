@@ -10,14 +10,12 @@ import { useEffect, useState } from "react"
 import { useParams } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { DeleteButton } from "@/components/delete-button"
-import { TenantInviteCard } from "@/components/tenant-invite-card"
 import { MpesaPayButton } from "@/components/mpesa-pay-button"
 import { formatCurrency, formatDate, tenantName } from "@/lib/utils"
 
 export default function TenantPage() {
   const params = useParams<{ id: string }>()
   const [tenant, setTenant] = useState<any>(null)
-  const [link, setLink] = useState<any>(null)
   const [recentPayments, setRecentPayments] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
@@ -27,7 +25,7 @@ export default function TenantPage() {
     const fetchData = async () => {
       try {
         const supabase = createClient()
-        const [tenantRes, paymentsRes, linkRes] = await Promise.all([
+        const [tenantRes, paymentsRes] = await Promise.all([
           supabase
             .from("tenants")
             .select(`
@@ -42,19 +40,13 @@ export default function TenantPage() {
             .eq("tenant_id", params.id)
             .order("due_date", { ascending: false })
             .limit(5),
-          supabase
-            .from("tenant_users")
-            .select("id, user_id, tenant_id")
-            .eq("tenant_id", params.id)
-            .maybeSingle(),
         ])
         if (tenantRes.error) throw tenantRes.error
         if (!tenantRes.data) setNotFound(true)
         else setTenant(tenantRes.data)
         setRecentPayments(paymentsRes.data || [])
-        setLink(linkRes.data)
       } catch (error) {
-        console.error("[i-manage] fetch tenant error", error)
+        console.error("[propdeskafrica] fetch tenant error", error)
         setNotFound(true)
       } finally {
         setLoading(false)
@@ -317,11 +309,6 @@ export default function TenantPage() {
         </Card>
       )}
 
-      <TenantInviteCard
-        tenantId={tenant.id}
-        tenantEmail={tenant.email}
-        initiallyLinked={Boolean((link as any)?.tenant_id)}
-      />
     </div>
   )
 }

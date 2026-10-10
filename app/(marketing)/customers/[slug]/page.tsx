@@ -16,9 +16,9 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params
   const c = customers.find((x) => x.slug === slug)
-  if (!c) return { title: "Customer — I-Manage" }
+  if (!c) return { title: "Customer — PropDesk Africa" }
   return {
-    title: `${c.name} — I-Manage customer story`,
+    title: `${c.name} — PropDesk Africa customer story`,
     description: c.summary,
     openGraph: { images: [c.cover] },
   }

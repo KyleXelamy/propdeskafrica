@@ -1,14 +1,49 @@
-SERVICE / PROPERTY COMPLAINT RECORD
+PROPDESK AFRICA BY SIEMAX LTD
+SERVICE AND PROPERTY COMPLAINT RECORD
 
-Date: __________ Name: __________________ Phone: ________
-Email: __________________ Property / unit: ______________
-Category: Maintenance / Rent / Staff / Safety / Other
+One complaint, one reference number, one owner, one close-out. This is the
+record that shows a complaint was handled properly if it is later disputed.
 
-What happened?
-____________________________________________________
-____________________________________________________
+THE COMPLAINT
+Reference:      ______________
+Date received:  ______________
+Reported by:    ☐ Tenant  ☐ Agent  ☐ Neighbour  ☐ Other: ______________
+Name:           __________________________________________
+Telephone:      ______________   Email: ______________________
+Property / unit: ________________________________________
+Category:  ☐ Maintenance ☐ Rent ☐ Noise ☐ Security ☐ Utility
+           ☐ Staff conduct ☐ Other: ______________
+Severity: ☐ Safety-critical  ☐ Urgent  ☐ Routine
 
-Preferred resolution: ________________________________
-Attachments / reference numbers: ______________________
+WHAT HAPPENED
+Date and time of incident: ______________________________________________
+______________________________________________________________________
+______________________________________________________________________
+Persons involved / witnesses: ______________________________________
+Evidence supplied: ☐ Photos ☐ Video ☐ Messages ☐ Receipts ☐ None
 
-Submit through the I-Manage contact form or email bknglabs.dev@gmail.com. For urgent help call 0758034649.
+ACTION TAKEN
+Immediate response and date: __________________________________________
+______________________________________________________________________
+Investigation carried out: ____________________________________________
+Contractor or third party engaged: ___________________________________
+
+RESOLUTION
+Outcome: ☐ Resolved ☐ Partially resolved ☐ Referred to Tribunal
+         ☐ Referred to police ☐ Ongoing
+What was agreed: _____________________________________________________
+Cost borne by: ☐ Landlord ☐ Tenant ☐ Shared — agreed: ______________
+Date closed: ______________   Complainant notified on: ______________
+
+SAFETY-CRITICAL COMPLAINTS
+- Fire, gas, structural collapse, exposed live wiring, flooding, or a
+  threat to a person: make the premises safe FIRST, then report to the
+  police and the relevant authority, and record the time of each call.
+- Eviction threats, harassment, or a utility disconnection: record the
+  exact words used, the date and time, and the names of anyone present.
+  These are matters for the Tribunal or the police, not for a letter.
+- Never resolve a complaint by disconnecting a service or by removing a
+  tenant's property. Both are unlawful.
+
+Complainant: ______________________________  Date: ______________
+Handled by:  ______________________________  Date: ______________

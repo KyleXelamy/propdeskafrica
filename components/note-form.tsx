@@ -48,9 +48,9 @@ export function NoteForm({ note, isEditing = false }: NoteFormProps) {
           .eq("status", "active")
           .order("full_name"),
       ])
-      if (propertiesResult.error) console.error("[i-manage] fetch properties error", propertiesResult.error)
+      if (propertiesResult.error) console.error("[propdeskafrica] fetch properties error", propertiesResult.error)
       else setProperties(propertiesResult.data || [])
-      if (tenantsResult.error) console.error("[i-manage] fetch tenants error", tenantsResult.error)
+      if (tenantsResult.error) console.error("[propdeskafrica] fetch tenants error", tenantsResult.error)
       else setTenants(tenantsResult.data || [])
     }
     fetchData()

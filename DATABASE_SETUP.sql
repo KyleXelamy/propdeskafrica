@@ -1,5 +1,5 @@
 -- =====================================================================
--- I-MANAGE DATABASE SETUP
+-- PROPDESK AFRICA DATABASE SETUP
 -- =====================================================================
 -- This file used to contain a hand-rolled schema; the canonical,
 -- consolidated, idempotent setup is now in

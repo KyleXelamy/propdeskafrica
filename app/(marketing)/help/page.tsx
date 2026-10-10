@@ -3,9 +3,9 @@ import Link from "next/link"
 import { ArrowRight, ArrowUpRight, BookOpen, MessageSquare, Mail } from "lucide-react"
 
 export const metadata: Metadata = {
-  title: "Help & FAQ — I-Manage",
+  title: "Help & FAQ — PropDesk Africa",
   description:
-    "Common questions, getting started guides and how to contact the I-Manage support team.",
+    "Common questions, getting started guides and how to contact the PropDesk Africa support team.",
 }
 
 const categories = [
@@ -21,7 +21,7 @@ const categories = [
         a: "Yes — Properties, Tenants and Payments all support CSV import. Export from your current tool, walk through the field mapping, and we'll validate every row.",
       },
       {
-        q: "Do I need a payment provider to use I-Manage?",
+        q: "Do I need a payment provider to use PropDesk Africa?",
         a: "No. You can log rent manually without ever touching M-Pesa. STK Push is opt-in per tenant.",
       },
     ],

@@ -36,7 +36,7 @@ export default function DocumentDetailPage() {
         if (!data) setNotFound(true)
         else setDocument(data)
       } catch (error) {
-        console.error("[i-manage] fetch document error", error)
+        console.error("[propdeskafrica] fetch document error", error)
         setNotFound(true)
       } finally {
         setLoading(false)

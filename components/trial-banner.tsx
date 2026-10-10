@@ -16,7 +16,7 @@ interface SubStatus {
   reason: string
 }
 
-const STORAGE_KEY = "imanage.trial-banner.dismissed"
+const STORAGE_KEY = "propdeskafrica.trial-banner.dismissed"
 
 export function TrialBanner() {
   const [status, setStatus] = useState<SubStatus | null>(null)

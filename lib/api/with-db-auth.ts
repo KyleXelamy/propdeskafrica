@@ -103,7 +103,7 @@ export function withDbAuth(handler: DbAuthHandler, opts: Options = {}) {
       return NextResponse.json({ data: result })
     } catch (e: any) {
       if (e instanceof DbHttpError) return jsonError(e.message, e.status)
-      console.error("[i-manage] withDbAuth handler error", e)
+      console.error("[propdeskafrica] withDbAuth handler error", e)
       return jsonError(e?.message || "Internal error", 500)
     }
   }

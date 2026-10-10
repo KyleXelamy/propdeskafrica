@@ -6,7 +6,7 @@
 
 import { neonConfigured, getDb } from "@/lib/db/neon"
 import { createClient } from "@/lib/supabase/server"
-import { APP_NAME, APP_VERSION, BACKUP_TABLES, type BackupPayload, type RestoreOptions, type RestoreResult, type SanitisedRow, sanitiseRow, BackupPayloadSchema, RestoreOptionsSchema } from "@/lib/system"
+import { APP_VERSION, BACKUP_TABLES, type BackupPayload, type RestoreOptions, type RestoreResult, type SanitisedRow, sanitiseRow, BackupPayloadSchema, RestoreOptionsSchema } from "@/lib/system"
 import { uploadBackup, getBackupSignedUrl, BACKUP_SIZE_LIMIT } from "@/lib/storage"
 
 type Db = {
@@ -349,5 +349,3 @@ export async function deleteBackup(userId: string, id: string): Promise<boolean>
   const { error } = await supa.from("backups").delete().eq("user_id", userId).eq("id", id)
   return !error
 }
-
-export const __APP_NAME = APP_NAME

@@ -525,7 +525,12 @@ export async function c2bTransactionStatus(transId: string): Promise<C2BStatusRe
  * the API only needs 0 (accept) or C2B00012 (reject). Other codes
  * exist for finer-grained control on Daraja's side.
  */
-export const C2B_RESPONSE_CODES: Record<string, string> = {
+/**
+ * Daraja C2B response codes, kept as an inline reference for the register
+ * flow. Not part of the public surface — nothing consumes it, and an
+ * exported-but-unused constant reads as API that callers depend on.
+ */
+const C2B_RESPONSE_CODES: Record<string, string> = {
   "0": "Success",
   "C2B00011": "Invalid MSISDN",
   "C2B00012": "Invalid AccountNumber",

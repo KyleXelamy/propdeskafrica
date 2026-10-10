@@ -1,5 +1,5 @@
 /**
- * I-Manage website content that powers Careers, Customers, Press,
+ * PropDesk Africa website content that powers Careers, Customers, Press,
  * Changelog, Status and Integrations. All data is static until a CMS
  * is wired in — easy to swap for a remote source later.
  */
@@ -14,23 +14,6 @@ export type OpenRole = {
 }
 
 export const openRoles: OpenRole[] = []
-
-
-export type CaseStudy = {
-  slug: string
-  company: string
-  industry: string
-  units: string
-  location: string
-  summary: string
-  results: { label: string; value: string }[]
-  quote: string
-  quoteAuthor: string
-  cover: string
-}
-
-export const caseStudies: CaseStudy[] = []
-
 
 
 export type ChangelogEntry = {
@@ -66,14 +49,6 @@ export const changelog: ChangelogEntry[] = [
     body: "Initial dashboard render is 38% faster for portfolios with 100+ units. Cached aggregate queries under the hood.",
   },
   {
-    version: "v2.5.0",
-    date: "2026-09-01",
-    title: "Tenant portal v2",
-    type: "feature",
-    body:
-      "Tenants can now pay rent, view their lease, raise maintenance, and download their statement — all from a phone-first portal.",
-  },
-  {
     version: "v2.4.2",
     date: "2026-08-18",
     title: "CSV import for properties, tenants, payments",
@@ -86,7 +61,7 @@ export const changelog: ChangelogEntry[] = [
     title: "Recurring expenses",
     type: "feature",
     body:
-      "Set up monthly insurance, security, service charges and more. I-Manage logs them automatically and reminds you to attach receipts.",
+      "Set up monthly insurance, security, service charges and more. PropDesk Africa logs them automatically and reminds you to attach receipts.",
   },
   {
     version: "v2.3.1",
@@ -166,7 +141,7 @@ export const integrations: Integration[] = [
   {
     name: "Notion",
     category: "Productivity",
-    description: "Embed live I-Manage widgets in your internal Notion docs.",
+    description: "Embed live PropDesk Africa widgets in your internal Notion docs.",
     status: "Coming soon",
     href: "https://www.notion.so",
   },
@@ -179,12 +154,11 @@ export type SystemComponent = {
 }
 
 export const systemComponents: SystemComponent[] = [
-  { key: "marketing", name: "Marketing site", description: "i-manage.app, marketing content and blog." },
+  { key: "marketing", name: "Marketing site", description: "propdeskafrica.com, marketing content and blog." },
   { key: "auth", name: "Authentication", description: "Sign in, sign up, password reset, email verification." },
   { key: "dashboard", name: "Landlord dashboard", description: "Properties, tenants, payments, expenses, reports." },
-  { key: "portal", name: "Tenant portal", description: "Tenant self-service payments and maintenance." },
   { key: "mpesa", name: "M-Pesa / Daraja", description: "STK Push, B2C callbacks, reconciliation." },
-  { key: "webhooks", name: "Outbound webhooks", description: "Agency-tier event delivery to your endpoints." },
+  { key: "webhooks", name: "Outbound webhooks", description: "Event delivery to your endpoints." },
 ]
 
 export type StatusIncident = {

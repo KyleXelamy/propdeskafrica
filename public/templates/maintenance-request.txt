@@ -1,13 +1,48 @@
+PROPDESK AFRICA BY SIEMAX LTD
 MAINTENANCE REQUEST
 
-Reported on: __________ Priority: Low / Medium / High / Urgent
-Property: __________________ Unit: __________________
-Reported by: __________________ Phone: ______________
-Issue title: _________________________________________
-Description: ________________________________________
-____________________________________________________
+A request in writing with a date on it is the difference between a repair
+that happens and a dispute about whether it was ever reported.
 
-Contractor: __________________ Estimate (KES): _______
-Scheduled date: __________ Completed date: ___________
-Actual cost (KES): _______ Status: ____________________
-Tenant / manager sign-off: ___________________________
+RAISED BY
+Tenant:     __________________________________________
+Telephone:  ______________   Email: ______________________
+Property:   __________________________________________
+Submitted:  ______________
+Preferred access time: ________________________________
+
+THE FAULT
+Category:  ☐ Plumbing  ☐ Electrical  ☐ Appliance  ☐ Structural
+           ☐ Pest  ☐ Security  ☐ Water  ☐ Other: ______________
+Urgency:   ☐ Emergency  ☐ Urgent  ☐ Routine
+Location in the premises: ____________________________________________
+Fault began on (if known): ______________
+
+DESCRIBE WHAT IS WRONG, IN YOUR OWN WORDS
+______________________________________________________________________
+______________________________________________________________________
+______________________________________________________________________
+
+IF THERE IS A SMELL OF GAS, A BURNING SMELL, FLOODING, EXPOSED LIVE
+WIRING OR A STRUCTURAL CRACK — TELEPHONE IMMEDIATELY. Do not wait on
+this form.
+
+ACCESS PERMISSION
+☐  I give permission to enter to carry out this work, on the date agreed.
+☐  Please contact me in advance of attendance.
+☐  I do not consent to entry. Contact must be made first.
+
+LANDLORD / AGENT USE
+Request reference:  ______________
+Received by / date: __________________________ ______________
+Assessed priority:  ☐ Emergency  ☐ Urgent  ☐ Routine
+Contractor assigned: _________________________
+Scheduled date:     ______________
+Completed on:       ______________
+Cost (KES):         ______________
+Deducted from deposit?  ☐ No  ☐ Yes — agreed with tenant in writing
+
+RESOLUTION / TENANT NOTIFIED ON: ______________________________________
+
+Tenant signature: _________________________  Date: ______________
+Received by:     _________________________  Date: ______________

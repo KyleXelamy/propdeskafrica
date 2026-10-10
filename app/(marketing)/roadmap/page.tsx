@@ -4,8 +4,8 @@ import { ArrowUpRight, MessageSquare, ThumbsUp, Sparkles, Wrench, BarChart3, Bui
 import { roadmap, type RoadmapStatus } from "@/lib/content/marketing"
 
 export const metadata: Metadata = {
-  title: "Roadmap — I-Manage by Siemax Ltd",
-  description: "What we're building next at I-Manage, in public.",
+  title: "Roadmap — PropDesk Africa by Siemax Ltd",
+  description: "What we're building next at PropDesk Africa, in public.",
 }
 
 const order: RoadmapStatus[] = ["Now", "Next", "Later", "Shipped"]

@@ -6,9 +6,9 @@ import { ContactForm } from "@/components/contact-form"
 import { BRAND } from "@/lib/brand"
 
 export const metadata: Metadata = {
-  title: "Contact — I-Manage by Siemax Ltd",
+  title: "Contact — PropDesk Africa by Siemax Ltd",
   description:
-    "Get in touch with the I-Manage team. We respond to every message within one business day.",
+    "Get in touch with the PropDesk Africa team. We respond to every message within one business day.",
 }
 
 const channels = [

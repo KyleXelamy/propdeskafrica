@@ -1,7 +1,7 @@
 import { blogPosts } from "@/lib/content/blog"
 
-const SITE = "https://i-manage.app"
-const FEED_TITLE = "I-Manage — Resources"
+const SITE = "https://propdeskafrica.com"
+const FEED_TITLE = "PropDesk Africa — Resources"
 const FEED_DESCRIPTION = "Practical property management guides, product updates and operating notes for landlords across Africa."
 
 function escape(value: string) {
@@ -25,7 +25,7 @@ export async function GET() {
     .filter((post) => post.slug && post.title && post.excerpt)
     .map((post) => {
       const url = `${SITE}/resources/${encodeURIComponent(post.slug)}`
-      const author = post.author?.name || "I-Manage"
+      const author = post.author?.name || "PropDesk Africa"
       return `<item>
         <title>${escape(post.title)}</title>
         <link>${url}</link>
@@ -46,7 +46,7 @@ export async function GET() {
     <atom:link href="${SITE}/rss.xml" rel="self" type="application/rss+xml" />
     <description>${escape(FEED_DESCRIPTION)}</description>
     <language>en-GB</language>
-    <copyright>© ${new Date().getUTCFullYear()} I-Manage</copyright>
+    <copyright>© ${new Date().getUTCFullYear()} PropDesk Africa</copyright>
     <ttl>60</ttl>
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
     ${items}

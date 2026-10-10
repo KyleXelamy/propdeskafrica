@@ -4,8 +4,8 @@ import { ArrowUpRight, Mail, MessageSquare, BookOpen, FileText } from "lucide-re
 import { ContactForm } from "@/components/contact-form"
 
 export const metadata: Metadata = {
-  title: "Support — I-Manage by Siemax Ltd",
-  description: "Get help with I-Manage. Documentation, community and direct support.",
+  title: "Support — PropDesk Africa by Siemax Ltd",
+  description: "Get help with PropDesk Africa. Documentation, community and direct support.",
 }
 
 export default function ContactSupportPage() {

@@ -4,8 +4,8 @@ import { ArrowUpRight, Code2, Webhook, KeyRound, FileJson, Terminal, BookOpen } 
 import { Button } from "@/components/ui/button"
 
 export const metadata: Metadata = {
-  title: "Developers — I-Manage by Siemax Ltd",
-  description: "REST API, webhooks, OAuth and an OpenAPI spec for I-Manage.",
+  title: "Developers — PropDesk Africa by Siemax Ltd",
+  description: "REST API, webhooks, OAuth and an OpenAPI spec for PropDesk Africa.",
 }
 
 const endpoints = [
@@ -88,7 +88,7 @@ export default function DevelopersPage() {
               Resources you already think in.
             </h2>
             <p className="mt-5 max-w-md text-base leading-7 text-muted-foreground">
-              Every entity in I-Manage has a REST endpoint. List, fetch, create, update, delete — with
+              Every entity in PropDesk Africa has a REST endpoint. List, fetch, create, update, delete — with
               consistent auth, pagination and error handling.
             </p>
             <div className="mt-6 flex flex-col gap-3 text-sm">

@@ -38,7 +38,7 @@ export const POST = withAuth(async (req, { supabase, userId }) => {
     phone,
     amount,
     accountReference: `SUB-${plan.toUpperCase()}`,
-    transactionDesc: `I-Manage ${planRow.name} subscription`,
+    transactionDesc: `PropDesk Africa ${planRow.name} subscription`,
   }).catch((e) => ({ error: e.message }))
 
   if ((result as any).error) {

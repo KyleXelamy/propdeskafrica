@@ -18,7 +18,7 @@ type SearchItem = {
 const PAGES: SearchItem[] = [
   { title: "Pricing", description: "Solo, Pro and Agency plans. Honest pricing, no transaction fees.", href: "/pricing", kind: "Page" },
   { title: "Customers", description: "A transparent look at an early-stage property management platform.", href: "/customers", kind: "Page" },
-  { title: "About", description: "The team building I-Manage and the values we ship by.", href: "/about", kind: "Page" },
+  { title: "About", description: "The team building PropDesk Africa and the values we ship by.", href: "/about", kind: "Page" },
   { title: "Changelog", description: "Every product update, improvement and fix.", href: "/changelog", kind: "Page" },
   { title: "Careers", description: "Open roles in engineering, design and operations.", href: "/careers", kind: "Page" },
   { title: "Contact", description: "Reach the team — humans reply within one business day.", href: "/contact", kind: "Page" },
@@ -28,7 +28,7 @@ const PAGES: SearchItem[] = [
   { title: "Status", description: "Real-time operational status for every component.", href: "/status", kind: "Page" },
   { title: "Press", description: "Press kit, coverage and media contacts.", href: "/press", kind: "Page" },
   { title: "Privacy policy", description: "How we collect, use and protect your data.", href: "/legal/privacy", kind: "Legal" },
-  { title: "Terms of service", description: "The terms governing your use of I-Manage.", href: "/legal/terms", kind: "Legal" },
+  { title: "Terms of service", description: "The terms governing your use of PropDesk Africa.", href: "/legal/terms", kind: "Legal" },
   { title: "Data Processing Agreement", description: "GDPR-aligned DPA for Agency and enterprise customers.", href: "/legal/dpa", kind: "Legal" },
 ]
 

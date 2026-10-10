@@ -15,8 +15,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params
   const i = insights.find((x) => x.slug === slug)
-  if (!i) return { title: "Insight — I-Manage" }
-  return { title: `${i.title} — I-Manage Insights`, description: i.excerpt, openGraph: { images: [i.cover] } }
+  if (!i) return { title: "Insight — PropDesk Africa" }
+  return { title: `${i.title} — PropDesk Africa Insights`, description: i.excerpt, openGraph: { images: [i.cover] } }
 }
 
 const insightBodies: Record<string, string> = {
@@ -36,7 +36,7 @@ We spent two years studying where these tools failed in our market:
 
 ## What we built differently
 
-I-Manage is designed around three constraints specific to our market:
+PropDesk Africa is designed around three constraints specific to our market:
 
 1. **STK Push is the default**, not a bolt-on. The dashboard, the tenant records and the API all assume a mobile money collection flow.
 2. **Reconciliation is a first-class feature.** Daraja's callback isn't always reliable. We reconcile every night against the transaction log.
@@ -59,7 +59,7 @@ The landlords doing best in 2026 share three habits:
 - **They charge for extras.** Parking, water, generator usage — these are now line items, not bundled into rent.
 - **They collect faster.** A 5% yield improvement on the same rent is achievable just by tightening collection.
 
-That's where I-Manage earns its keep — not by increasing rents, but by helping landlords collect every shilling they're owed, on time, with less manual work.`,
+That's where PropDesk Africa earns its keep — not by increasing rents, but by helping landlords collect every shilling they're owed, on time, with less manual work.`,
   "why-we-built-our-own-reconciliation": `The single most expensive line item in our monthly burn is not engineers, marketing or office rent. It's "mismatched payment records."
 
 When STK Push goes wrong — and it does, roughly 1.4% of the time — the prompt never arrives, the customer cancels, or the callback never reaches us. The tenant's money may or may not have moved. The landlord's ledger is now wrong.

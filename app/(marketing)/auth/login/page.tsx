@@ -6,8 +6,8 @@ import { AuthShell } from "@/components/auth-shell"
 export const dynamic = "force-dynamic"
 
 export const metadata: Metadata = {
-  title: "Sign in — I-Manage",
-  description: "Sign in to your I-Manage landlord dashboard.",
+  title: "Sign in — PropDesk Africa",
+  description: "Sign in to your PropDesk Africa landlord dashboard.",
 }
 
 export default function LoginPage() {

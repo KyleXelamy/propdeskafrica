@@ -30,20 +30,34 @@ const Schema = z.object({
   mode: z.enum(["applied", "failed", "missing"]).default("missing"),
 })
 
-async function checkAccess(request: NextRequest) {
+/**
+ * Returns an error response to send back, or null when access is allowed.
+ *
+ * Previously any signed-in user could flip patch bookkeeping for the whole
+ * platform. In production this now requires MIGRATION_SECRET; the
+ * logged-in-user path is dev-only.
+ */
+async function checkAccess(request: NextRequest): Promise<NextResponse | null> {
   const expected = process.env.MIGRATION_SECRET
   const got = request.headers.get("x-migration-secret")
     ?? request.headers.get("authorization")?.replace(/^Bearer\s+/i, "")
-  if (expected && got === expected) return true
+  if (expected && got === expected) return null
+
+  if (process.env.NODE_ENV === "production") {
+    return NextResponse.json(
+      { error: expected ? "Forbidden" : "MIGRATION_SECRET must be configured in production" },
+      { status: expected ? 403 : 503 },
+    )
+  }
+
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  return Boolean(user)
+  return user ? null : NextResponse.json({ error: "Forbidden" }, { status: 403 })
 }
 
 export async function POST(request: NextRequest) {
-  if (!(await checkAccess(request))) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 })
-  }
+  const denied = await checkAccess(request)
+  if (denied) return denied
   const parse = Schema.safeParse(await request.json().catch(() => ({})))
   if (!parse.success) {
     return NextResponse.json({ error: parse.error.issues[0]?.message ?? "Invalid input" }, { status: 400 })

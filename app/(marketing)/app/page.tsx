@@ -4,9 +4,9 @@ import { ArrowUpRight, Smartphone, Bell, Wifi, Download, Share2 } from "lucide-r
 import { Button } from "@/components/ui/button"
 
 export const metadata: Metadata = {
-  title: "I-Manage App — Run your portfolio from your pocket",
+  title: "PropDesk Africa App — Run your portfolio from your pocket",
   description:
-    "Install I-Manage as a Progressive Web App on iOS or Android. Native feel, no app store friction.",
+    "Install PropDesk Africa as a Progressive Web App on iOS or Android. Native feel, no app store friction.",
 }
 
 const features = [
@@ -46,7 +46,7 @@ const steps = [
   {
     n: "03",
     title: "Run your portfolio",
-    body: "Open the I-Manage app from your launcher. It launches fullscreen, just like a native app.",
+    body: "Open the PropDesk Africa app from your launcher. It launches fullscreen, just like a native app.",
   },
 ]
 
@@ -63,7 +63,7 @@ export default function AppLandingPage() {
               Your portfolio, in your pocket.
             </h1>
             <p className="mt-7 max-w-lg text-lg leading-8 text-primary-foreground/70">
-              I-Manage ships as a Progressive Web App. Install it once, use it anywhere — even when
+              PropDesk Africa ships as a Progressive Web App. Install it once, use it anywhere — even when
               the network isn't cooperating.
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">

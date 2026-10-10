@@ -99,7 +99,7 @@ export default function CheckoutPage() {
         <Button asChild variant="ghost" size="sm">
           <Link href="/dashboard/billing"><ArrowLeft className="h-4 w-4 mr-1" /> Back to billing</Link>
         </Button>
-        <h1 className="text-2xl md:text-3xl font-bold text-foreground mt-2">Subscribe to {plan?.name || "I-Manage"}</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-foreground mt-2">Subscribe to {plan?.name || "PropDesk Africa"}</h1>
         <p className="text-sm md:text-base text-muted-foreground">
           Pay with M-Pesa. You&apos;ll get an STK push on your phone to enter your PIN.
         </p>

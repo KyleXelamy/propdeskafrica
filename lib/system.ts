@@ -1,5 +1,5 @@
 /**
- * I-Manage system library.
+ * PropDesk Africa system library.
  *
  * Self-contained backup + patch/update system. No admin panel.
  * The platform can:
@@ -55,7 +55,7 @@ export type BackupTable = (typeof BACKUP_TABLES)[number]
 export const CURRENT_SCHEMA_VERSION = 15
 
 export const APP_VERSION = "5.0.0"
-export const APP_NAME = "I-Manage"
+export const APP_NAME = "PropDesk Africa"
 export const APP_COMMIT = process.env.NEXT_PUBLIC_APP_COMMIT ?? "dev"
 
 export interface PatchDescriptor {
@@ -93,6 +93,8 @@ export const PATCH_LOG: PatchDescriptor[] = [
   { id: "p_2026_10_005", description: "Atomic bump_paybill_counters() RPC for C2B confirmation", sql: "13-paybill-counters.sql", kind: "config" },
   { id: "p_2026_10_006", description: "Subscriptions: plans + per-user subscription + trial", sql: "14-subscriptions.sql", kind: "schema" },
   { id: "p_2026_10_007", description: "Subscription payments: per-user STK push intents for plans", sql: "15-subscription-payments.sql", kind: "schema" },
+  { id: "p_2026_10_008", description: "Schema repair: add columns missing on databases deployed before them", sql: "15-repair-live-schema.sql", kind: "schema" },
+  { id: "p_2026_10_009", description: "Single-price plans: free tier (3 units) + KES 2,490/month Pro, retire solo/agency", sql: "16-plans-single-price.sql", kind: "config" },
 ]
 
 export function describePatches(): Array<{ id: string; description: string; kind: string }> {
@@ -177,11 +179,6 @@ export interface RestoreResult {
 // Format helpers
 // ====================================================================
 
-export function formatTimestamp(d: Date | string): string {
-  const date = typeof d === "string" ? new Date(d) : d
-  return date.toISOString()
-}
-
 export function formatSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
@@ -190,9 +187,9 @@ export function formatSize(bytes: number): string {
 }
 
 /**
- * Build a JSON backup filename: `i-manage-backup-{YYYY-MM-DD}.json`
+ * Build a JSON backup filename: `propdeskafrica-backup-{YYYY-MM-DD}.json`
  */
-export function backupFilename(prefix = "i-manage-backup"): string {
+export function backupFilename(prefix = "propdeskafrica-backup"): string {
   const d = new Date()
   const yyyy = d.getUTCFullYear()
   const mm = String(d.getUTCMonth() + 1).padStart(2, "0")

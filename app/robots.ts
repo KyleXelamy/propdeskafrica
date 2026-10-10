@@ -9,6 +9,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ["/api/", "/dashboard/", "/auth/callback"],
       },
     ],
-    sitemap: "https://i-manage.app/sitemap.xml",
+    sitemap: "https://propdeskafrica.com/sitemap.xml",
   }
 }

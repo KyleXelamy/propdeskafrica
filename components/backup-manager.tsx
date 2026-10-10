@@ -79,7 +79,7 @@ export function BackupManager({ initialBackups, appVersion }: { initialBackups: 
       const url = URL.createObjectURL(blob)
       const a = document.createElement("a")
       a.href = url
-      a.download = data.filename ?? "i-manage-backup.json"
+      a.download = data.filename ?? "propdeskafrica-backup.json"
       a.click()
       URL.revokeObjectURL(url)
       // Refresh list
@@ -308,7 +308,7 @@ export function BackupManager({ initialBackups, appVersion }: { initialBackups: 
             <div className="space-y-0.5">
               <Label className="text-base">Schedule automatic backups</Label>
               <p className="text-sm text-muted-foreground">
-                When enabled, I-Manage creates a fresh full backup on the cadence you choose.
+                When enabled, PropDesk Africa creates a fresh full backup on the cadence you choose.
               </p>
             </div>
             <Switch checked={autoBackup} onCheckedChange={setAutoBackup} />

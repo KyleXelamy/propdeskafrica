@@ -3,7 +3,7 @@ import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 
 export const metadata: Metadata = {
-  title: "Customers — I-Manage by Siemax Ltd",
+  title: "Customers — PropDesk Africa by Siemax Ltd",
   description:
     "A transparent look at an early-stage property management platform.",
 }
@@ -21,7 +21,7 @@ export default function CustomersPage() {
               The landlords we build for.
             </h1>
             <p className="mt-7 max-w-xl text-lg leading-8 text-primary-foreground/70">
-              I-Manage is just getting started. We are building the operating layer for landlords and property teams.
+              PropDesk Africa is just getting started. We are building the operating layer for landlords and property teams.
             </p>
           </div>
         </div>

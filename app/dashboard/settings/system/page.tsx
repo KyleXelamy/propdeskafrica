@@ -5,8 +5,8 @@ import { Activity, Server, GitMerge } from "lucide-react"
 
 export const dynamic = "force-dynamic"
 export const metadata = {
-  title: "System info • I-Manage",
-  description: "Patch status, schema version, and platform health for your I-Manage instance.",
+  title: "System info • PropDesk Africa",
+  description: "Patch status, schema version, and platform health for your PropDesk Africa instance.",
 }
 
 export default async function SystemPage() {
@@ -16,7 +16,7 @@ export default async function SystemPage() {
       <div>
         <h1 className="text-3xl font-semibold tracking-tight">Workspace health</h1>
         <p className="mt-1 text-muted-foreground">
-          I-Manage checks your workspace and keeps it ready automatically.
+          PropDesk Africa checks your workspace and keeps it ready automatically.
         </p>
       </div>
 

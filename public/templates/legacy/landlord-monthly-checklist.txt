@@ -1,14 +1,52 @@
-LANDLORD MONTHLY OPERATIONS CHECKLIST
+PROPDESK AFRICA BY SIEMAX LTD
+LANDLORD MONTHLY CHECKLIST
 
-[ ] Review rent ledger and unpaid balances
-[ ] Send reminders and record follow-ups
-[ ] Reconcile bank / M-Pesa collections
-[ ] Review maintenance requests and contractor invoices
-[ ] Check lease expiries in the next 90 days
-[ ] File receipts and documents
-[ ] Review utilities, insurance and recurring expenses
-[ ] Walk through vacant units
-[ ] Export a monthly backup
-[ ] Share owner report where applicable
+About twenty minutes, once a month. The cheapest risk control a landlord
+has. Work down the list and note anything you carry into next month.
 
-Month: __________ Prepared by: __________________
+LANDLORD: ______________________________     MONTH: _________________
+
+1. RENT COLLECTION
+☐  Send rent reminders to every tenant on the 1st.
+☐  Chase tenants who have not paid by the 5th, in writing.
+☐  Record every payment in PropDesk Africa on the day it arrives.
+☐  Issue a receipt for each payment received.
+☐  Reconcile M-Pesa and bank statements against the ledger.
+☐  Review arrears aging; decide on written demands for persistent
+    non-payers.
+
+2. PROPERTY CONDITION
+☐  Walk the premises and common areas.
+☐  Review open maintenance requests; close out what is done.
+☐  Check for leaks, damp, pests and roof damage after the rains.
+☐  Confirm gates, locks, lighting and water tanks are secure.
+☐  Verify the fire extinguisher and smoke alarms are present and in date.
+
+3. LEASES AND NOTICES
+☐  Diary the end of each fixed term — six months and three months out.
+☐  Confirm all notices were served in writing and proof is filed.
+☐  Check no notice period given is shorter than the Agreement requires.
+☐  Renew expiring leases in writing rather than letting them roll over.
+
+4. MONEY AND TAX
+☐  Reconcile monthly income against the property's expected rent.
+☐  Set aside funds for KRA income tax on schedule.
+☐  File the KRA return when due; keep the computation.
+☐  Review expenses claimed against receipts held.
+☐  Set aside for county property rates and any service charge.
+
+5. COMPLIANCE
+☐  Confirm buildings insurance is valid and covers current values.
+☐  Check certificate and permit renewals falling due this month.
+☐  Review NHIF or NSSF obligations for a caretaker or agent.
+☐  Confirm the fire risk assessment and any drill requirement is current.
+
+6. PERSONAL DATA
+☐  Delete or anonymise tenant records for ended tenancies where no dispute
+    is live.
+☐  Confirm access to tenant ID numbers and payment records is limited to
+    those who need it.
+
+NOTES / CARRY FORWARD
+______________________________________________________________________
+______________________________________________________________________

@@ -2,8 +2,8 @@ import type { Metadata } from "next"
 import Link from "next/link"
 
 export const metadata: Metadata = {
-  title: "Terms of service — I-Manage by Siemax Ltd",
-  description: "The terms and conditions for using I-Manage.",
+  title: "Terms of service — PropDesk Africa by Siemax Ltd",
+  description: "The terms and conditions for using PropDesk Africa.",
 }
 
 export default function TermsPage() {
@@ -22,7 +22,7 @@ export default function TermsPage() {
       <article className="container-x max-w-3xl py-16 lg:py-20">
         <div className="space-y-8 text-base leading-8 text-foreground/85">
           <p>
-            These terms govern your use of I-Manage, operated by Siemax Ltd ("we", "us"). By creating
+            These terms govern your use of PropDesk Africa, operated by Siemax Ltd ("we", "us"). By creating
             an account you agree to them. If you don't agree, please don't use the service.
           </p>
 
@@ -36,7 +36,7 @@ export default function TermsPage() {
           <Section title="2. Acceptable use">
             <p>You agree not to:</p>
             <ul className="mt-4 list-disc space-y-2 pl-6">
-              <li>Use I-Manage to harass tenants or third parties.</li>
+              <li>Use PropDesk Africa to harass tenants or third parties.</li>
               <li>Upload content that is illegal in your jurisdiction.</li>
               <li>Attempt to access data belonging to other landlords.</li>
               <li>Reverse engineer, resell or white-label the service without written permission.</li>
@@ -53,7 +53,7 @@ export default function TermsPage() {
 
           <Section title="4. Data ownership">
             <p>
-              You own the data you put into I-Manage. We act as a data processor on your behalf and
+              You own the data you put into PropDesk Africa. We act as a data processor on your behalf and
               will never sell, rent, or share it for advertising.
             </p>
           </Section>
@@ -67,7 +67,7 @@ The service is provided "as is". We will communicate planned maintenance through
           <Section title="6. Limitation of liability">
             <p>
               To the maximum extent permitted by law, our total liability for any claim arising from
-              your use of I-Manage is limited to the amount you paid us in the 12 months preceding the
+              your use of PropDesk Africa is limited to the amount you paid us in the 12 months preceding the
               claim. We are not liable for indirect or consequential damages.
             </p>
           </Section>

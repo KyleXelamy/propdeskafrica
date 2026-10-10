@@ -16,8 +16,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params
   const s = solutions.find((x) => x.slug === slug)
-  if (!s) return { title: "Solution — I-Manage" }
-  return { title: `${s.name} — I-Manage`, description: s.summary }
+  if (!s) return { title: "Solution — PropDesk Africa" }
+  return { title: `${s.name} — PropDesk Africa`, description: s.summary }
 }
 
 export default async function SolutionPage({
@@ -67,7 +67,7 @@ export default async function SolutionPage({
         <div className="container-x max-w-3xl">
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">Why teams switch</p>
           <h2 className="mt-4 text-3xl font-medium leading-tight tracking-[-0.04em] sm:text-4xl">
-            Common reasons teams choose I-Manage.
+            Common reasons teams choose PropDesk Africa.
           </h2>
           <ul className="mt-10 space-y-4">
             {[

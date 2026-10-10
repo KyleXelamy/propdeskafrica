@@ -15,8 +15,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { category } = await params
   const c = docCategories.find((x) => x.slug === category)
-  if (!c) return { title: "Docs — I-Manage" }
-  return { title: `${c.name} — I-Manage Docs`, description: c.description }
+  if (!c) return { title: "Docs — PropDesk Africa" }
+  return { title: `${c.name} — PropDesk Africa Docs`, description: c.description }
 }
 
 export default async function DocsCategoryPage({

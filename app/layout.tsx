@@ -4,7 +4,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { CookieConsent } from "@/components/cookie-consent"
 import "./globals.css"
 
-const siteUrl = "https://i-manage.app"
+const siteUrl = "https://propdeskafrica.com"
 
 export const viewport: Viewport = {
   themeColor: [
@@ -18,37 +18,37 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "I-Manage — Property operations",
-    template: "%s | I-Manage",
+    default: "PropDesk Africa — Property operations",
+    template: "%s | PropDesk Africa",
   },
   description:
-    "I-Manage — the operating system for landlords and property agencies. Track properties, tenants, rent, expenses, maintenance, quotations and documents in one place.",
-  applicationName: "I-Manage",
+    "PropDesk Africa — the operating system for landlords and property agencies. Track properties, tenants, rent, expenses, maintenance, quotations and documents in one place.",
+  applicationName: "PropDesk Africa",
   authors: [{ name: "Brian Kiarie", url: "https://www.linkedin.com/in/brian-kiarie-00b3a3391" }],
   creator: "Brian Kiarie",
-  publisher: "I-Manage",
+  publisher: "PropDesk Africa",
   keywords: [
     "property management software",
     "rental management software",
     "landlord software",
     "property management Kenya",
     "rent collection software",
-    "I-Manage",
+    "PropDesk Africa",
   ],
   generator: "Next.js",
   openGraph: {
     type: "website",
     url: siteUrl,
-    title: "I-Manage — modern property management",
+    title: "PropDesk Africa — modern property management",
     description:
       "Run your rental portfolio with clarity. M-Pesa paybill + STK Push rent collection, tenant records, quotations, maintenance workflows and live financial reports.",
-    siteName: "I-Manage",
+    siteName: "PropDesk Africa",
     locale: "en_US",
-    images: [{ url: "/og-default.png", width: 1200, height: 630, alt: "I-Manage — Property operations" }],
+    images: [{ url: "/og-default.png", width: 1200, height: 630, alt: "PropDesk Africa — Property operations" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "I-Manage — modern property management",
+    title: "PropDesk Africa — modern property management",
     description:
       "Run your rental portfolio with clarity. M-Pesa paybill + STK Push rent collection, tenant records, quotations, maintenance workflows and live financial reports.",
     images: ["/og-default.png"],
@@ -88,12 +88,12 @@ export default function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "SoftwareApplication",
-              name: "I-Manage",
+              name: "PropDesk Africa",
               applicationCategory: "BusinessApplication",
               operatingSystem: "Web",
               url: siteUrl,
               description: "Property operations software for landlords and property teams.",
-              publisher: { "@type": "Organization", name: "I-Manage", url: siteUrl },
+              publisher: { "@type": "Organization", name: "PropDesk Africa", url: siteUrl },
             }),
           }}
         />

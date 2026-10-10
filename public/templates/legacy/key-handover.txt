@@ -1,17 +1,50 @@
+PROPDESK AFRICA BY SIEMAX LTD
 KEY AND ACCESS HANDOVER RECORD
 
-Property / unit: ______________________________
-Tenant: ______________________________________
-Handover date: __________ Return date: __________
+Complete at the point of handing over or returning possession. This fixes
+the date responsibility passes, and settles which keys exist.
 
-ITEM                         QUANTITY       CONDITION
-Front door keys              ______________ ______________
-Gate / access cards          ______________ ______________
-Mailbox keys                 ______________ ______________
-Remote controls              ______________ ______________
-Other                        ______________ ______________
+PROPERTY / UNIT: _________________________________________________________
+TENANT:         __________________________________________
+LANDLORD/AGENT: __________________________________________
+HANDOVER DATE:  ______________   RETURN DATE: ______________
+PURPOSE: ☐ Move-in handover  ☐ Move-out return  ☐ Replacement keys
 
-Meter readings: Electricity __________ Water __________
-Notes: _______________________________________________
+ITEMS ISSUED OR RETURNED
+ITEM                          QTY OUT   QTY BACK   CONDITION
+Front door key
+Back / inner door key
+Gate remote or access card
+Mailbox key
+Water meter key
+Store room key
+Spare key held by agent
+Other (specify): ______________________________
 
-Issued by: __________________ Received by: ____________
+METER READINGS AT HANDOVER
+                READING        ACCOUNT / METER NO.
+Electricity     ________       ______________________
+Water           ________       ______________________
+Gas             ________       ______________________
+Other           ________       ______________________
+
+These readings settle the utility question at the end of the tenancy.
+A blank here is an argument waiting to happen.
+
+ACKNOWLEDGEMENT
+- The tenant confirms the items above were received in working order and
+  accepts responsibility for their secure custody from the handover date.
+- The tenant will not duplicate, lend or dispose of any key or access
+  device without the landlord's written consent.
+- The tenant will report lost or stolen keys immediately, and will bear
+  the cost of replacement and of any loss arising from delay in reporting.
+- All items are returned on the move-out date, or on termination of the
+  tenancy, whichever is earlier.
+
+AT MOVE-OUT
+- Read the meters again and record them beside the move-in readings.
+- Photograph every key returned and every lock.
+- Do not accept a verbal handover. The signature is the whole point.
+
+ISSUED BY: ________________________  Date: ______________
+RECEIVED BY (tenant): _____________  Date: ______________

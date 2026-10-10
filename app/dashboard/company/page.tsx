@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Briefcase, Users, Building2, BarChart3, Mail } from "lucide-react"
 
 export const metadata: Metadata = {
-  title: "Company — I-Manage",
+  title: "Company — PropDesk Africa",
   // naming compnyes is def not my thinkg man , hahahhahah //
   description: "Run your agency or company: team, landlords, aggregate reporting.",
 }
@@ -89,7 +89,7 @@ export default async function CompanyPage() {
           <div className="flex items-center justify-between">
             <div>
               <CardTitle>Team</CardTitle>
-              <CardDescription>Everyone with access to your I-Manage workspace.</CardDescription>
+              <CardDescription>Everyone with access to your PropDesk Africa workspace.</CardDescription>
             </div>
           </div>
 

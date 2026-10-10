@@ -2,65 +2,14 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { ArrowUpRight, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { PLANS, formatPrice, FREE_UNIT_LIMIT, MONTHLY_PRICE_KES } from "@/lib/pricing"
 
 export const metadata: Metadata = {
-  title: "Pricing — I-Manage by Siemax Ltd",
+  title: "Pricing — PropDesk Africa by Siemax Ltd",
   description:
     "Simple, transparent pricing for landlords and property teams. Start free, scale as you grow.",
 }
 
-const tiers = [
-  {
-    name: "Solo",
-    price: "Free",
-    cadence: "Up to 3 units",
-    description: "For the independent landlord just getting organised.",
-    highlight: false,
-    cta: { label: "Start free", href: "/auth/sign-up" },
-    features: [
-      "Up to 3 rental units",
-      "Tenant & lease tracking",
-      "Rent collection log",
-      "Expense & receipt logging",
-      "Document vault (1 GB)",
-      "Email support",
-    ],
-  },
-  {
-    name: "Pro",
-    price: "KES 2,490",
-    cadence: "per month",
-    description: "For landlords running a real portfolio.",
-    highlight: true,
-    cta: { label: "Start 14-day trial", href: "/auth/sign-up" },
-    features: [
-      "Unlimited units & tenants",
-      "Native M-Pesa STK Push rent collection",
-      "Paybill / till integration with auto-reconciliation",
-      "Quotations & approvals workflow",
-      "Damages tracking & inspections",
-      "Document vault (10 GB)",
-      "Priority support",
-    ],
-  },
-  {
-    name: "Agency",
-    price: "Talk to us",
-    cadence: "tailored to your team",
-    description: "For agencies and property teams running 50+ units.",
-    highlight: false,
-    cta: { label: "Book a call", href: "/contact" },
-    features: [
-      "Everything in Pro",
-      "Multi-landlord accounts & roles",
-      "White-label client portal (optional)",
-      "Custom reporting & exports",
-      "API & webhook access",
-      "SLA-backed support",
-      "Onboarding manager",
-    ],
-  },
-]
 
 const faqs = [
   {
@@ -69,7 +18,7 @@ const faqs = [
   },
   {
     q: "Do you charge transaction fees on M-Pesa?",
-    a: "We pass through Daraja's standard STK Push fees. I-Manage itself does not take a percentage.",
+    a: "We pass through Daraja's standard STK Push fees. PropDesk Africa itself does not take a percentage.",
   },
   {
     q: "What happens to my data if I downgrade?",
@@ -77,11 +26,11 @@ const faqs = [
   },
   {
     q: "Can I import from my current tool?",
-    a: "Yes. CSV import covers properties, tenants and payments. Larger migrations are handled by our team on the Agency plan.",
+    a: "Yes. CSV import covers properties, tenants and payments, and it works on the free plan. For a larger migration we will run the import for you.",
   },
   {
     q: "Is there a student or non-profit discount?",
-    a: "Contact us and we can discuss whether a discounted plan is available for your organisation.",
+    a: "Tell us who you are. We would rather help a landlord maintain a property than lose them to a spreadsheet.",
   },
 ]
 
@@ -108,10 +57,10 @@ export default function PricingPage() {
       {/* Tiers */}
       <section className="bg-background py-16 lg:py-24">
         <div className="container-x">
-          <div className="grid gap-6 lg:grid-cols-3">
-            {tiers.map((tier) => (
+          <div className="grid gap-6 lg:grid-cols-2">
+            {PLANS.map((tier) => (
               <div
-                key={tier.name}
+                key={tier.code}
                 className={
                   "relative flex flex-col rounded-3xl border p-8 lg:p-10 transition-shadow " +
                   (tier.highlight
@@ -126,10 +75,10 @@ export default function PricingPage() {
                 )}
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">{tier.name}</p>
                 <div className="mt-6 flex items-baseline gap-2">
-                  <span className="text-4xl font-medium tracking-tight lg:text-5xl">{tier.price}</span>
+                  <span className="text-4xl font-medium tracking-tight lg:text-5xl">{formatPrice(tier.price)}</span>
                   <span className="text-sm text-muted-foreground">{tier.cadence}</span>
                 </div>
-                <p className="mt-3 text-sm text-muted-foreground">{tier.description}</p>
+                <p className="mt-3 text-sm text-muted-foreground">{tier.tagline}</p>
                 <Button
                   asChild
                   size="lg"
@@ -140,8 +89,8 @@ export default function PricingPage() {
                       : "bg-secondary text-secondary-foreground hover:bg-secondary/80")
                   }
                 >
-                  <Link href={tier.cta.href}>
-                    {tier.cta.label} <ArrowUpRight data-icon="inline-end" />
+                  <Link href={tier.href}>
+                    {tier.cta} <ArrowUpRight data-icon="inline-end" />
                   </Link>
                 </Button>
                 <ul className="mt-8 space-y-3 text-sm">
@@ -159,7 +108,7 @@ export default function PricingPage() {
           </div>
 
           <p className="mt-10 text-center text-sm text-muted-foreground">
-            Prices in KES. USD/EUR equivalents available on request. All plans include unlimited team seats.
+            One price for everyone: KES {MONTHLY_PRICE_KES.toLocaleString('en-KE')} a month once you pass {FREE_UNIT_LIMIT} units. No tier to outgrow, no feature locks, and no percentage of your rent. All plans include unlimited team seats.
           </p>
         </div>
       </section>
@@ -174,7 +123,7 @@ export default function PricingPage() {
             </h2>
             <p className="mt-6 text-lg leading-8 text-muted-foreground">
               Most property platforms charge you 1–3% on top of every rent transaction. We think that's
-              wrong — it punishes you for growing. I-Manage is a flat monthly price, full stop.
+              wrong — it punishes you for growing. PropDesk Africa is a flat monthly price, full stop.
             </p>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">

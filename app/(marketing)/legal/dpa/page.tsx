@@ -2,9 +2,9 @@ import type { Metadata } from "next"
 import Link from "next/link"
 
 export const metadata: Metadata = {
-  title: "Data Processing Agreement — I-Manage by Siemax Ltd",
+  title: "Data Processing Agreement — PropDesk Africa by Siemax Ltd",
   description:
-    "I-Manage's Data Processing Agreement for Agency and enterprise customers.",
+    "PropDesk Africa's Data Processing Agreement for Agency and enterprise customers.",
 }
 
 export default function DPAPage() {
@@ -23,15 +23,15 @@ export default function DPAPage() {
       <article className="container-x max-w-3xl py-16 lg:py-20">
         <div className="space-y-8 text-base leading-8 text-foreground/85">
           <p>
-            This Data Processing Agreement ("DPA") forms part of the I-Manage Terms of Service and
-            applies wherever I-Manage processes personal data on behalf of a customer. It is designed
+            This Data Processing Agreement ("DPA") forms part of the PropDesk Africa Terms of Service and
+            applies wherever PropDesk Africa processes personal data on behalf of a customer. It is designed
             to meet the requirements of Article 28 of the EU GDPR and equivalent provisions in other
             jurisdictions.
           </p>
 
           <Section title="1. Roles">
             <p>
-              The customer is the <strong>Data Controller</strong>. Siemax Ltd, operating I-Manage,
+              The customer is the <strong>Data Controller</strong>. Siemax Ltd, operating PropDesk Africa,
               is the <strong>Data Processor</strong>. Where Siemax engages a sub-processor (e.g.
               Supabase, Resend, Vercel), Siemax acts as Data Processor and the sub-processor acts on
               Siemax's documented instructions.
@@ -41,7 +41,7 @@ export default function DPAPage() {
           <Section title="2. Subject matter & duration">
             <p>
               Siemax processes the personal data described in our <Link href="/legal/privacy" className="text-primary underline">privacy policy</Link>{" "}
-              solely for the purpose of providing the I-Manage service, for the duration of the
+              solely for the purpose of providing the PropDesk Africa service, for the duration of the
               customer's subscription and any post-termination wind-down period not exceeding 90 days.
             </p>
           </Section>
@@ -92,7 +92,7 @@ export default function DPAPage() {
             <p>
               Siemax will assist the customer in responding to data subject requests (access, correction,
               deletion, portability, objection) within statutory timeframes. The customer may submit
-              such requests directly through their I-Manage dashboard.
+              such requests directly through their PropDesk Africa dashboard.
             </p>
           </Section>
 

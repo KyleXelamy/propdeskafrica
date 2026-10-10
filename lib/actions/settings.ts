@@ -35,7 +35,7 @@ export async function updatePreferences(formData: FormData) {
     .upsert({ user_id: user.id, ...preferencesData, updated_at: new Date().toISOString() })
 
   if (error) {
-    console.error("[i-manage] preferences update error", error)
+    console.error("[propdeskafrica] preferences update error", error)
     throw new Error("Failed to update preferences")
   }
 
@@ -65,7 +65,7 @@ export async function updateNotifications(formData: FormData) {
     // If the column doesn't exist yet, fall back to logging so settings
     // still work locally before the user runs the latest migration.
     console.warn(
-      "[i-manage] notification preferences not persisted — column missing?",
+      "[propdeskafrica] notification preferences not persisted — column missing?",
       error,
     )
   }
@@ -101,7 +101,7 @@ export async function updateProfile(formData: FormData) {
     .upsert({ user_id: user.id, ...profileData, updated_at: new Date().toISOString() })
 
   if (error) {
-    console.error("[i-manage] profile update error", error)
+    console.error("[propdeskafrica] profile update error", error)
     throw new Error("Failed to update profile")
   }
 
@@ -112,7 +112,7 @@ export async function updateProfile(formData: FormData) {
       ? await supabase.from("companies").update({ name: profileData.company_name, slug }).eq("id", existingCompany.id)
       : await supabase.from("companies").insert({ owner_id: user.id, name: profileData.company_name, slug })
     if (companyResult.error) {
-      console.warn("[i-manage] company workspace table unavailable; profile name was saved", companyResult.error.message)
+      console.warn("[propdeskafrica] company workspace table unavailable; profile name was saved", companyResult.error.message)
     }
   }
 
@@ -132,7 +132,7 @@ export async function updatePassword(formData: FormData) {
 
   const { error } = await supabase.auth.updateUser({ password: newPassword })
   if (error) {
-    console.error("[i-manage] password update error", error)
+    console.error("[propdeskafrica] password update error", error)
     throw new Error(error.message || "Failed to update password")
   }
 
@@ -140,46 +140,11 @@ export async function updatePassword(formData: FormData) {
   return asAction({ success: true })
 }
 
-export async function exportData(format: "csv" | "pdf" | "backup") {
-  const { supabase, user } = await requireUser()
-
-  const [properties, tenants, payments, expenses] = await Promise.all([
-    supabase.from("properties").select("*").eq("user_id", user.id),
-    supabase.from("tenants").select("*").eq("user_id", user.id),
-    supabase.from("rent_payments").select("*").eq("user_id", user.id),
-    supabase.from("expenses").select("*").eq("user_id", user.id),
-  ])
-
-  const payload = {
-    user: { id: user.id, email: user.email },
-    generatedAt: new Date().toISOString(),
-    counts: {
-      properties: properties.data?.length || 0,
-      tenants: tenants.data?.length || 0,
-      payments: payments.data?.length || 0,
-      expenses: expenses.data?.length || 0,
-    },
-    data: {
-      properties: properties.data || [],
-      tenants: tenants.data || [],
-      payments: payments.data || [],
-      expenses: expenses.data || [],
-    },
-  }
-
-  return {
-    success: true,
-    format,
-    message: `Export ready (${payload.counts.properties} properties, ${payload.counts.tenants} tenants, ${payload.counts.payments} payments, ${payload.counts.expenses} expenses).`,
-    payload,
-  }
-}
-
 export async function signOutAllDevices() {
   const supabase = await createClient()
   const { error } = await supabase.auth.signOut({ scope: "global" })
   if (error) {
-    console.error("[i-manage] global sign-out error", error)
+    console.error("[propdeskafrica] global sign-out error", error)
     throw new Error("Failed to sign out from all devices")
   }
   redirect("/auth/login")
