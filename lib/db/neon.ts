@@ -31,6 +31,17 @@ export function neonConfigured(): boolean {
 }
 
 /**
+ * Return the cached Neon SQL client, creating it lazily from the configured URL.
+ */
+export function getDb(): NeonQueryFunction<false, false> {
+  if (cachedSql) return cachedSql
+  const url = getDbUrl()
+  if (!url) throw new Error("Neon database is not configured")
+  cachedSql = neon(url)
+  return cachedSql
+}
+
+/**
  * Ping the database. Returns ms round-trip or throws. Used by /api/health.
  */
 export async function pingDb(): Promise<{ ok: true; ms: number } | { ok: false; error: string }> {
