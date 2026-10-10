@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { timingSafeEqual } from "node:crypto"
 import { createClient } from "@supabase/supabase-js"
 import { isFromSafaricom } from "@/lib/mpesa/daraja"
 
@@ -25,6 +26,15 @@ export async function POST(req: NextRequest) {
   // Public endpoint — we DO NOT use withAuth here. We rely on:
   //   1. The configured callback URL being hard-to-guess (env var), and
   //   2. Optional IP allowlist (MPESA_ALLOWED_CALLBACK_IPS).
+  const callbackSecret = process.env.MPESA_CALLBACK_SECRET
+  const providedSecret = req.headers.get("x-mpesa-callback-secret")
+  if (!callbackSecret) {
+    return NextResponse.json({ ResultCode: 1, ResultDesc: "Callback secret is not configured" }, { status: 503 })
+  }
+  if (!providedSecret || providedSecret.length !== callbackSecret.length || !timingSafeEqual(Buffer.from(providedSecret), Buffer.from(callbackSecret))) {
+    return NextResponse.json({ ResultCode: 1, ResultDesc: "Rejected" }, { status: 403 })
+  }
+
   const forwardedFor = req.headers.get("x-forwarded-for")?.split(",")[0].trim() || null
   if (!isFromSafaricom(forwardedFor)) {
     return NextResponse.json({ ResultCode: 1, ResultDesc: "Rejected" }, { status: 403 })

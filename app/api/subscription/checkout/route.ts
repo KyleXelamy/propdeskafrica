@@ -18,7 +18,7 @@ export const POST = withAuth(async (req, { supabase, userId }) => {
   const plan = (body.plan || "").toString()
   const phone = (body.phone || "").toString().trim()
 
-  if (!["solo", "pro", "agency"].includes(plan)) throw new HttpError("Invalid plan", 400)
+  if (plan !== "pro") throw new HttpError("PropDesk Africa currently has one subscription plan", 400)
   if (!phone) throw new HttpError("phone required", 400)
 
   // Resolve plan price

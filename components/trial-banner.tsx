@@ -64,13 +64,15 @@ export function TrialBanner() {
             <Button asChild size="sm" variant="outline" className="bg-background text-foreground hover:bg-muted">
               <Link href="/dashboard/billing">Upgrade</Link>
             </Button>
-            <button
-              onClick={() => { sessionStorage.setItem(STORAGE_KEY, "1"); setDismissed(true) }}
-              className="text-muted-foreground hover:text-foreground p-1"
-              aria-label="Dismiss"
-            >
-              <X className="h-3.5 w-3.5" />
-            </button>
+            {status.days_left > 3 && (
+              <button
+                onClick={() => { sessionStorage.setItem(STORAGE_KEY, "1"); setDismissed(true) }}
+                className="text-muted-foreground hover:text-foreground p-1"
+                aria-label="Dismiss"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
           </div>
         </AlertDescription>
       </Alert>

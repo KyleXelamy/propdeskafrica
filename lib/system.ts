@@ -95,6 +95,7 @@ export const PATCH_LOG: PatchDescriptor[] = [
   { id: "p_2026_10_007", description: "Subscription payments: per-user STK push intents for plans", sql: "15-subscription-payments.sql", kind: "schema" },
   { id: "p_2026_10_008", description: "Schema repair: add columns missing on databases deployed before them", sql: "15-repair-live-schema.sql", kind: "schema" },
   { id: "p_2026_10_009", description: "Single-price plans: free tier (3 units) + KES 2,490/month Pro, retire solo/agency", sql: "16-plans-single-price.sql", kind: "config" },
+  { id: "p_2026_10_010", description: "Payment hardening: one plan, idempotency, callback fields and Stripe checkout", sql: "16-payment-hardening.sql", kind: "schema" },
 ]
 
 export function describePatches(): Array<{ id: string; description: string; kind: string }> {

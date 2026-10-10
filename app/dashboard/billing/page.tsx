@@ -63,6 +63,13 @@ export default async function BillingPage({
 }) {
   const { reason } = await searchParams
   const { user, status } = await getSubscriptionState()
+  const supabase = await createClient()
+  const { data: paymentHistory } = await supabase
+    .from("subscription_payments")
+    .select("id, plan_code, amount, phone, status, result_desc, mpesa_receipt, created_at, completed_at")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false })
+    .limit(20)
   const isTrialing = status?.is_trialing
   const isExpired = !status?.is_active
   const daysLeft = status?.days_left || 0
@@ -143,7 +150,7 @@ export default async function BillingPage({
       <div id="plans" className="space-y-3 pt-4">
         <h2 className="text-xl font-semibold">Pick a plan</h2>
         <p className="text-sm text-muted-foreground">
-          Pay with M-Pesa STK Push, Paybill, or get in touch for a manual invoice.
+          Pay securely with M-Pesa STK Push or card, or get in touch for a manual invoice.
         </p>
 
         <div className="grid gap-4 md:grid-cols-3">
@@ -203,6 +210,28 @@ export default async function BillingPage({
           })}
         </div>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Payment history</CardTitle>
+          <CardDescription>Your PropDesk Africa subscription payments and receipts.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {paymentHistory?.length ? (
+            <div className="divide-y">
+              {paymentHistory.map((payment) => (
+                <div key={payment.id} className="flex flex-col gap-1 py-3 text-sm sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <p className="font-medium">KES {Number(payment.amount).toLocaleString()} · {payment.plan_code}</p>
+                    <p className="text-xs text-muted-foreground">{new Date(payment.created_at).toLocaleString()} {payment.mpesa_receipt ? `· Receipt ${payment.mpesa_receipt}` : ""}</p>
+                  </div>
+                  <Badge variant={payment.status === "active" || payment.status === "subscribed" ? "default" : payment.status === "failed" ? "destructive" : "secondary"}>{payment.status}</Badge>
+                </div>
+              ))}
+            </div>
+          ) : <p className="text-sm text-muted-foreground">No subscription payments yet.</p>}
+        </CardContent>
+      </Card>
 
       {/* Manual / offline payment card */}
       <Card>
