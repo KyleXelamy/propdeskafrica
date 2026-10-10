@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Building2, Users, DollarSign, AlertTriangle, Loader2 } from "lucide-react"
+import { Building2, Users, DollarSign, AlertTriangle, Loader2, Upload, ArrowRight } from "lucide-react"
 import Link from "next/link"
 import { formatKenyaCurrency } from "@/lib/utils"
 import { useEffect, useState } from "react"
@@ -125,6 +125,19 @@ export default function DashboardPage() {
             </Link>
           ))}
         </div>
+      )}
+
+      {!loading && stats?.properties === 0 && (
+        <Card className="border-primary/20 bg-primary/[0.03]">
+          <CardHeader>
+            <CardTitle className="text-lg md:text-xl">Set up your first property</CardTitle>
+            <CardDescription>Start your 14-day PropDesk Africa trial by adding a property or importing your portfolio.</CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-2 sm:flex-row">
+            <Button asChild><Link href="/dashboard/properties/new"><Building2 className="mr-2 h-4 w-4" />Add your first property<ArrowRight className="ml-2 h-4 w-4" /></Link></Button>
+            <Button asChild variant="outline"><Link href="/dashboard/properties"><Upload className="mr-2 h-4 w-4" />Import a CSV</Link></Button>
+          </CardContent>
+        </Card>
       )}
 
       <Card>
