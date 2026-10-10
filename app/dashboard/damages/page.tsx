@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Plus, ShieldAlert, Camera, MapPin, ArrowRight, Wrench } from "lucide-react"
 
 export const metadata: Metadata = {
-  title: "Damages & inspections — I-Manage",
+  title: "Damages & inspections — PropDesk Africa",
   description: "Photo-document move-in condition, track damages, settle deposits fairly.",
 }
 

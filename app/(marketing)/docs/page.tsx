@@ -4,8 +4,8 @@ import { ArrowUpRight, BookOpen, Code2, Layers, Settings2, ShieldCheck, Wallet }
 import { docArticles, docCategories } from "@/lib/content/marketing"
 
 export const metadata: Metadata = {
-  title: "Docs — I-Manage by Siemax Ltd",
-  description: "Guides, API reference and integration docs for I-Manage.",
+  title: "Docs — PropDesk Africa by Siemax Ltd",
+  description: "Guides, API reference and integration docs for PropDesk Africa.",
 }
 
 const articleCounts = docCategories.map((c) => ({
@@ -28,7 +28,7 @@ export default function DocsHub() {
           </h1>
           <p className="mt-6 max-w-xl text-lg leading-8 text-primary-foreground/70">
             Guides for every workflow, a full REST + webhooks reference, and the data you need to
-            integrate I-Manage into your stack.
+            integrate PropDesk Africa into your stack.
           </p>
           <form action="/docs" className="mt-8 flex max-w-md gap-2">
             <input

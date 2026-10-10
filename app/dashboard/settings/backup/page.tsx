@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button"
 
 export const dynamic = "force-dynamic"
 export const metadata = {
-  title: "Backup & restore • I-Manage",
+  title: "Backup & restore • PropDesk Africa",
   description: "Back up your entire workspace or restore from a previous backup. No data leaves your database.",
 }
 
@@ -41,7 +41,7 @@ export default async function BackupPage() {
           <CardContent>
             <CardDescription>
               Backups include the data, the schema version, and the app version. Restore into any
-              I-Manage instance — fresh, live, or recovered.
+              PropDesk Africa instance — fresh, live, or recovered.
             </CardDescription>
           </CardContent>
         </Card>

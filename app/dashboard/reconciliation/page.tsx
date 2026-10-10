@@ -7,7 +7,7 @@ import Link from "next/link"
 import { ReconciliationRules } from "@/components/reconciliation-rules"
 
 export const metadata: Metadata = {
-  title: "Reconciliation — I-Manage",
+  title: "Reconciliation — PropDesk Africa",
   description: "Per-tenant rules that match incoming paybill payments to the right tenant.",
 }
 

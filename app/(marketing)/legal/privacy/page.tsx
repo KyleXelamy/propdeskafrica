@@ -2,8 +2,8 @@ import type { Metadata } from "next"
 import Link from "next/link"
 
 export const metadata: Metadata = {
-  title: "Privacy policy — I-Manage by Siemax Ltd",
-  description: "How I-Manage collects, uses and protects your data.",
+  title: "Privacy policy — PropDesk Africa by Siemax Ltd",
+  description: "How PropDesk Africa collects, uses and protects your data.",
 }
 
 export default function PrivacyPage() {
@@ -22,7 +22,7 @@ export default function PrivacyPage() {
       <article className="container-x max-w-3xl py-16 lg:py-20">
         <div className="space-y-8 text-base leading-8 text-foreground/85">
           <p>
-            I-Manage is operated by Siemax Ltd ("we", "us", "our"). This policy explains what data we
+            PropDesk Africa is operated by Siemax Ltd ("we", "us", "our"). This policy explains what data we
             collect, why we collect it, and what choices you have. We've written it in plain language
             on purpose — if anything is unclear, write to us at{" "}
             <Link href="mailto:bknglabs.dev@gmail.com" className="text-primary underline">bknglabs.dev@gmail.com</Link>.
@@ -39,7 +39,7 @@ export default function PrivacyPage() {
 
           <Section title="2. Why we collect it">
             <ul className="mt-4 list-disc space-y-2 pl-6">
-              <li>To provide the I-Manage product and sync your data across devices.</li>
+              <li>To provide the PropDesk Africa product and sync your data across devices.</li>
               <li>To process rent and expense transactions on your behalf.</li>
               <li>To send important service notifications (rent received, lease expiring, etc.).</li>
               <li>To improve the product and prevent abuse.</li>

@@ -36,7 +36,7 @@ export const GET = withAuth(async (req: NextRequest, { supabase, userId }) => {
   }
 
   const stamp = new Date().toISOString().slice(0, 10)
-  const filename = `i-manage-export-${stamp}.${format === "csv" ? "csv" : "json"}`
+  const filename = `propdeskafrica-export-${stamp}.${format === "csv" ? "csv" : "json"}`
 
   if (format === "csv") {
     // Generate a single CSV containing all tables, separated by a header row.

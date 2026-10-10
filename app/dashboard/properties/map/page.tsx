@@ -8,7 +8,7 @@ import { getDb, neonConfigured } from "@/lib/db/neon"
 import { createClient } from "@/lib/supabase/server"
 
 export const metadata: Metadata = {
-  title: "Properties map — I-Manage",
+  title: "Properties map — PropDesk Africa",
   description: "Every property pinned. Click for details.",
 }
 

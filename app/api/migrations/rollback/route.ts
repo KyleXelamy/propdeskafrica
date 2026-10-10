@@ -28,15 +28,25 @@ const Schema = z.object({
 
 function checkSecret(request: NextRequest) {
   const expected = process.env.MIGRATION_SECRET
-  if (!expected) return true
+  // Fail CLOSED in production. Previously an unset MIGRATION_SECRET meant
+  // "allow everyone", which put an unauthenticated schema-rollback endpoint
+  // on the public internet whenever the env var was missing or mistyped.
+  if (!expected) {
+    if (process.env.NODE_ENV === "production") {
+      return NextResponse.json(
+        { error: "MIGRATION_SECRET must be configured in production" },
+        { status: 503 },
+      )
+    }
+    return null // dev only
+  }
   const got = request.headers.get("x-migration-secret") ?? request.headers.get("authorization")?.replace(/^Bearer\s+/i, "")
-  return got === expected
+  return got === expected ? null : NextResponse.json({ error: "Forbidden" }, { status: 403 })
 }
 
 export async function POST(request: NextRequest) {
-  if (!checkSecret(request)) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 })
-  }
+  const denied = checkSecret(request)
+  if (denied) return denied
   const body = (await request.json().catch(() => ({}))) as z.infer<typeof Schema>
   const parse = Schema.safeParse(body)
   if (!parse.success) {

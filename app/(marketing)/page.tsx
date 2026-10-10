@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { features } from "@/lib/content/marketing"
 
 import * as Icons from "lucide-react"
+import { PLANS, formatPrice } from "@/lib/pricing"
 
 const featureIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   Banknote, Users, Wrench, FileText, BarChart3, Receipt, Building2, Layers,
@@ -157,14 +158,10 @@ export default function MarketingHome() {
               Start free. Upgrade when your portfolio does. We don&apos;t take a percentage of your rent.
             </p>
           </div>
-          <div className="mt-14 grid gap-5 lg:grid-cols-3">
-            {[
-              { name: "Solo", price: "Free", cadence: "Up to 3 units", cta: "Start free" },
-              { name: "Pro", price: "KES 2,490", cadence: "per month", cta: "Start 14-day trial", highlight: true },
-              { name: "Agency", price: "Talk to us", cadence: "tailored", cta: "Book a call" },
-            ].map((t) => (
+          <div className="mt-14 grid gap-5 lg:grid-cols-2">
+            {PLANS.map((t) => (
               <div
-                key={t.name}
+                key={t.code}
                 className={
                   "rounded-3xl border p-7 lg:p-8 " +
                   (t.highlight ? "border-primary bg-card shadow-xl" : "border-border bg-card")
@@ -176,10 +173,10 @@ export default function MarketingHome() {
                   </span>
                 )}
                 <p className="mt-3 text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">{t.name}</p>
-                <p className="mt-3 text-3xl font-medium tracking-tight">{t.price}</p>
+                <p className="mt-3 text-3xl font-medium tracking-tight">{formatPrice(t.price)}</p>
                 <p className="text-sm text-muted-foreground">{t.cadence}</p>
                 <Link
-                  href={t.name === "Agency" ? "/contact/sales" : "/auth/sign-up"}
+                  href={t.href}
                   className={
                     "mt-7 block rounded-full px-5 py-2.5 text-center text-sm font-medium " +
                     (t.highlight

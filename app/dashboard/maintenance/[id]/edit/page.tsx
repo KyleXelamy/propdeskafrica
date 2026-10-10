@@ -26,7 +26,7 @@ export default function EditMaintenancePage() {
         if (!data) setNotFound(true)
         else setMaintenanceRequest(data)
       } catch (error) {
-        console.error("[i-manage] fetch maintenance request error", error)
+        console.error("[propdeskafrica] fetch maintenance request error", error)
         setNotFound(true)
       } finally {
         setLoading(false)

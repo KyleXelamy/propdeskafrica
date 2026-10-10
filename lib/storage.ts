@@ -15,8 +15,6 @@ const BUCKET = "backups"
 const SIZE_LIMIT = 5 * 1024 * 1024 // 5 MB
 
 export const BACKUP_SIZE_LIMIT = SIZE_LIMIT
-export const STORAGE_BUCKET = BUCKET
-
 export interface StorageResult {
   ok: boolean
   path: string
@@ -66,22 +64,5 @@ export async function getBackupSignedUrl(userId: string, path: string): Promise<
     return data?.signedUrl ?? null
   } catch {
     return null
-  }
-}
-
-export async function ensureBucket(): Promise<boolean> {
-  if (!isServiceRoleConfigured()) return false
-  try {
-    const supa = createServiceClient()!
-    const { data } = await supa.storage.getBucket(BUCKET)
-    if (data) return true
-    const { error } = await supa.storage.createBucket(BUCKET, {
-      public: false,
-      fileSizeLimit: "50mb",
-      allowedMimeTypes: ["application/json"],
-    })
-    return !error
-  } catch {
-    return false
   }
 }

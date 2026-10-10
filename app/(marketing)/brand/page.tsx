@@ -4,8 +4,8 @@ import { Download } from "lucide-react"
 import { brandAssets } from "@/lib/content/marketing"
 
 export const metadata: Metadata = {
-  title: "Brand kit — I-Manage by Siemax Ltd",
-  description: "Logos, color palette, typography and product photography for the I-Manage brand.",
+  title: "Brand kit — PropDesk Africa by Siemax Ltd",
+  description: "Logos, color palette, typography and product photography for the PropDesk Africa brand.",
 }
 
 const colors = [
@@ -26,7 +26,7 @@ export default function BrandPage() {
         <div className="container-x relative pt-32 pb-16 lg:pt-44">
           <p className="text-xs font-semibold uppercase tracking-[0.25em] text-accent">Brand</p>
           <h1 className="mt-6 text-5xl font-medium leading-[0.98] tracking-[-0.05em] sm:text-7xl">
-            I-Manage brand kit.
+            PropDesk Africa brand kit.
           </h1>
           <p className="mt-6 max-w-xl text-lg leading-8 text-primary-foreground/70">
             Logos, color tokens, typography and photography. Free to use in editorial and partner

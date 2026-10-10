@@ -31,7 +31,7 @@ export default function MaintenancePage() {
         if (error) throw error
         setMaintenanceRequests(data || [])
       } catch (err: any) {
-        console.error("[i-manage] fetch maintenance error", err)
+        console.error("[propdeskafrica] fetch maintenance error", err)
         setError(err.message || "Failed to load maintenance requests")
       } finally {
         setLoading(false)

@@ -47,7 +47,7 @@ export function TenantForm({ tenant, isEditing = false }: TenantFormProps) {
       const supabase = createClient()
       const { data, error } = await supabase.from("properties").select("id, name, address").order("name")
       if (error) {
-        console.error("[i-manage] fetch properties error", error)
+        console.error("[propdeskafrica] fetch properties error", error)
       } else {
         setProperties(data || [])
       }

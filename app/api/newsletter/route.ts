@@ -3,7 +3,7 @@ import { z } from "zod"
 
 /**
  * POST /api/newsletter
- * Public endpoint. Subscribes an email to the I-Manage newsletter.
+ * Public endpoint. Subscribes an email to the PropDesk Africa newsletter.
  * Stub: in production we push to a Supabase `newsletter_subscribers` table
  * and trigger a confirmation via Resend.
  */

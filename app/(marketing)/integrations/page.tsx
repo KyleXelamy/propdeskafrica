@@ -4,8 +4,8 @@ import { ArrowUpRight } from "lucide-react"
 import { integrations } from "@/lib/content/site"
 
 export const metadata: Metadata = {
-  title: "Integrations — I-Manage by Siemax Ltd",
-  description: "Payments, accounting, communication and storage integrations for I-Manage.",
+  title: "Integrations — PropDesk Africa by Siemax Ltd",
+  description: "Payments, accounting, communication and storage integrations for PropDesk Africa.",
 }
 
 const categories = ["Payments", "Accounting", "Communication", "Storage", "Productivity"] as const
@@ -28,7 +28,7 @@ export default function IntegrationsPage() {
               Plays nicely with your stack.
             </h1>
             <p className="mt-7 max-w-xl text-lg leading-8 text-primary-foreground/70">
-              Connect I-Manage to the tools you already use — payments, accounting, comms and storage.
+              Connect PropDesk Africa to the tools you already use — payments, accounting, comms and storage.
               Agency and Enterprise customers can also build on our API.
             </p>
           </div>
@@ -47,7 +47,7 @@ export default function IntegrationsPage() {
                 {cat === "Accounting" && "Keep the books in sync."}
                 {cat === "Communication" && "Talk to tenants where they already are."}
                 {cat === "Storage" && "Backups, sorted."}
-                {cat === "Productivity" && "Pipe I-Manage into your daily tools."}
+                {cat === "Productivity" && "Pipe PropDesk Africa into your daily tools."}
               </h2>
               <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
                 {items.map((i) => (

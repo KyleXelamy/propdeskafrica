@@ -1,9 +1,9 @@
 -- ============================================================
 -- 001-core.sql
--- Core I-Manage tables. Idempotent. Plain Postgres (Neon-compatible).
+-- Core PropDesk Africa tables. Idempotent. Plain Postgres (Neon-compatible).
 -- ============================================================
 --
--- Important: I-Manage uses Supabase ONLY for Auth + Storage. The database
+-- Important: PropDesk Africa uses Supabase ONLY for Auth + Storage. The database
 -- itself is hosted on Neon (Postgres). To keep migrations portable:
 --   * No `auth.users` foreign keys — user_id is a plain uuid. Application
 --     code is responsible for scoping every query by the authenticated

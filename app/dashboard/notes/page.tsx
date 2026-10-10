@@ -34,7 +34,7 @@ export default async function NotesPage() {
     .order("created_at", { ascending: false })
 
   if (error) {
-    console.error("[i-manage] notes fetch error", error)
+    console.error("[propdeskafrica] notes fetch error", error)
   }
 
   const pinnedNotes = notes?.filter((note: any) => note.is_pinned) || []

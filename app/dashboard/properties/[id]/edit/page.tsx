@@ -26,7 +26,7 @@ export default function EditPropertyPage() {
         if (!data) setNotFound(true)
         else setProperty(data)
       } catch (error) {
-        console.error("[i-manage] fetch property error", error)
+        console.error("[propdeskafrica] fetch property error", error)
         setNotFound(true)
       } finally {
         setLoading(false)

@@ -16,17 +16,31 @@ export const runtime = "nodejs"
  * Idempotent within a day — at most one scheduled backup per user
  * per calendar day is created.
  */
-function checkSecret(request: NextRequest) {
+/**
+ * Returns an error response to send back, or null when the caller is allowed.
+ *
+ * Fails CLOSED in production. This endpoint iterates every user with
+ * auto-backup enabled and writes backup rows, so an unset
+ * BACKUP_CRON_SECRET must not mean "allow everyone" — previously it did.
+ */
+function checkSecret(request: NextRequest): NextResponse | null {
   const expected = process.env.BACKUP_CRON_SECRET
-  if (!expected) return true // dev mode
+  if (!expected) {
+    if (process.env.NODE_ENV === "production") {
+      return NextResponse.json(
+        { error: "BACKUP_CRON_SECRET must be configured in production" },
+        { status: 503 },
+      )
+    }
+    return null // dev only
+  }
   const got = request.headers.get("x-cron-secret") ?? request.headers.get("authorization")?.replace(/^Bearer\s+/i, "")
-  return got === expected
+  return got === expected ? null : NextResponse.json({ error: "Forbidden" }, { status: 403 })
 }
 
 export async function POST(request: NextRequest) {
-  if (!checkSecret(request)) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 })
-  }
+  const denied = checkSecret(request)
+  if (denied) return denied
   const body = (await request.json().catch(() => ({}))) as { user_id?: string; frequency?: "daily" | "weekly" | "monthly" }
   const supa = await createClient()
   const supaAdmin = supa

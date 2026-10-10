@@ -5,9 +5,9 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 
 export const metadata: Metadata = {
-  title: "About — I-Manage",
+  title: "About — PropDesk Africa",
   description:
-    "We're building the calm operating system for ambitious landlords and property teams across Africa. Meet the team behind I-Manage.",
+    "We're building the calm operating system for ambitious landlords and property teams across Africa. Meet the team behind PropDesk Africa.",
 }
 
 const values = [
@@ -46,13 +46,13 @@ export default function AboutPage() {
         <div className="container-x relative pt-36 pb-24 lg:pt-48 lg:pb-32">
           <p className="mb-7 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.25em] text-accent">
             <span className="h-px w-10 bg-accent" />
-            About I-Manage
+            About PropDesk Africa
           </p>
           <h1 className="max-w-4xl text-5xl font-medium leading-[0.98] tracking-[-0.05em] sm:text-7xl lg:text-[88px]">
             We're building the <em className="font-serif font-normal text-accent">calm</em> behind a well-run portfolio.
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-8 text-primary-foreground/70">
-            I-Manage is a Siemax Ltd product. We're a small team of engineers, designers and former
+            PropDesk Africa is a Siemax Ltd product. We're a small team of engineers, designers and former
             landlords shipping the property platform we wished existed when we were doing the job ourselves.
           </p>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
@@ -82,7 +82,7 @@ export default function AboutPage() {
           </div>
           <div className="space-y-6 text-lg leading-8 text-muted-foreground">
             <p>
-              I-Manage began with a simple question: why should running a property portfolio still feel
+              PropDesk Africa began with a simple question: why should running a property portfolio still feel
               like chasing spreadsheets and messages? We are building the clearer operating layer that
               owners and teams can rely on every day.
             </p>
@@ -97,16 +97,16 @@ export default function AboutPage() {
       {/* Founders */}
       <section className="border-y border-border bg-card py-20 lg:py-24">
         <div className="container-x">
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">The people behind I-Manage</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">The people behind PropDesk Africa</p>
           <div className="mt-8 grid gap-8 lg:grid-cols-[0.7fr_1.3fr]">
             <div className="overflow-hidden rounded-3xl border border-border bg-background">
-              <img src="/people/brian-kiarie.png" alt="Brian Kiarie, founder of I-Manage" className="aspect-square w-full object-cover" />
+              <img src="/people/brian-kiarie.png" alt="Brian Kiarie, founder of PropDesk Africa" className="aspect-square w-full object-cover" />
             </div>
             <article className="rounded-3xl border border-border bg-background p-6 sm:p-8">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Founder · CFO &amp; Operations</p>
               <h2 className="mt-3 text-3xl font-medium tracking-[-0.03em]">Brian Kiarie</h2>
               <p className="mt-5 text-lg leading-8 text-muted-foreground">“We are building the calm operating layer property teams need to stay on top of the work, the money and the relationships.”</p>
-              <p className="mt-5 text-sm leading-6 text-muted-foreground">Brian leads the operating model, financial discipline and day-to-day execution behind I-Manage.</p>
+              <p className="mt-5 text-sm leading-6 text-muted-foreground">Brian leads the operating model, financial discipline and day-to-day execution behind PropDesk Africa.</p>
               <div className="mt-7 flex flex-wrap gap-4 text-sm text-muted-foreground">
                 <a href="mailto:bknglabs.dev@gmail.com" className="inline-flex items-center gap-2 hover:text-foreground"><Mail className="size-4" /> bknglabs.dev@gmail.com</a>
                 <a href="tel:0758034649" className="inline-flex items-center gap-2 hover:text-foreground"><Phone className="size-4" /> 0758034649</a>

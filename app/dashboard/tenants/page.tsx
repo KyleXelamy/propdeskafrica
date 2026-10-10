@@ -49,7 +49,7 @@ export default function TenantsPage() {
         if (error) throw error
         setTenants(data || [])
       } catch (err: any) {
-        console.error("[i-manage] fetch tenants error", err)
+        console.error("[propdeskafrica] fetch tenants error", err)
         setError(err.message || "Failed to load tenants")
       } finally {
         setLoading(false)

@@ -2,8 +2,8 @@ import type { Metadata } from "next"
 import Link from "next/link"
 
 export const metadata: Metadata = {
-  title: "Acceptable use — I-Manage by Siemax Ltd",
-  description: "The rules of the road for using I-Manage.",
+  title: "Acceptable use — PropDesk Africa by Siemax Ltd",
+  description: "The rules of the road for using PropDesk Africa.",
 }
 
 export default function AcceptableUsePage() {
@@ -22,12 +22,12 @@ export default function AcceptableUsePage() {
       <div className="container-x max-w-3xl py-16">
         <div className="space-y-8 text-base leading-8 text-foreground/85">
           <p>
-            These ground rules keep I-Manage working for everyone. By using I-Manage, you agree to
+            These ground rules keep PropDesk Africa working for everyone. By using PropDesk Africa, you agree to
             them. If something on this page confuses you, write to{" "}
             <Link href="mailto:bknglabs.dev@gmail.com" className="text-primary underline">bknglabs.dev@gmail.com</Link>.
           </p>
 
-          <Section title="1. You must not use I-Manage to">
+          <Section title="1. You must not use PropDesk Africa to">
             <ul className="mt-4 list-disc space-y-2 pl-6">
               <li>Harass, threaten or impersonate tenants, landlords or staff.</li>
               <li>Store or transmit unlawful content in any jurisdiction.</li>
@@ -39,7 +39,7 @@ export default function AcceptableUsePage() {
 
           <Section title="2. Tenant data">
             <p>
-              You are responsible for the personal data of your tenants. I-Manage is a processor on
+              You are responsible for the personal data of your tenants. PropDesk Africa is a processor on
               your behalf — see our{" "}
               <Link href="/legal/dpa" className="text-primary underline">DPA</Link> and{" "}
               <Link href="/legal/privacy" className="text-primary underline">privacy policy</Link>.

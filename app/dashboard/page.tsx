@@ -36,7 +36,7 @@ export default function DashboardPage() {
         const data = await res.json()
         setStats(data)
       } catch (e: any) {
-        console.error("[i-manage] dashboard error", e)
+        console.error("[propdeskafrica] dashboard error", e)
         setError(e.message || "Failed to load stats")
       } finally {
         setLoading(false)

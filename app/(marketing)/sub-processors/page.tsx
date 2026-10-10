@@ -2,8 +2,8 @@ import type { Metadata } from "next"
 import { subProcessors } from "@/lib/content/marketing"
 
 export const metadata: Metadata = {
-  title: "Sub-processors — I-Manage by Siemax Ltd",
-  description: "The list of sub-processors that handle I-Manage customer data.",
+  title: "Sub-processors — PropDesk Africa by Siemax Ltd",
+  description: "The list of sub-processors that handle PropDesk Africa customer data.",
 }
 
 export default function SubProcessorsPage() {
@@ -16,7 +16,7 @@ export default function SubProcessorsPage() {
             Sub-processors
           </h1>
           <p className="mt-6 max-w-xl text-base leading-7 text-primary-foreground/70">
-            The third parties that handle I-Manage customer data on our behalf. We notify customers
+            The third parties that handle PropDesk Africa customer data on our behalf. We notify customers
             at least 30 days before adding or replacing a sub-processor.
           </p>
         </div>

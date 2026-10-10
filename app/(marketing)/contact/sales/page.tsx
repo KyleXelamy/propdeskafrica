@@ -4,8 +4,8 @@ import { ArrowUpRight, Mail, Phone, Calendar, Building2 } from "lucide-react"
 import { MarketingSalesForm } from "@/components/marketing-sales-form"
 
 export const metadata: Metadata = {
-  title: "Contact sales — I-Manage by Siemax Ltd",
-  description: "Talk to the I-Manage team about Agency and Enterprise plans.",
+  title: "Contact sales — PropDesk Africa by Siemax Ltd",
+  description: "Talk to the PropDesk Africa team about Agency and Enterprise plans.",
 }
 
 export default function ContactSalesPage() {
@@ -16,7 +16,7 @@ export default function ContactSalesPage() {
         <div className="container-x relative pt-32 pb-16 lg:pt-44">
           <p className="text-xs font-semibold uppercase tracking-[0.25em] text-accent">Sales</p>
           <h1 className="mt-6 max-w-3xl text-5xl font-medium leading-[0.98] tracking-[-0.05em] sm:text-7xl">
-            Talk to our team about I-Manage.
+            Talk to our team about PropDesk Africa.
           </h1>
           <p className="mt-7 max-w-xl text-lg leading-8 text-primary-foreground/70">
             We&apos;ll learn your portfolio, recommend a plan, and walk you through a real setup.

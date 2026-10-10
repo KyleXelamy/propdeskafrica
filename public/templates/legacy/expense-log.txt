@@ -1,9 +1,42 @@
+PROPDESK AFRICA BY SIEMAX LTD
 PROPERTY EXPENSE LOG
 
-Date        Property        Category        Vendor        Amount KES        Receipt ref
-__________  ______________  ______________  ____________  ________________  ____________
-__________  ______________  ______________  ____________  ________________  ____________
-__________  ______________  ______________  ____________  ________________  ____________
+Every expense without a receipt is an expense the tax office may disallow.
+Record the receipt reference as you go, not at year end. Keep the original
+receipts behind this sheet — if a repair is later charged to a tenant's
+deposit, the receipt is the only proof of what it cost.
 
-Categories: maintenance, utilities, insurance, taxes, management, marketing, legal, security, cleaning, repairs, supplies, travel, other.
-Prepared by: __________________ Month: __________
+PROPERTY: ______________________________________________________________
+PERIOD:   ____________________
+PREPARED BY: __________________________
+
+DATE    CATEGORY        VENDOR          PURPOSE             KES      RECEIPT
+______  ______________  ______________  __________________  ______  ________
+______  ______________  ______________  __________________  ______  ________
+______  ______________  ______________  __________________  ______  ________
+______  ______________  ______________  __________________  ______  ________
+______  ______________  ______________  __________________  ______  ________
+______  ______________  ______________  __________________  ______  ________
+______  ______________  ______________  __________________  ______  ________
+______  ______________  ______________  __________________  ______  ________
+______  ______________  ______________  __________________  ______  ________
+______  ______________  ______________  __________________  ______  ________
+______  ______________  ______________  __________________  ______  ________
+______  ______________  ______________  __________________  ______  ________
+______  ______________  ______________  __________________  ______  ________
+______  ______________  ______________  __________________  ______  ________
+
+SUMMARY
+Total expenses for the period:            KES ______________
+  of which repairs and maintenance:       KES ______________
+  of which utilities and services:        KES ______________
+Utilities recovered from tenants:         KES ______________
+NET COST TO THE LANDLORD:                 KES ______________
+
+SUGGESTED CATEGORIES
+Repairs and maintenance · Insurance · Rates and levies · Utilities ·
+Security and guarding · Management or agent fees · Professional fees ·
+Legal · Marketing · Other
+
+Prepared by: _________________________  Date: ______________
+Reviewed by: _________________________  Date: ______________

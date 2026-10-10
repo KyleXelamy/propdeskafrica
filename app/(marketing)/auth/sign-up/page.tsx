@@ -3,8 +3,8 @@ import SignUpForm from "@/components/sign-up-form"
 import { AuthShell } from "@/components/auth-shell"
 
 export const metadata: Metadata = {
-  title: "Get started — I-Manage",
-  description: "Create your I-Manage landlord account in seconds.",
+  title: "Get started — PropDesk Africa",
+  description: "Create your PropDesk Africa landlord account in seconds.",
 }
 
 export default function SignUpPage() {

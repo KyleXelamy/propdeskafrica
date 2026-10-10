@@ -4,9 +4,9 @@ import { ArrowUpRight, Lock, KeyRound, Eye, Server, FileCheck2, Mail } from "luc
 import { Button } from "@/components/ui/button"
 
 export const metadata: Metadata = {
-  title: "Security — I-Manage by Siemax Ltd",
+  title: "Security — PropDesk Africa by Siemax Ltd",
   description:
-    "How I-Manage protects your data — encryption, access controls, infrastructure, compliance and how to report a vulnerability.",
+    "How PropDesk Africa protects your data — encryption, access controls, infrastructure, compliance and how to report a vulnerability.",
 }
 
 const principles = [

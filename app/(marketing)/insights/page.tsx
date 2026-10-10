@@ -4,8 +4,8 @@ import { ArrowUpRight, ArrowRight } from "lucide-react"
 import { insights } from "@/lib/content/marketing"
 
 export const metadata: Metadata = {
-  title: "Insights — I-Manage by Siemax Ltd",
-  description: "Longer reads, market analysis and field reports from the I-Manage team.",
+  title: "Insights — PropDesk Africa by Siemax Ltd",
+  description: "Longer reads, market analysis and field reports from the PropDesk Africa team.",
 }
 
 export default function InsightsHub() {
@@ -22,7 +22,7 @@ export default function InsightsHub() {
           </h1>
           <p className="mt-6 max-w-xl text-lg leading-8 text-primary-foreground/70">
             The longer reads from the team — analysis, market takes and what we learned building
-            I-Manage in the messy real world.
+            PropDesk Africa in the messy real world.
           </p>
         </div>
       </section>

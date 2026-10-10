@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import Link from "next/link"
 
 export const metadata: Metadata = {
-  title: "Cookie policy — I-Manage by Siemax Ltd",
+  title: "Cookie policy — PropDesk Africa by Siemax Ltd",
   description: "What cookies we use, why, and how to opt out.",
 }
 
@@ -22,7 +22,7 @@ export default function CookiePolicyPage() {
       <div className="container-x max-w-3xl py-16">
         <div className="space-y-8 text-base leading-8 text-foreground/85">
           <p>
-            This policy explains what cookies I-Manage sets, what they do, and how you can opt out.
+            This policy explains what cookies PropDesk Africa sets, what they do, and how you can opt out.
             We try to use as few as possible — and we never use third-party advertising cookies.
           </p>
 

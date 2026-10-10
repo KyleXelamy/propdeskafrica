@@ -43,7 +43,7 @@ export const POST = withAuth(async (_request, { supabase, userId }, { id }) => {
   try {
     const res = await fetch(url.toString(), {
       headers: {
-        "User-Agent": "I-Manage/1.0 (property geocoder)",
+        "User-Agent": "PropDeskAfrica/1.0 (property geocoder)",
         "Accept": "application/json",
       },
       cache: "no-store",

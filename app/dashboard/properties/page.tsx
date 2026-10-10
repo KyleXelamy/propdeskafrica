@@ -49,7 +49,7 @@ export default function PropertiesPage() {
         })
         setProperties(withCover)
       } catch (err: any) {
-        console.error("[i-manage] fetch properties error", err)
+        console.error("[propdeskafrica] fetch properties error", err)
         setError(err.message || "Failed to load properties")
       } finally {
         setLoading(false)

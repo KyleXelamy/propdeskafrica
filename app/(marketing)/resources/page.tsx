@@ -7,7 +7,7 @@ import { NewsletterForm } from "@/components/newsletter-form"
 import { ResourceSearch } from "@/components/resource-search"
 
 export const metadata: Metadata = {
-  title: "Resources — I-Manage by Siemax Ltd",
+  title: "Resources — PropDesk Africa by Siemax Ltd",
   description:
     "Field notes, product deep dives and practical guides for landlords running a real property portfolio.",
 }
@@ -32,7 +32,7 @@ export default function ResourcesPage() {
             </h1>
             <p className="mt-7 max-w-xl text-lg leading-8 text-primary-foreground/70">
               Product updates, financial deep dives and the occasional opinionated rant. Written by
-              the team — and the landlords — building I-Manage.
+              the team — and the landlords — building PropDesk Africa.
             </p>
           </div>
         </div>

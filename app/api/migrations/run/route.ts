@@ -27,22 +27,38 @@ const Schema = z.object({
   record: z.boolean().default(true),
 })
 
-async function checkAccess(request: NextRequest) {
+async function checkAccess(request: NextRequest): Promise<NextResponse | null> {
   const expected = process.env.MIGRATION_SECRET
   const got = request.headers.get("x-migration-secret") ?? request.headers.get("authorization")?.replace(/^Bearer\s+/i, "")
-  if (!expected || got === expected) return true
+
+  // Fail CLOSED in production. This endpoint executes SQL against the live
+  // database, so an unset MIGRATION_SECRET must never mean "allow all" —
+  // that is the difference between a deploy gap and a public SQL endpoint.
+  if (!expected) {
+    if (process.env.NODE_ENV === "production") {
+      return NextResponse.json(
+        { error: "MIGRATION_SECRET must be configured in production" },
+        { status: 503 },
+      )
+    }
+    // Dev: still require a signed-in user, so the behaviour matches prod.
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    return user ? null : NextResponse.json({ error: "Forbidden" }, { status: 403 })
+  }
+
+  if (got === expected) return null
 
   // Signed-in dashboard users can request the idempotent setup check without
   // ever seeing or copying an infrastructure secret.
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  return Boolean(user)
+  return user ? null : NextResponse.json({ error: "Forbidden" }, { status: 403 })
 }
 
 export async function POST(request: NextRequest) {
-  if (!(await checkAccess(request))) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 })
-  }
+  const denied = await checkAccess(request)
+  if (denied) return denied
   const body = (await request.json().catch(() => ({}))) as z.infer<typeof Schema>
   const parse = Schema.safeParse(body)
   if (!parse.success) {

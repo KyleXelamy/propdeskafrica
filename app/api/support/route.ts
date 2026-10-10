@@ -37,10 +37,12 @@ export const POST = withAuth(async (request, { userId }) => {
     )
   }
 
-  // Stub: in production we create a `support_tickets` row tagged with userId
-  // and notify the support inbox.
+  // No `support_tickets` table exists yet, so a ticket is currently only
+  // logged. The reference is still issued and returned so the UI can show
+  // the user something, but it is not yet persisted or emailed anywhere —
+  // do not present it to a customer as a tracked ticket.
   const ticketRef =
-    "IM-" +
+    "PDA-" +
     Date.now().toString(36).toUpperCase() +
     "-" +
     Math.random().toString(36).slice(2, 6).toUpperCase()
@@ -55,6 +57,8 @@ export const POST = withAuth(async (request, { userId }) => {
 })
 
 export const GET = withAuth(async () => {
-  // Placeholder list — would normally return this user's tickets.
-  return NextResponse.json({ tickets: [] })
+  // Ticket history is not implemented yet — there is no support_tickets
+  // table. Returning an empty list rather than an error so the client
+  // renders an empty state instead of failing.
+  return NextResponse.json({ tickets: [], implemented: false })
 })

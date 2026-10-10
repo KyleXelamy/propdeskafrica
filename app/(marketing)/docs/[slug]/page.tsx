@@ -15,8 +15,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params
   const a = docArticles.find((x) => x.slug === slug)
-  if (!a) return { title: "Doc — I-Manage" }
-  return { title: `${a.title} — I-Manage Docs`, description: a.excerpt }
+  if (!a) return { title: "Doc — PropDesk Africa" }
+  return { title: `${a.title} — PropDesk Africa Docs`, description: a.excerpt }
 }
 
 function renderBody(body: string) {

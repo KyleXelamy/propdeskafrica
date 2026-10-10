@@ -3,8 +3,8 @@ import Link from "next/link"
 import { Check, X, ArrowUpRight } from "lucide-react"
 
 export const metadata: Metadata = {
-  title: "Compare — I-Manage by Siemax Ltd",
-  description: "How I-Manage compares to spreadsheets, generic CRMs and US-built rent platforms.",
+  title: "Compare — PropDesk Africa by Siemax Ltd",
+  description: "How PropDesk Africa compares to spreadsheets, generic CRMs and US-built rent platforms.",
 }
 
 const rows: { label: string; us: boolean | string; spreadsheet: boolean | string; generic: boolean | string; usbuilt: boolean | string }[] = [
@@ -40,7 +40,7 @@ export default function ComparePage() {
             How we stack up.
           </h1>
           <p className="mt-6 max-w-xl text-lg leading-8 text-primary-foreground/70">
-            An honest comparison of I-Manage against spreadsheets, generic CRMs and US-built rent
+            An honest comparison of PropDesk Africa against spreadsheets, generic CRMs and US-built rent
             platforms. No "best in class" puffery.
           </p>
         </div>
@@ -54,7 +54,7 @@ export default function ComparePage() {
                 <thead>
                   <tr className="border-b border-border bg-muted/40 text-xs uppercase tracking-[0.18em] text-muted-foreground">
                     <th className="px-5 py-4 text-left font-semibold">Capability</th>
-                    <th className="px-5 py-4 text-center font-semibold text-foreground">I-Manage</th>
+                    <th className="px-5 py-4 text-center font-semibold text-foreground">PropDesk Africa</th>
                     <th className="px-5 py-4 text-center font-semibold">Spreadsheets</th>
                     <th className="px-5 py-4 text-center font-semibold">Generic CRM</th>
                     <th className="px-5 py-4 text-center font-semibold">US-built rent software</th>

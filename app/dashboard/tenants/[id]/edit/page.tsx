@@ -27,7 +27,7 @@ export default function EditTenantPage() {
         if (!data) setNotFound(true)
         else setTenant(data)
       } catch (error) {
-        console.error("[i-manage] fetch tenant error", error)
+        console.error("[propdeskafrica] fetch tenant error", error)
         setNotFound(true)
       } finally {
         setLoading(false)

@@ -1,5 +1,5 @@
 {
-  "name": "i-manage",
+  "name": "propdeskafrica",
   "version": "1.0.0",
   "packageManager": "pnpm@10.34.6",
   "private": true,
@@ -10,13 +10,13 @@
     "github": "https://github.com/Knighty7-ciper"
   },
   "company": "Siemax Ltd",
-  "homepage": "https://github.com/Knighty7-ciper/i-manage",
+  "homepage": "https://github.com/Knighty7-ciper/propdeskafrica",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Knighty7-ciper/i-manage.git"
+    "url": "https://github.com/Knighty7-ciper/propdeskafrica.git"
   },
   "bugs": {
-    "url": "https://github.com/Knighty7-ciper/i-manage/issues"
+    "url": "https://github.com/Knighty7-ciper/propdeskafrica/issues"
   },
   "scripts": {
     "build": "next build",

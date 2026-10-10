@@ -5,16 +5,37 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { X } from "lucide-react"
 
-const STORAGE_KEY = "imanage_cookie_consent_v1"
+const STORAGE_KEY = "propdeskafrica_cookie_consent_v1"
+
+/**
+ * Pre-rebrand key. Consent is a legal record, so we never drop it on the
+ * floor during a rename: read the old key once, copy it across, then remove
+ * it. Without this, every existing visitor gets re-prompted for consent they
+ * already gave.
+ */
+const LEGACY_STORAGE_KEY = "imanage_cookie_consent_v1"
 
 type Consent = "all" | "essential" | null
+
+function readConsent(): Consent {
+  const current = window.localStorage.getItem(STORAGE_KEY) as Consent
+  if (current) return current
+
+  const legacy = window.localStorage.getItem(LEGACY_STORAGE_KEY) as Consent
+  if (legacy) {
+    window.localStorage.setItem(STORAGE_KEY, legacy)
+    window.localStorage.removeItem(LEGACY_STORAGE_KEY)
+    return legacy
+  }
+  return null
+}
 
 export function CookieConsent() {
   const [open, setOpen] = useState(false)
 
   useEffect(() => {
     try {
-      const stored = window.localStorage.getItem(STORAGE_KEY) as Consent
+      const stored = readConsent()
       if (!stored) {
         // Small delay so it doesn't slam in instantly on first paint.
         const t = setTimeout(() => setOpen(true), 1200)

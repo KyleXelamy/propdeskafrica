@@ -50,7 +50,7 @@ export default function FinancesPage() {
         setRentPayments(paymentsRes.data || [])
         setExpenses(expensesRes.data || [])
       } catch (err: any) {
-        console.error("[i-manage] fetch finances error", err)
+        console.error("[propdeskafrica] fetch finances error", err)
         setError(err.message || "Failed to load financial data")
       } finally {
         setLoading(false)

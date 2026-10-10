@@ -4,9 +4,9 @@ import { ArrowRight, ArrowUpRight } from "lucide-react"
 import { solutions } from "@/lib/content/marketing"
 
 export const metadata: Metadata = {
-  title: "Solutions — I-Manage by Siemax Ltd",
+  title: "Solutions — PropDesk Africa by Siemax Ltd",
   description:
-    "I-Manage for solo landlords, commercial operators, agencies, vacation rentals, developers and enterprise teams.",
+    "PropDesk Africa for solo landlords, commercial operators, agencies, vacation rentals, developers and enterprise teams.",
 }
 
 export default function SolutionsHub() {
@@ -21,7 +21,7 @@ export default function SolutionsHub() {
               Built for the way you actually work.
             </h1>
             <p className="mt-7 max-w-xl text-lg leading-8 text-primary-foreground/70">
-              Whether you're running one unit or a thousand, I-Manage adapts to your workflow instead
+              Whether you're running one unit or a thousand, PropDesk Africa adapts to your workflow instead
               of forcing you into ours.
             </p>
           </div>

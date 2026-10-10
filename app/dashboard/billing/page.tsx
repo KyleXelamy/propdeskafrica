@@ -250,8 +250,8 @@ export default async function BillingPage({
           </p>
           <p className="text-xs text-muted-foreground">
             Or get in touch:{" "}
-            <a href="mailto:billing@imanage.co.ke" className="underline hover:text-primary">
-              billing@imanage.co.ke
+            <a href="mailto:billing@propdeskafrica.com" className="underline hover:text-primary">
+              billing@propdeskafrica.com
             </a>{" "}
             · +254 700 000 000
           </p>

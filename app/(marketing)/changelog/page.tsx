@@ -4,7 +4,7 @@ import { ArrowUpRight, Sparkles, Wrench, ShieldCheck, Bug } from "lucide-react"
 import { changelog, type ChangelogEntry } from "@/lib/content/site"
 
 export const metadata: Metadata = {
-  title: "Changelog — I-Manage by Siemax Ltd",
+  title: "Changelog — PropDesk Africa by Siemax Ltd",
   description: "Every product update, improvement and fix we've shipped.",
 }
 

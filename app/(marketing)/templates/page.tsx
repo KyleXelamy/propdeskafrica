@@ -1,21 +1,30 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { Download, Search } from "lucide-react"
+import { Download } from "lucide-react"
 import { templates } from "@/lib/content/marketing"
-import { templateDownloadPath } from "@/lib/brand"
 
 export const metadata: Metadata = {
-  title: "Templates — I-Manage by Siemax Ltd",
-  description: "Free lease agreements, inspection checklists, notices and CSV templates for landlords.",
+  title: "Templates — PropDesk Africa by Siemax Ltd",
+  description: "Free lease agreements, condition reports, notices and CSV templates for Kenyan landlords.",
 }
-
-const categories = ["Lease", "Inspection", "Notice", "Receipt", "Checklist"] as const
 
 const formatBadge: Record<string, string> = {
   PDF: "bg-destructive/10 text-destructive",
   DOCX: "bg-primary/10 text-primary",
   CSV: "bg-success/10 text-success",
 }
+
+const formatNote: Record<string, string> = {
+  PDF: "PDF",
+  DOCX: "Word document",
+  CSV: "CSV · import-ready",
+}
+
+/**
+ * Derived from the catalogue, not hand-listed. A hardcoded list silently
+ * hides any category someone adds later.
+ */
+const categories = Array.from(new Set(templates.map((t) => t.category))).sort()
 
 export default function TemplatesPage() {
   return (
@@ -76,13 +85,18 @@ export default function TemplatesPage() {
                       <span className="text-xs text-muted-foreground">{t.region}</span>
                     </div>
                     <p className="mt-4 text-base font-medium leading-tight">{t.name}</p>
-                    <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">{t.description}</p>
+                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t.description}</p>
+                    {t.legalBasis ? (
+                      <p className="mt-3 text-xs leading-relaxed text-muted-foreground/80">
+                        <span className="font-medium text-foreground/70">Basis:</span> {t.legalBasis}
+                      </p>
+                    ) : null}
                     <div className="mt-5 flex items-center justify-between border-t border-border pt-4">
                       <span className="text-xs text-muted-foreground">
-                        {t.downloads.toLocaleString()} downloads
+                        {formatNote[t.format] ?? t.format}
                       </span>
                       <a
-                        href={t.downloadPath ?? templateDownloadPath(t.slug)}
+                        href={t.downloadPath}
                         download
                         className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
                       >

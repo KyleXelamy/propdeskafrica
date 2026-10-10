@@ -3,8 +3,8 @@ import Link from "next/link"
 import { ArrowUpRight, Database, Globe2, Lock } from "lucide-react"
 
 export const metadata: Metadata = {
-  title: "Data residency — I-Manage by Siemax Ltd",
-  description: "Where your I-Manage data lives, how we keep it safe, and how to pin a region.",
+  title: "Data residency — PropDesk Africa by Siemax Ltd",
+  description: "Where your PropDesk Africa data lives, how we keep it safe, and how to pin a region.",
 }
 
 const regions = [

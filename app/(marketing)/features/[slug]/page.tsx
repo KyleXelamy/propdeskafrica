@@ -17,9 +17,9 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params
   const feature = features.find((f) => f.slug === slug)
-  if (!feature) return { title: "Feature — I-Manage" }
+  if (!feature) return { title: "Feature — PropDesk Africa" }
   return {
-    title: `${feature.name} — I-Manage`,
+    title: `${feature.name} — PropDesk Africa`,
     description: feature.summary,
     openGraph: feature.image ? { images: [feature.image] } : undefined,
   }
