@@ -93,7 +93,7 @@ export const PATCH_LOG: PatchDescriptor[] = [
   { id: "p_2026_10_005", description: "Atomic bump_paybill_counters() RPC for C2B confirmation", sql: "13-paybill-counters.sql", kind: "config" },
   { id: "p_2026_10_006", description: "Subscriptions: plans + per-user subscription + trial", sql: "14-subscriptions.sql", kind: "schema" },
   { id: "p_2026_10_007", description: "Subscription payments: per-user STK push intents for plans", sql: "15-subscription-payments.sql", kind: "schema" },
-  { id: "p_2026_10_008", description: "Payment hardening: one plan, idempotency, callback fields", sql: "16-payment-hardening.sql", kind: "schema" },
+  { id: "p_2026_10_008", description: "Payment hardening: one plan, idempotency, callback fields and Stripe checkout", sql: "16-payment-hardening.sql", kind: "schema" },
 ]
 
 export function describePatches(): Array<{ id: string; description: string; kind: string }> {

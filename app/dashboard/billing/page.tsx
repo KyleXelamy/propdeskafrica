@@ -93,7 +93,7 @@ export default async function BillingPage({
           <AlertDescription>
             <strong>Your access is paused.</strong>{" "}
             {reason === "trial_ended"
-              ? "Your 14-day trial has ended. Pick a plan to keep using I-Manage."
+              ? "Your 14-day trial has ended. Pick a plan to keep using PropDesk Africa."
               : reason === "canceled" || reason === "expired"
                 ? "Your subscription has ended. Pick a plan to resume."
                 : "Pick a plan below to continue."}
@@ -150,7 +150,7 @@ export default async function BillingPage({
       <div id="plans" className="space-y-3 pt-4">
         <h2 className="text-xl font-semibold">Pick a plan</h2>
         <p className="text-sm text-muted-foreground">
-          Pay with M-Pesa STK Push, Paybill, or get in touch for a manual invoice.
+          Pay securely with M-Pesa STK Push or card, or get in touch for a manual invoice.
         </p>
 
         <div className="grid gap-4 md:grid-cols-3">

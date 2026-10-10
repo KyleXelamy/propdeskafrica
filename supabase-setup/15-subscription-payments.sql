@@ -11,6 +11,8 @@ create table if not exists public.subscription_payments (
   phone text not null,
   checkout_request_id text unique,
   merchant_request_id text,
+  stripe_session_id text unique,
+  stripe_payment_intent_id text,
   status text not null default 'initiated'
     check (status in ('initiated','pending','active','subscribed','failed','canceled')),
   result_code text,

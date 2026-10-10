@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Loader2, Smartphone, CheckCircle2, ArrowLeft, AlertCircle } from "lucide-react"
+import { Loader2, Smartphone, CreditCard, CheckCircle2, ArrowLeft, AlertCircle } from "lucide-react"
 import Link from "next/link"
 
 interface Plan {
@@ -29,6 +29,7 @@ export default function CheckoutPage() {
   const [error, setError] = useState<string | null>(null)
   const [desc, setDesc] = useState<string | null>(null)
   const [pollHandle, setPollHandle] = useState<ReturnType<typeof setInterval> | null>(null)
+  const [cardLoading, setCardLoading] = useState(false)
 
   useEffect(() => {
     fetch("/api/plans").then((r) => r.json()).then((plans) => {
@@ -40,6 +41,24 @@ export default function CheckoutPage() {
   useEffect(() => {
     return () => { if (pollHandle) clearInterval(pollHandle) }
   }, [pollHandle])
+
+  const payByCard = async () => {
+    setError(null)
+    setCardLoading(true)
+    try {
+      const response = await fetch("/api/subscription/stripe-checkout", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ plan: planCode }),
+      })
+      const data = await response.json()
+      if (!response.ok || !data.url) throw new Error(data.error || "Unable to start card checkout")
+      window.location.assign(data.url)
+    } catch (e: any) {
+      setError(e.message)
+      setCardLoading(false)
+    }
+  }
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -99,7 +118,7 @@ export default function CheckoutPage() {
         <Button asChild variant="ghost" size="sm">
           <Link href="/dashboard/billing"><ArrowLeft className="h-4 w-4 mr-1" /> Back to billing</Link>
         </Button>
-        <h1 className="text-2xl md:text-3xl font-bold text-foreground mt-2">Subscribe to {plan?.name || "I-Manage"}</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-foreground mt-2">Subscribe to {plan?.name || "PropDesk Africa"}</h1>
         <p className="text-sm md:text-base text-muted-foreground">
           Pay with M-Pesa. You&apos;ll get an STK push on your phone to enter your PIN.
         </p>
@@ -190,6 +209,14 @@ export default function CheckoutPage() {
               <p className="text-xs text-muted-foreground text-center">
                 You&apos;ll receive an M-Pesa prompt on your phone.
               </p>
+              <div className="relative py-1 text-center text-xs text-muted-foreground before:absolute before:left-0 before:right-0 before:top-1/2 before:border-t">
+                <span className="relative bg-card px-2">or</span>
+              </div>
+              <Button type="button" variant="outline" className="w-full" onClick={payByCard} disabled={cardLoading || !plan}>
+                {cardLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <CreditCard className="h-4 w-4 mr-2" />}
+                Pay securely by card
+              </Button>
+              <p className="text-xs text-muted-foreground text-center">Card payments are processed securely by Stripe.</p>
             </form>
           </CardContent>
         </Card>
