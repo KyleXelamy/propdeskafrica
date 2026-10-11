@@ -7,7 +7,6 @@ import { Briefcase, Users, Building2, BarChart3, Mail } from "lucide-react"
 
 export const metadata: Metadata = {
   title: "Company — PropDesk Africa",
-  // naming compnyes is def not my thinkg man , hahahhahah //
   description: "Run your agency or company: team, landlords, aggregate reporting.",
 }
 
@@ -56,8 +55,6 @@ export default async function CompanyPage() {
         </div>
         <p className="text-sm text-muted-foreground">Company records are shown from your workspace database.</p>
       </header>
-
-        // tired afsccccccccccccccccccccccc //
 
       {/* Top stats */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -129,18 +126,16 @@ export default async function CompanyPage() {
                   </tr>
                 ))}
 
-                // so am thinking maybe i run away, hahhahhaha,, to wherrrrrreeeeeeee //
               </tbody>
             </table>
              </div>  
         </CardContent>
       </Card>
 
-      {/* Landlords */}    // make stuff ofr the rich for the rich,, do you get what i mean //
+      {/* Landlords */}
       <Card>
         <CardHeader>
           <CardTitle>Landlords under management</CardTitle>
-          // we all lie sometimes rt,, hahhahahhahha,, i see everything dawg, hhheeehhehee //
           <CardDescription>Each landlord sees only their own data. You see everything.</CardDescription>
         </CardHeader>
         <CardContent>
@@ -167,4 +162,3 @@ export default async function CompanyPage() {
     </div>
   )
 }
-//company page is completely done, i think i need to take a break and go for a walk, hahahhahahha //

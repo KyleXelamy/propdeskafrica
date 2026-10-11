@@ -4,24 +4,12 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Plus, ShieldAlert, Camera, MapPin, ArrowRight, Wrench } from "lucide-react"
+import { createClient } from "@/lib/supabase/server"
 
 export const metadata: Metadata = {
   title: "Damages & inspections — PropDesk Africa",
   description: "Photo-document move-in condition, track damages, settle deposits fairly.",
 }
-
-const damages: Array<{
-  id: string
-  title: string
-  property: string
-  tenant: string
-  severity: string
-  status: string
-  reported: string
-  cost: number
-  photos: number
-  location: string
-}> = []
 
 const severityStyle: Record<string, string> = {
   Low: "bg-muted text-muted-foreground",
@@ -29,7 +17,24 @@ const severityStyle: Record<string, string> = {
   High: "bg-destructive/15 text-destructive",
 }
 
-export default function DamagesPage() {
+export default async function DamagesPage() {
+  const supabase = await createClient()
+  const { data: damageRows } = await supabase
+    .from("damages")
+    .select("id, title, property_id, tenant_id, location, severity, status, cost, estimated_cost, photos, reported_at, resolved_at")
+    .order("reported_at", { ascending: false })
+
+  const damages = damageRows ?? []
+  const activeDamages = damages.filter((damage) => !["resolved", "written_off"].includes(damage.status))
+  const openRepairValue = activeDamages.reduce((sum, damage) => sum + (damage.cost ?? damage.estimated_cost ?? 0), 0)
+  const depositDeductions = damages
+    .filter((damage) => damage.status === "deposit_deduction")
+    .reduce((sum, damage) => sum + (damage.cost ?? 0), 0)
+  const resolvedDamages = damages.filter((damage) => damage.resolved_at)
+  const averageResolutionDays = resolvedDamages.length
+    ? Math.round(resolvedDamages.reduce((sum, damage) => sum + (new Date(damage.resolved_at).getTime() - new Date(damage.reported_at).getTime()) / 86400000, 0) / resolvedDamages.length)
+    : 0
+
   return (
     <div className="space-y-8">
       <header className="flex flex-wrap items-end justify-between gap-4">
@@ -54,16 +59,16 @@ export default function DamagesPage() {
         <Card>
           <CardHeader className="pb-2">
             <CardDescription>Active damages</CardDescription>
-            <CardTitle className="text-3xl">0</CardTitle>
+            <CardTitle className="text-3xl">{activeDamages.length}</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-xs text-muted-foreground">No records yet</p>
+            <p className="text-xs text-muted-foreground">Live records from your database</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
             <CardDescription>Open repair value</CardDescription>
-            <CardTitle className="text-3xl">KES 18.3k</CardTitle>
+            <CardTitle className="text-3xl">KES {openRepairValue.toLocaleString()}</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-xs text-muted-foreground">Budget vs. actual</p>
@@ -72,16 +77,16 @@ export default function DamagesPage() {
         <Card>
           <CardHeader className="pb-2">
             <CardDescription>Deposit deductions YTD</CardDescription>
-            <CardTitle className="text-3xl">KES 67k</CardTitle>
+            <CardTitle className="text-3xl">KES {depositDeductions.toLocaleString()}</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-xs text-muted-foreground">14 moves processed</p>
+            <p className="text-xs text-muted-foreground">Based on recorded deductions</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
             <CardDescription>Avg. resolution</CardDescription>
-            <CardTitle className="text-3xl">6 days</CardTitle>
+            <CardTitle className="text-3xl">{averageResolutionDays} days</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-xs text-muted-foreground">From log → resolved</p>
@@ -115,12 +120,12 @@ export default function DamagesPage() {
                       <p className="font-mono text-xs text-muted-foreground">{d.id}</p>
                       <p className="mt-1 text-sm font-medium">{d.title}</p>
                       <p className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
-                        <Camera className="size-3" /> {d.photos} photos
+                        <Camera className="size-3" /> {d.photos?.length ?? 0} photos
                       </p>
                     </td>
                     <td className="px-4 py-4">
-                      <p className="text-sm font-medium">{d.property}</p>
-                      <p className="text-xs text-muted-foreground">{d.tenant}</p>
+                      <p className="text-sm font-medium">Property {d.property_id.slice(0, 8)}</p>
+                      <p className="text-xs text-muted-foreground">{d.tenant_id ? `Tenant ${d.tenant_id.slice(0, 8)}` : "No tenant linked"}</p>
                     </td>
                     <td className="px-4 py-4">
                       <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
