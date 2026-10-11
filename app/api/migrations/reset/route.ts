@@ -43,16 +43,16 @@ async function checkAccess(request: NextRequest): Promise<NextResponse | null> {
     ?? request.headers.get("authorization")?.replace(/^Bearer\s+/i, "")
   if (expected && got === expected) return null
 
-  if (process.env.NODE_ENV === "production") {
-    return NextResponse.json(
-      { error: expected ? "Forbidden" : "MIGRATION_SECRET must be configured in production" },
-      { status: expected ? 403 : 503 },
-    )
+  if (process.env.NODE_ENV !== "production") {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    return user ? null : NextResponse.json({ error: "Forbidden" }, { status: 403 })
   }
 
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  return user ? null : NextResponse.json({ error: "Forbidden" }, { status: 403 })
+  return NextResponse.json(
+    { error: expected ? "Forbidden" : "MIGRATION_SECRET must be configured in production" },
+    { status: expected ? 403 : 503 },
+  )
 }
 
 export async function POST(request: NextRequest) {
