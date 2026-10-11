@@ -13,9 +13,8 @@ export const runtime = "nodejs"
  *
  * Server-side patch runner. Walks the patch log, applies any patch that
  * isn't recorded in the `patches` table yet. Idempotent — running twice
- * is a no-op. No auth required at the HTTP level (designed to be invoked
- * during boot or by an internal operator), but the request MUST include
- * a `secret` header that matches `MIGRATION_SECRET` env var.
+ * is a no-op. Production requests MUST include a secret header that matches
+ * the `MIGRATION_SECRET` environment variable; signed-in fallback is dev-only.
  *
  * The secret header is a soft check; the real security is that this
  * endpoint runs only on the host that owns the database. There is no
@@ -47,13 +46,15 @@ async function checkAccess(request: NextRequest): Promise<NextResponse | null> {
     return user ? null : NextResponse.json({ error: "Forbidden" }, { status: 403 })
   }
 
-  if (got === expected) return null
+  if (expected && got === expected) return null
 
-  // Signed-in dashboard users can request the idempotent setup check without
-  // ever seeing or copying an infrastructure secret.
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  return user ? null : NextResponse.json({ error: "Forbidden" }, { status: 403 })
+  if (process.env.NODE_ENV !== "production") {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    return user ? null : NextResponse.json({ error: "Forbidden" }, { status: 403 })
+  }
+
+  return NextResponse.json({ error: "Forbidden" }, { status: 403 })
 }
 
 export async function POST(request: NextRequest) {

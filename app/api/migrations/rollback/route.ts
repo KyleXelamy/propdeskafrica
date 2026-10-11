@@ -18,34 +18,34 @@ export const runtime = "nodejs"
  * is then expected to re-run the patch on top of their database if
  * they need it.
  *
- * Gated by `MIGRATION_SECRET` or, in dev, the same `x-migration-secret`
- * header used by /api/migrations/run.
+ * Production is gated by `MIGRATION_SECRET`; development also requires an
+ * authenticated dashboard session when the secret is absent.
  */
 const Schema = z.object({
   patch_id: z.string(),
   confirm: z.boolean().default(false),
 })
 
-function checkSecret(request: NextRequest) {
+async function checkSecret(request: NextRequest) {
   const expected = process.env.MIGRATION_SECRET
   // Fail CLOSED in production. Previously an unset MIGRATION_SECRET meant
   // "allow everyone", which put an unauthenticated schema-rollback endpoint
   // on the public internet whenever the env var was missing or mistyped.
-  if (!expected) {
-    if (process.env.NODE_ENV === "production") {
-      return NextResponse.json(
-        { error: "MIGRATION_SECRET must be configured in production" },
-        { status: 503 },
-      )
-    }
-    return null // dev only
-  }
   const got = request.headers.get("x-migration-secret") ?? request.headers.get("authorization")?.replace(/^Bearer\s+/i, "")
-  return got === expected ? null : NextResponse.json({ error: "Forbidden" }, { status: 403 })
+  if (expected && got === expected) return null
+  if (process.env.NODE_ENV === "production") {
+    return NextResponse.json(
+      { error: expected ? "Forbidden" : "MIGRATION_SECRET must be configured in production" },
+      { status: expected ? 403 : 503 },
+    )
+  }
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  return user ? null : NextResponse.json({ error: "Forbidden" }, { status: 403 })
 }
 
 export async function POST(request: NextRequest) {
-  const denied = checkSecret(request)
+  const denied = await checkSecret(request)
   if (denied) return denied
   const body = (await request.json().catch(() => ({}))) as z.infer<typeof Schema>
   const parse = Schema.safeParse(body)
