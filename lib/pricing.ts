@@ -9,13 +9,10 @@
  *
  * The model is deliberately simple and deliberately flat:
  *
- *   FREE  — up to 3 units, KES 0, no card, no expiry.
- *   PRO   — KES 2,490 per month, unlimited units.
+ *   PRO   — KES 2,490 per month, whether a landlord manages 3 units or 100.
  *
- * There is one paid price. A landlord with 4 units and a landlord with 400
- * pay the same, and neither hits a ceiling — anyone who needs more units
- * just upgrades. That is the whole promise, and it is what the marketing
- * copy says.
+ * New users receive a 14-day trial. There is no free-forever plan and no
+ * unit-based pricing tier.
  *
  * To change pricing, change it HERE and add a migration (see
  * supabase-setup/16-plans-single-price.sql). Do not edit an already-applied
@@ -23,23 +20,20 @@
  * and the database will keep the old number.
  */
 
-/** Units a landlord can manage before we ask them to pay. */
-export const FREE_UNIT_LIMIT = 3
-
 /** The single paid price, in whole KES, per month. */
 export const MONTHLY_PRICE_KES = 2490
 
 /** Length of the paid trial offered at sign-up, in days. */
 export const TRIAL_DAYS = 14
 
-export type PlanCode = "free" | "pro"
+export type PlanCode = "pro"
 
 export interface Plan {
   /** Stable identifier, shared with the `plans.code` column. */
   code: PlanCode
   name: string
   tagline: string
-  /** Whole KES per month. 0 for the free plan. */
+  /** Whole KES per month. */
   price: number
   cadence: string
   /** null = unlimited. */
@@ -52,26 +46,6 @@ export interface Plan {
 }
 
 export const PLANS: Plan[] = [
-  {
-    code: "free",
-    name: "Free",
-    tagline: "For the landlord just getting organised",
-    price: 0,
-    cadence: "KES / month",
-    max_properties: FREE_UNIT_LIMIT,
-    max_tenants: null,
-    features: [
-      "Up to 3 rental units",
-      "Tenant & lease tracking",
-      "Rent collection log",
-      "Expense & receipt logging",
-      "Document vault (1 GB)",
-      "Email support",
-    ],
-    cta: "Start free",
-    href: "/auth/sign-up",
-    highlight: false,
-  },
   {
     code: "pro",
     name: "Pro",
@@ -98,6 +72,5 @@ export const PLANS: Plan[] = [
 
 /** Display helper — keeps "KES 2,490" formatting identical on every surface. */
 export function formatPrice(price: number): string {
-  if (price === 0) return "Free"
   return `KES ${price.toLocaleString("en-KE")}`
 }

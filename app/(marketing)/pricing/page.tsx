@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { ArrowUpRight, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { PLANS, formatPrice, FREE_UNIT_LIMIT, MONTHLY_PRICE_KES } from "@/lib/pricing"
+import { PLANS, formatPrice, MONTHLY_PRICE_KES, TRIAL_DAYS } from "@/lib/pricing"
 
 export const metadata: Metadata = {
   title: "Pricing — PropDesk Africa by Siemax Ltd",
@@ -14,19 +14,19 @@ export const metadata: Metadata = {
 const faqs = [
   {
     q: "Can I cancel anytime?",
-    a: "Yes. No contracts, no claw-backs. Cancel from your dashboard and you'll keep access through the end of your billing period.",
+    a: "Yes. No contracts, no claw-backs. Cancel from your dashboard and you’ll keep access through the end of your billing period.",
   },
   {
     q: "Do you charge transaction fees on M-Pesa?",
     a: "We pass through Daraja's standard STK Push fees. PropDesk Africa itself does not take a percentage.",
   },
   {
-    q: "What happens to my data if I downgrade?",
-    a: "We keep your data for 12 months on the free tier. If you exceed the free unit limit, you'll be prompted to upgrade before any data is restricted.",
+    q:     "What happens after the trial?",
+    a: `Your ${TRIAL_DAYS}-day trial includes the complete PropDesk Africa workspace. After the trial, the subscription is KES ${MONTHLY_PRICE_KES.toLocaleString("en-KE")} per month for any portfolio size.`,
   },
   {
     q: "Can I import from my current tool?",
-    a: "Yes. CSV import covers properties, tenants and payments, and it works on the free plan. For a larger migration we will run the import for you.",
+    a: "Yes. CSV import covers properties, tenants and payments. For a larger migration we can run the import for you.",
   },
   {
     q: "Is there a student or non-profit discount?",
@@ -47,8 +47,8 @@ export default function PricingPage() {
               Honest plans. No surprises.
             </h1>
             <p className="mx-auto mt-7 max-w-xl text-lg leading-8 text-primary-foreground/70">
-              Start free. Upgrade when your portfolio does. No setup fees, no per-feature locks, no
-              percentage of your rent.
+              Start with a complete {TRIAL_DAYS}-day trial. Then pay one flat monthly price, whether
+              you manage 3 units or 100. No setup fees, no per-feature locks, no percentage of your rent.
             </p>
           </div>
         </div>
@@ -108,7 +108,7 @@ export default function PricingPage() {
           </div>
 
           <p className="mt-10 text-center text-sm text-muted-foreground">
-            One price for everyone: KES {MONTHLY_PRICE_KES.toLocaleString('en-KE')} a month once you pass {FREE_UNIT_LIMIT} units. No tier to outgrow, no feature locks, and no percentage of your rent. All plans include unlimited team seats.
+            One price for everyone: KES {MONTHLY_PRICE_KES.toLocaleString('en-KE')} a month after your {TRIAL_DAYS}-day trial. The same price whether you manage 3 units or 100. No tier to outgrow, no feature locks, and no percentage of your rent.
           </p>
         </div>
       </section>

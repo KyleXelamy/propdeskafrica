@@ -14,7 +14,7 @@ import { createClient } from "@/lib/supabase/server"
  *     is_trialing: boolean,
  *     trial_expired: boolean,
  *     days_left: number,
- *     plan: 'free' | 'pro' | null,
+ *     plan: 'pro' | null,
  *     plan_name: string | null,
  *     reason: 'no_subscription' | 'trialing' | 'active' | 'past_due' | 'canceled' | 'expired' | 'trial_ended'
  *   }
@@ -87,7 +87,7 @@ export const GET = withAuth(async (_req, { supabase, userId }) => {
 
 /**
  * PATCH /api/subscription
- * Body: { plan?: 'free' | 'pro', cancel?: true }
+ * Body: { plan?: 'pro', cancel?: true }
  *
  * For now this just lets the user "switch plan" — it does NOT take payment.
  * The real flow is: user picks plan → STK Push via /api/mpesa/stkpush with
@@ -106,7 +106,7 @@ export const PATCH = withAuth(async (req, { supabase, userId }) => {
     return successResponse(data)
   }
   if (body.plan) {
-    const valid = ["free", "pro"]
+    const valid = ["pro"]
     if (!valid.includes(body.plan)) throw new HttpError("Invalid plan", 400)
     const { data, error } = await supabase
       .from("subscriptions")

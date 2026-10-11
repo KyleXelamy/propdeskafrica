@@ -4,7 +4,7 @@ import { createClient } from "@supabase/supabase-js"
 
 /**
  * POST /api/subscription/checkout
- * Body: { plan: 'free' | 'pro', phone: string }
+ * Body: { plan: 'pro', phone: string }
  *
  * Initiates an M-Pesa STK Push for the chosen subscription plan. On
  * confirmation, the subscription is moved from 'trialing' → 'active' and
