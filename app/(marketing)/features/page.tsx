@@ -5,7 +5,7 @@ import { features } from "@/lib/content/marketing"
 import * as Icons from "lucide-react"
 
 export const metadata: Metadata = {
-  title: "Features — PropDesk Africa by Siemax Ltd",
+  title: "Features — PropDesk Africa",
   description: "Every feature that makes PropDesk Africa the calm operating system for ambitious landlords.",
 }
 

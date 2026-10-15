@@ -52,7 +52,7 @@ export default function AboutPage() {
             We're building the <em className="font-serif font-normal text-accent">calm</em> behind a well-run portfolio.
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-8 text-primary-foreground/70">
-            PropDesk Africa is a Siemax Ltd product. We're a small team of engineers, designers and former
+            PropDesk Africa is a PropDesk Africa product. We're a small team of engineers, designers and former
             landlords shipping the property platform we wished existed when we were doing the job ourselves.
           </p>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">

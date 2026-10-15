@@ -3,13 +3,12 @@
   "version": "1.0.0",
   "packageManager": "pnpm@10.34.6",
   "private": true,
-  "description": "PropDesk Africa by Siemax Ltd — modern property management for landlords and tenants.",
+  "description": "PropDesk Africa — modern property management for landlords and tenants.",
   "author": {
     "name": "Brian Kiarie",
     "url": "https://www.linkedin.com/in/brian-kiarie-00b3a3391",
     "github": "https://github.com/Knighty7-ciper"
   },
-  "company": "Siemax Ltd",
   "homepage": "https://github.com/Knighty7-ciper/propdeskafrica",
   "repository": {
     "type": "git",

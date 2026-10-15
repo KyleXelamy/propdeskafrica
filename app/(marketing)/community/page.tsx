@@ -3,7 +3,7 @@ import Link from "next/link"
 import { ArrowUpRight, MessageCircle, Github, Users, Calendar } from "lucide-react"
 
 export const metadata: Metadata = {
-  title: "Community — PropDesk Africa by Siemax Ltd",
+  title: "Community — PropDesk Africa",
   description: "Join the PropDesk Africa community of landlords, developers and property teams.",
 }
 

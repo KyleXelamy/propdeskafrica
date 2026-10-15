@@ -3,7 +3,7 @@ import Link from "next/link"
 import { Check, X, ArrowUpRight } from "lucide-react"
 
 export const metadata: Metadata = {
-  title: "Compare — PropDesk Africa by Siemax Ltd",
+  title: "Compare — PropDesk Africa",
   description: "How PropDesk Africa compares to spreadsheets, generic CRMs and US-built rent platforms.",
 }
 

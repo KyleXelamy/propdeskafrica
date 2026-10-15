@@ -25,8 +25,6 @@ import {
   ClipboardList,
   Map,
   GitMerge,
-  Archive,
-  Activity,
   CreditCard,
   Contact,
 
@@ -52,8 +50,6 @@ const navigation = [
   { name: "Reports", href: "/dashboard/reports", icon: BarChart3 },
   { name: "Company", href: "/dashboard/company", icon: Briefcase },
   { name: "Billing", href: "/dashboard/billing", icon: CreditCard },
-  { name: "Backup", href: "/dashboard/settings/backup", icon: Archive },
-  { name: "System", href: "/dashboard/settings/system", icon: Activity },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ]
 

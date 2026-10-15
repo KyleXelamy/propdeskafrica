@@ -4,7 +4,7 @@
  * Every template is generated via the `docx` library, so the output is a
  * proper Word file (.docx) that opens in Word, Pages, Google Docs, and
  * LibreOffice. Each template:
- *   - Has a clean header with "PropDesk Africa · by Siemax Ltd" branding
+ *   - Has a clean header with "PropDesk Africa" branding
  *   - States the correct Kenyan statutory basis for what it does
  *   - Is designed for A4 paper, single-column, generous margins
  *   - Carries signature blocks, dates, and a property/tenant-specific fill
@@ -69,7 +69,7 @@ function brandHeader(label: string): Header {
         spacing: { after: 0 },
         children: [
           new TextRun({ text: "PropDesk Africa", bold: true, color: "0369A1", size: 20 }),
-          new TextRun({ text: "  ·  by Siemax Ltd", color: "64748B", size: 16 }),
+          new TextRun({ text: "  ", color: "64748B", size: 16 }),
         ],
       }),
       new Paragraph({

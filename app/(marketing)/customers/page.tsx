@@ -3,7 +3,7 @@ import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 
 export const metadata: Metadata = {
-  title: "Customers — PropDesk Africa by Siemax Ltd",
+  title: "Customers — PropDesk Africa",
   description:
     "A transparent look at an early-stage property management platform.",
 }

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { PLANS, formatPrice, MONTHLY_PRICE_KES, TRIAL_DAYS } from "@/lib/pricing"
 
 export const metadata: Metadata = {
-  title: "Pricing — PropDesk Africa by Siemax Ltd",
+  title: "Pricing — PropDesk Africa",
   description:
     "Simple, transparent pricing for landlords and property teams. Start free, scale as you grow.",
 }

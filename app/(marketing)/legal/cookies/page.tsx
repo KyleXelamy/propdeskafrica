@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import Link from "next/link"
 
 export const metadata: Metadata = {
-  title: "Cookie policy — PropDesk Africa by Siemax Ltd",
+  title: "Cookie policy — PropDesk Africa",
   description: "What cookies we use, why, and how to opt out.",
 }
 

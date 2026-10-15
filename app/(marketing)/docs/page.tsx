@@ -4,7 +4,7 @@ import { ArrowUpRight, BookOpen, Code2, Layers, Settings2, ShieldCheck, Wallet }
 import { docArticles, docCategories } from "@/lib/content/marketing"
 
 export const metadata: Metadata = {
-  title: "Docs — PropDesk Africa by Siemax Ltd",
+  title: "Docs — PropDesk Africa",
   description: "Guides, API reference and integration docs for PropDesk Africa.",
 }
 

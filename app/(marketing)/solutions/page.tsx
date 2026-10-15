@@ -4,7 +4,7 @@ import { ArrowRight, ArrowUpRight } from "lucide-react"
 import { solutions } from "@/lib/content/marketing"
 
 export const metadata: Metadata = {
-  title: "Solutions — PropDesk Africa by Siemax Ltd",
+  title: "Solutions — PropDesk Africa",
   description:
     "PropDesk Africa for solo landlords, commercial operators, agencies, vacation rentals, developers and enterprise teams.",
 }

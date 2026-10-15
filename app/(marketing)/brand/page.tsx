@@ -4,7 +4,7 @@ import { Download } from "lucide-react"
 import { brandAssets } from "@/lib/content/marketing"
 
 export const metadata: Metadata = {
-  title: "Brand kit — PropDesk Africa by Siemax Ltd",
+  title: "Brand kit — PropDesk Africa",
   description: "Logos, color palette, typography and product photography for the PropDesk Africa brand.",
 }
 

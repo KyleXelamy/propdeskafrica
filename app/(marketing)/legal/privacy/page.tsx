@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import Link from "next/link"
 
 export const metadata: Metadata = {
-  title: "Privacy policy — PropDesk Africa by Siemax Ltd",
+  title: "Privacy policy — PropDesk Africa by PropDesk Africa",
   description: "How PropDesk Africa collects, uses and protects your data.",
 }
 
@@ -22,7 +22,7 @@ export default function PrivacyPage() {
       <article className="container-x max-w-3xl py-16 lg:py-20">
         <div className="space-y-8 text-base leading-8 text-foreground/85">
           <p>
-            PropDesk Africa is operated by Siemax Ltd ("we", "us", "our"). This policy explains what data we
+            PropDesk Africa is operated by PropDesk Africa ("we", "us", "our"). This policy explains what data we
             collect, why we collect it, and what choices you have. We've written it in plain language
             on purpose — if anything is unclear, write to us at{" "}
             <Link href="mailto:bknglabs.dev@gmail.com" className="text-primary underline">bknglabs.dev@gmail.com</Link>.
