@@ -60,7 +60,8 @@ export async function getBackupSignedUrl(userId: string, path: string): Promise<
   if (!isServiceRoleConfigured()) return null
   try {
     const supa = createServiceClient()!
-    const { data } = await supa.storage.from(BUCKET).createSignedUrl(`${userId}/${path}`, 600)
+    const storagePath = path.startsWith(`${userId}/`) ? path : `${userId}/${path}`
+    const { data } = await supa.storage.from(BUCKET).createSignedUrl(storagePath, 600)
     return data?.signedUrl ?? null
   } catch {
     return null
