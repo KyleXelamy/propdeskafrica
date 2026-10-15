@@ -108,12 +108,22 @@ const neonDb: Db = {
 const supabaseDb: Db = {
   async select(table, userId) {
     const supa = await createClient()
-    const { data } = await supa.from(table).select("*").eq("user_id", userId)
+    const keyColumn = table === "user_profiles" ? "id" : "user_id"
+    const { data, error } = await supa.from(table).select("*").eq(keyColumn, userId)
+    if (error) {
+      console.warn(`[backup] supabase select failed for ${table}`, error.message)
+      return []
+    }
     return (data ?? []).map(sanitiseRow)
   },
   async count(table, userId) {
     const supa = await createClient()
-    const { count } = await supa.from(table).select("*", { count: "exact", head: true }).eq("user_id", userId)
+    const keyColumn = table === "user_profiles" ? "id" : "user_id"
+    const { count, error } = await supa.from(table).select("*", { count: "exact", head: true }).eq(keyColumn, userId)
+    if (error) {
+      console.warn(`[backup] supabase count failed for ${table}`, error.message)
+      return 0
+    }
     return count ?? 0
   },
   async insert(table, userId, rows, onConflict) {
@@ -145,8 +155,10 @@ const supabaseDb: Db = {
   },
   async deleteForUser(table, userId) {
     const supa = await createClient()
+    const keyColumn = table === "user_profiles" ? "id" : "user_id"
     try {
-      await supa.from(table).delete().eq("user_id", userId)
+      const { error } = await supa.from(table).delete().eq(keyColumn, userId)
+      if (error) console.warn(`[backup] supabase delete failed for ${table}`, error.message)
     } catch (err) {
       console.warn(`[backup] supabase delete failed for ${table}`, err)
     }
