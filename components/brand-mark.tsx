@@ -5,6 +5,7 @@
  * The mark combines a doorway, skyline, and check shape to represent
  * property operations that stay clear and in control.
  */
+import Image from "next/image"
 import Link from "next/link"
 
 interface MarkProps {
@@ -14,25 +15,14 @@ interface MarkProps {
 
 export function BrandMark({ size = 32, className }: MarkProps) {
   return (
-    <svg
+    <Image
+      src="/propdesk-africa-logo.png"
+      alt="PropDesk Africa"
       width={size}
       height={size}
-      viewBox="0 0 40 40"
-      xmlns="http://www.w3.org/2000/svg"
-      className={className}
-      aria-label="PropDesk Africa"
-    >
-      <defs>
-        <linearGradient id="propdeskafrica-mark-gradient" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="hsl(var(--primary))" />
-          <stop offset="100%" stopColor="hsl(var(--accent))" />
-        </linearGradient>
-      </defs>
-      <rect x="2" y="2" width="36" height="36" rx="11" fill="url(#propdeskafrica-mark-gradient)" />
-      <path d="M11 29V17l9-6 9 6v12" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M16 29V21h8v8" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="m13 15 3-2 3 2 3-2 3 2" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
+      className={`rounded-[28%] object-cover ${className || ""}`}
+      priority
+    />
   )
 }
 
