@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import { subProcessors } from "@/lib/content/marketing"
 
 export const metadata: Metadata = {
-  title: "Sub-processors — PropDesk Africa by Siemax Ltd",
+  title: "Sub-processors — PropDesk Africa",
   description: "The list of sub-processors that handle PropDesk Africa customer data.",
 }
 

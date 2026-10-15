@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import Link from "next/link"
 
 export const metadata: Metadata = {
-  title: "Terms of service — PropDesk Africa by Siemax Ltd",
+  title: "Terms of service — PropDesk Africa by PropDesk Africa",
   description: "The terms and conditions for using PropDesk Africa.",
 }
 
@@ -22,7 +22,7 @@ export default function TermsPage() {
       <article className="container-x max-w-3xl py-16 lg:py-20">
         <div className="space-y-8 text-base leading-8 text-foreground/85">
           <p>
-            These terms govern your use of PropDesk Africa, operated by Siemax Ltd ("we", "us"). By creating
+            These terms govern your use of PropDesk Africa, operated by PropDesk Africa ("we", "us"). By creating
             an account you agree to them. If you don't agree, please don't use the service.
           </p>
 

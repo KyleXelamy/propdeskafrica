@@ -4,7 +4,7 @@ import { ArrowUpRight, Code2, Webhook, KeyRound, FileJson, Terminal, BookOpen } 
 import { Button } from "@/components/ui/button"
 
 export const metadata: Metadata = {
-  title: "Developers — PropDesk Africa by Siemax Ltd",
+  title: "Developers — PropDesk Africa",
   description: "REST API, webhooks, OAuth and an OpenAPI spec for PropDesk Africa.",
 }
 

@@ -7,7 +7,7 @@ import { NewsletterForm } from "@/components/newsletter-form"
 import { ResourceSearch } from "@/components/resource-search"
 
 export const metadata: Metadata = {
-  title: "Resources — PropDesk Africa by Siemax Ltd",
+  title: "Resources — PropDesk Africa",
   description:
     "Field notes, product deep dives and practical guides for landlords running a real property portfolio.",
 }

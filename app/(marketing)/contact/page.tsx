@@ -6,7 +6,7 @@ import { ContactForm } from "@/components/contact-form"
 import { BRAND } from "@/lib/brand"
 
 export const metadata: Metadata = {
-  title: "Contact — PropDesk Africa by Siemax Ltd",
+  title: "Contact — PropDesk Africa",
   description:
     "Get in touch with the PropDesk Africa team. We respond to every message within one business day.",
 }

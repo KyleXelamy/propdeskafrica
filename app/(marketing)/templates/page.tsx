@@ -4,7 +4,7 @@ import { Download } from "lucide-react"
 import { templates } from "@/lib/content/marketing"
 
 export const metadata: Metadata = {
-  title: "Templates — PropDesk Africa by Siemax Ltd",
+  title: "Templates — PropDesk Africa",
   description: "Free lease agreements, condition reports, notices and CSV templates for Kenyan landlords.",
 }
 
@@ -18,6 +18,21 @@ const formatNote: Record<string, string> = {
   PDF: "PDF",
   DOCX: "Word document",
   CSV: "CSV · import-ready",
+}
+
+const downloadPathBySlug: Record<string, string> = {
+  "kenya-residential-lease": "/templates/preview/lease.docx",
+  "kenya-month-to-month": "/templates/preview/lease.docx",
+  "uganda-residential-lease": "/templates/preview/lease.docx",
+  "tanzania-residential-lease": "/templates/preview/lease.docx",
+  "move-in-inspection": "/templates/preview/inspection.docx",
+  "move-out-inspection": "/templates/preview/inspection.docx",
+  "rent-increase-notice": "/templates/preview/rent-increase.docx",
+  "termination-notice": "/templates/preview/termination.docx",
+  "rent-receipt-pdf": "/templates/preview/receipt.docx",
+  "landlord-monthly-checklist": "/templates/preview/checklist.docx",
+  "csv-property-import": "/templates/property-import.csv",
+  "commercial-lease-kenya": "/templates/preview/lease.docx",
 }
 
 /**
@@ -96,7 +111,7 @@ export default function TemplatesPage() {
                         {formatNote[t.format] ?? t.format}
                       </span>
                       <a
-                        href={t.downloadPath}
+                        href={t.downloadPath ?? downloadPathBySlug[t.slug]}
                         download
                         className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
                       >

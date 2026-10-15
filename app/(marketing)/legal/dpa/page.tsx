@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import Link from "next/link"
 
 export const metadata: Metadata = {
-  title: "Data Processing Agreement — PropDesk Africa by Siemax Ltd",
+  title: "Data Processing Agreement — PropDesk Africa by PropDesk Africa Ltd",
   description:
     "PropDesk Africa's Data Processing Agreement for Agency and enterprise customers.",
 }
@@ -31,16 +31,16 @@ export default function DPAPage() {
 
           <Section title="1. Roles">
             <p>
-              The customer is the <strong>Data Controller</strong>. Siemax Ltd, operating PropDesk Africa,
-              is the <strong>Data Processor</strong>. Where Siemax engages a sub-processor (e.g.
-              Supabase, Resend, Vercel), Siemax acts as Data Processor and the sub-processor acts on
-              Siemax's documented instructions.
+              The customer is the <strong>Data Controller</strong>. PropDesk Africa Ltd, operating PropDesk Africa,
+              is the <strong>Data Processor</strong>. Where PropDesk Africa engages a sub-processor (e.g.
+              Supabase, Resend, Vercel), PropDesk Africa acts as Data Processor and the sub-processor acts on
+              PropDesk Africa's documented instructions.
             </p>
           </Section>
 
           <Section title="2. Subject matter & duration">
             <p>
-              Siemax processes the personal data described in our <Link href="/legal/privacy" className="text-primary underline">privacy policy</Link>{" "}
+              PropDesk Africa processes the personal data described in our <Link href="/legal/privacy" className="text-primary underline">privacy policy</Link>{" "}
               solely for the purpose of providing the PropDesk Africa service, for the duration of the
               customer's subscription and any post-termination wind-down period not exceeding 90 days.
             </p>
@@ -81,7 +81,7 @@ export default function DPAPage() {
 
           <Section title="6. Security measures">
             <p>
-              Siemax maintains the technical and organisational measures described on our{" "}
+              PropDesk Africa maintains the technical and organisational measures described on our{" "}
               <Link href="/security" className="text-primary underline">security page</Link>,
               including encryption in transit and at rest, row-level security, audit logging, and
               least-privilege staff access.
@@ -90,7 +90,7 @@ export default function DPAPage() {
 
           <Section title="7. Data subject rights">
             <p>
-              Siemax will assist the customer in responding to data subject requests (access, correction,
+              PropDesk Africa will assist the customer in responding to data subject requests (access, correction,
               deletion, portability, objection) within statutory timeframes. The customer may submit
               such requests directly through their PropDesk Africa dashboard.
             </p>
@@ -106,14 +106,14 @@ export default function DPAPage() {
 
           <Section title="9. Breach notification">
             <p>
-              Siemax will notify the customer without undue delay, and in any case within 48 hours,
+              PropDesk Africa will notify the customer without undue delay, and in any case within 48 hours,
               after becoming aware of a personal data breach affecting the customer's data.
             </p>
           </Section>
 
           <Section title="10. Deletion on termination">
             <p>
-              Within 90 days of subscription termination, Siemax will delete all personal data
+              Within 90 days of subscription termination, PropDesk Africa will delete all personal data
               associated with the customer account, except where retention is mandated by law (e.g.
               financial records for 7 years).
             </p>

@@ -4,7 +4,7 @@ import { ArrowUpRight, Mail, Phone, Calendar, Building2 } from "lucide-react"
 import { MarketingSalesForm } from "@/components/marketing-sales-form"
 
 export const metadata: Metadata = {
-  title: "Contact sales — PropDesk Africa by Siemax Ltd",
+  title: "Contact sales — PropDesk Africa",
   description: "Talk to the PropDesk Africa team about Agency and Enterprise plans.",
 }
 

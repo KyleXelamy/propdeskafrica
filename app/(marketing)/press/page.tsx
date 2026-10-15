@@ -4,7 +4,7 @@ import { ArrowUpRight, Download, Mail } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export const metadata: Metadata = {
-  title: "Press — PropDesk Africa by Siemax Ltd",
+  title: "Press — PropDesk Africa by PropDesk Africa",
   description:
     "Press kit, brand assets, coverage and contact for journalists covering PropDesk Africa.",
 }
@@ -61,7 +61,7 @@ export default function PressPage() {
   { k: "Kenya-first", v: "Built for local property teams" },
   { k: "M-Pesa ready", v: "Designed around familiar payments" },
   { k: "12 templates", v: "Practical landlord resources" },
-  { k: "Siemax Ltd", v: "PropDesk Africa product team" },
+  { k: "PropDesk Africa", v: "PropDesk Africa product team" },
           ].map((s) => (
             <div key={s.k}>
               <p className="text-3xl font-medium tracking-tight sm:text-4xl">{s.k}</p>
@@ -80,7 +80,7 @@ export default function PressPage() {
           </h2>
           <div className="mt-10 rounded-2xl border border-border bg-card p-6 sm:p-8">
             <p className="max-w-2xl text-base leading-7 text-muted-foreground">
-              We are building our press library and do not list third-party coverage until it has been confirmed and published. For current product information, interviews, or approved screenshots, contact the Siemax Ltd team directly.
+              We are building our press library and do not list third-party coverage until it has been confirmed and published. For current product information, interviews, or approved screenshots, contact the PropDesk Africa team directly.
             </p>
             <Button asChild variant="outline" className="mt-6 rounded-full">
               <Link href="mailto:bknglabs.dev@gmail.com?subject=PropDesk Africa%20press%20enquiry">

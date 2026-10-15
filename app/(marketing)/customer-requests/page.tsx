@@ -4,7 +4,7 @@ import { ArrowUpRight, MessageSquare, ThumbsUp, Sparkles } from "lucide-react"
 import { FeedbackBoard } from "@/components/feedback-board"
 
 export const metadata: Metadata = {
-  title: "Customer requests — PropDesk Africa by Siemax Ltd",
+  title: "Customer requests — PropDesk Africa",
   description: "Submit ideas, vote on what gets built next, and track their status.",
 }
 

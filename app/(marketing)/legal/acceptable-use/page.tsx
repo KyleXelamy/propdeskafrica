@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import Link from "next/link"
 
 export const metadata: Metadata = {
-  title: "Acceptable use — PropDesk Africa by Siemax Ltd",
+  title: "Acceptable use — PropDesk Africa",
   description: "The rules of the road for using PropDesk Africa.",
 }
 

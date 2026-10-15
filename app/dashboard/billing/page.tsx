@@ -6,6 +6,7 @@ import { CheckCircle2, Sparkles, AlertTriangle, Smartphone, ArrowRight } from "l
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
+import { PLANS } from "@/lib/pricing"
 
 export const dynamic = "force-dynamic"
 
@@ -74,9 +75,7 @@ export default async function BillingPage({
   const isExpired = !status?.is_active
   const daysLeft = status?.days_left || 0
 
-  // Fetch plans from /api/plans (server-side fetch)
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
-  const plans: Plan[] = await fetch(`${baseUrl}/api/plans`).then(r => r.json()).catch(() => [])
+  const plans: Plan[] = PLANS
 
   return (
     <div className="space-y-6 pt-2 md:pt-0">

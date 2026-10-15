@@ -1,12 +1,11 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { ArrowUpRight, CheckCircle2, AlertCircle } from "lucide-react"
-import { systemComponents, statusIncidents } from "@/lib/content/site"
+import { statusIncidents } from "@/lib/content/site"
 
 export const metadata: Metadata = {
-  title: "Status — PropDesk Africa by Siemax Ltd",
-  description:
-    "Real-time operational status for PropDesk Africa: marketing site, dashboard, M-Pesa integration and webhooks.",
+  title: "Status — PropDesk Africa",
+  description: "Current availability of PropDesk Africa services.",
 }
 
 const allOperational = true
@@ -46,22 +45,15 @@ export default function StatusPage() {
       <section className="bg-background py-16">
         <div className="container-x">
           <div className="overflow-hidden rounded-2xl border border-border bg-card">
-            {systemComponents.map((c, i) => (
-              <div
-                key={c.key}
-                className={`flex items-center justify-between gap-6 p-5 ${
-                  i < systemComponents.length - 1 ? "border-b border-border" : ""
-                }`}
-              >
-                <div>
-                  <p className="text-base font-medium">{c.name}</p>
-                  <p className="mt-1 text-sm text-muted-foreground">{c.description}</p>
-                </div>
-                <span className="inline-flex shrink-0 items-center gap-2 rounded-full bg-success/15 px-3 py-1.5 text-xs font-medium text-success">
-                  <CheckCircle2 className="size-3.5" /> Operational
-                </span>
+            <div className="flex items-center justify-between gap-6 p-5">
+              <div>
+                <p className="text-base font-medium">PropDesk Africa</p>
+                <p className="mt-1 text-sm text-muted-foreground">The application is available for customers.</p>
               </div>
-            ))}
+              <span className="inline-flex shrink-0 items-center gap-2 rounded-full bg-success/15 px-3 py-1.5 text-xs font-medium text-success">
+                <CheckCircle2 className="size-3.5" /> Operational
+              </span>
+            </div>
           </div>
         </div>
       </section>
