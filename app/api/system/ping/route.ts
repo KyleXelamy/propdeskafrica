@@ -13,7 +13,6 @@ export async function GET() {
   const started = Date.now()
   const db = neonConfigured() ? "neon" : "supabase"
   let dbOk = false
-  let dbError: string | undefined
   let versionInfo: string | undefined
   try {
     if (neonConfigured()) {
@@ -28,11 +27,11 @@ export async function GET() {
         versionInfo = String(data.schema_version)
         dbOk = true
       } else if (error) {
-        dbError = error.message
+        console.error("[system/ping] database check failed", error.message)
       }
     }
   } catch (err) {
-    dbError = err instanceof Error ? err.message : "ping failed"
+    console.error("[system/ping] database check failed", err)
   }
   return NextResponse.json(
     {
@@ -40,7 +39,6 @@ export async function GET() {
       db,
       latency_ms: Date.now() - started,
       schema_version: versionInfo,
-      db_error: dbError,
       timestamp: new Date().toISOString(),
     },
     { status: dbOk ? 200 : 503 },
