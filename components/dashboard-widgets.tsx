@@ -93,7 +93,7 @@ export function LeaseExpiryAlerts() {
                 <Link
                   key={lease.tenant_id}
                   href={lease.property_id ? `/dashboard/properties/${lease.property_id}` : "/dashboard/tenants"}
-                  className="flex items-center justify-between gap-3 p-3 border rounded-lg hover:bg-muted/30 transition-colors"
+                  className="group flex items-center justify-between gap-3 rounded-xl border border-border/80 bg-card p-3 transition-[background-color,border-color,transform,box-shadow] duration-200 hover:-translate-y-px hover:border-primary/30 hover:bg-accent/35 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   <div className="min-w-0">
                     <div className="font-medium truncate">{lease.tenant_name}</div>
@@ -185,7 +185,7 @@ export function ActivityFeed() {
                 <Link
                   key={item.id}
                   href={item.href}
-                  className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted/30 transition-colors"
+                  className="group flex items-start gap-3 rounded-xl border border-transparent p-3 transition-[background-color,border-color,transform] duration-200 hover:-translate-y-px hover:border-border hover:bg-accent/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   <div className={`p-1.5 rounded-md shrink-0 ${toneClasses[item.badgeTone || "muted"]}`}>
                     <Icon className="h-3.5 w-3.5" />
