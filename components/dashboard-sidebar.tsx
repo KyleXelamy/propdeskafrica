@@ -73,14 +73,16 @@ function SidebarContent({ userEmail, userName, companyName, onNavigate }: Sideba
     <div className="flex h-full min-h-0 flex-col border-r border-sidebar-border bg-sidebar">
       {/* Logo */}
       <div className="flex min-h-16 items-center gap-3 border-b border-sidebar-border px-4 md:px-5">
-        <Image
-          src="/propdesk-africa-logo.png"
-          alt="PropDesk Africa"
-          width={38}
-          height={38}
-          className="size-9 shrink-0 rounded-xl object-cover"
-          priority
-        />
+        <span className="size-9 shrink-0 overflow-hidden rounded-xl bg-transparent">
+          <Image
+            src="/propdesk-africa-logo.png"
+            alt="PropDesk Africa"
+            width={38}
+            height={38}
+            className="h-full w-full scale-[1.42] object-cover"
+            priority
+          />
+        </span>
         <div className="min-w-0">
           <p className="truncate text-sm font-semibold text-sidebar-foreground">PropDesk Africa</p>
           <p className="truncate text-[11px] uppercase tracking-[0.14em] text-sidebar-foreground/55">{companyName || "Workspace"}</p>

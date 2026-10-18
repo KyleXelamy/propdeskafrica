@@ -11,8 +11,8 @@ export default function SignUpPage() {
   return (
     <AuthShell
       eyebrow="Get started"
-      title="The first 3 units are free. Forever."
-      body="No credit card. No phone calls. Set up your portfolio, invite your first tenant and start collecting rent in minutes."
+      title="Your first 14 days are free."
+      body="No credit card. Set up your portfolio, invite your first tenant and start collecting rent in minutes."
       footerPrompt="Already have an account?"
       footerHref="/auth/login"
       footerLabel="Sign in"

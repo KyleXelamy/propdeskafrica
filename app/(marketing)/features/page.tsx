@@ -72,7 +72,7 @@ export default function FeaturesHub() {
             See it in action.
           </h2>
           <p className="mx-auto mt-4 max-w-md text-base leading-7 text-accent-foreground/80">
-            Start free with up to 3 units. No credit card. No phone calls.
+            Start with 14 days free and full access. No credit card.
           </p>
           <Link
             href="/auth/sign-up"

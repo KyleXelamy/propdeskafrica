@@ -15,14 +15,19 @@ interface MarkProps {
 
 export function BrandMark({ size = 32, className }: MarkProps) {
   return (
-    <Image
-      src="/propdesk-africa-logo.png"
-      alt="PropDesk Africa"
-      width={size}
-      height={size}
-      className={`rounded-[28%] object-cover ${className || ""}`}
-      priority
-    />
+    <span
+      className={`inline-flex shrink-0 overflow-hidden rounded-[28%] bg-transparent ${className || ""}`}
+      style={{ width: size, height: size }}
+    >
+      <Image
+        src="/propdesk-africa-logo.png"
+        alt="PropDesk Africa"
+        width={size}
+        height={size}
+        className="h-full w-full scale-[1.42] object-cover"
+        priority
+      />
+    </span>
   )
 }
 

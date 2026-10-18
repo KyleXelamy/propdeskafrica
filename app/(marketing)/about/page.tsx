@@ -99,9 +99,9 @@ export default function AboutPage() {
         <div className="container-x">
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">The people behind PropDesk Africa</p>
           <div className="mt-8 grid gap-8 lg:grid-cols-[0.7fr_1.3fr]">
-            <div className="overflow-hidden rounded-3xl border border-border bg-background">
-              <img src="/people/brian-kiarie.png" alt="Brian Kiarie, founder of PropDesk Africa" className="aspect-square w-full object-cover" />
-            </div>
+  <div className="overflow-hidden rounded-3xl border border-border bg-background">
+    <img src="/propdesk-property-operations.png" alt="A well-managed residential property and rental workspace" className="aspect-square w-full object-cover" />
+  </div>
             <article className="rounded-3xl border border-border bg-background p-6 sm:p-8">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Founder · CFO &amp; Operations</p>
               <h2 className="mt-3 text-3xl font-medium tracking-[-0.03em]">Brian Kiarie</h2>

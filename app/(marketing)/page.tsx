@@ -43,7 +43,7 @@ export default function MarketingHome() {
               </Button>
             </div>
             <p className="mt-6 text-xs text-white/55">
-              Free up to 3 units. No credit card. No phone calls.
+              14 days free. Full access. No credit card.
             </p>
           </div>
         </div>
