@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
 import { Switch } from "@/components/ui/switch"
-import { User, Bell, Shield, Database, Download, Loader2, Archive, Cpu } from "lucide-react"
+import { User, Bell, Shield, Database, Download, Loader2, Archive } from "lucide-react"
 import { redirect } from "next/navigation"
 import {
   updateProfile,
@@ -63,7 +63,7 @@ export default async function SettingsPage() {
       </div>
 
       <Tabs defaultValue="profile" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-7 h-auto">
+        <TabsList className="grid h-auto w-full grid-cols-2 sm:grid-cols-6">
           <TabsTrigger value="profile" className="flex items-center gap-2">
             <User className="h-4 w-4" />
             <span className="hidden sm:inline">Profile</span>
@@ -87,12 +87,6 @@ export default async function SettingsPage() {
             <a href="/dashboard/settings/backup" className="flex items-center gap-2">
               <Archive className="h-4 w-4" />
               <span className="hidden sm:inline">Backup</span>
-            </a>
-          </TabsTrigger>
-          <TabsTrigger value="system" asChild className="flex items-center gap-2">
-            <a href="/dashboard/settings/system" className="flex items-center gap-2">
-              <Cpu className="h-4 w-4" />
-              <span className="hidden sm:inline">System</span>
             </a>
           </TabsTrigger>
         </TabsList>
