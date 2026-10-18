@@ -121,7 +121,7 @@ export default function ContactPage() {
             Not sure yet? Just try it.
           </h2>
           <p className="mx-auto mt-4 max-w-md text-base leading-7 text-accent-foreground/80">
-            The first 3 units are free. No credit card. No phone calls. No "free trial expiring soon."
+            Start with 14 days free and full access. No credit card. No pressure.
           </p>
           <Button
             asChild

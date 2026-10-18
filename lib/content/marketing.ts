@@ -46,7 +46,7 @@ export const features: Feature[] = [
     ],
     icon: "Users",
     image:
-      "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=1600&q=80",
+      "/propdesk-property-operations.png",
   },
   {
     slug: "quotations",
@@ -199,7 +199,7 @@ export const features: Feature[] = [
     ],
     icon: "Contact",
     image:
-      "https://images.unsplash.com/photo-1556761175-4b46a572b786?auto=format&fit=crop&w=1600&q=80",
+      "/propdesk-property-operations.png",
   },
   {
     slug: "company-view",
@@ -800,7 +800,7 @@ export const insights: Insight[] = [
     readingMinutes: 12,
     publishedAt: "2026-08-30",
     author: "Brian Kiarie",
-    cover: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=1600&q=80",
+    cover: "/propdesk-property-operations.png",
   },
   {
     slug: "landlord-economics-2026",

@@ -53,8 +53,10 @@ export function withAuth<P = Record<string, string>>(
       return await handler(request, { supabase, userId: user.id }, params)
     } catch (err) {
       console.error("[api] unhandled error", err)
-      const message = err instanceof Error ? err.message : "Internal server error"
-      return errorResponse(message, 500)
+      return errorResponse(
+        process.env.NODE_ENV === "production" ? "Internal server error" : err instanceof Error ? err.message : "Internal server error",
+        500,
+      )
     }
   }
 }

@@ -16,7 +16,7 @@ export function createServiceClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY
   if (!url || !key) {
-    console.warn("[supabase/service] service role not configured — falling back to anonymous client")
+    console.error("[supabase/service] service role is not configured")
     return null
   }
   return createSupabaseClient(url, key, {

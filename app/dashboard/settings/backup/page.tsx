@@ -5,8 +5,6 @@ import { APP_VERSION } from "@/lib/system"
 import { BackupManager } from "@/components/backup-manager"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Database, FileText, History } from "lucide-react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
 
 export const dynamic = "force-dynamic"
 export const metadata = {
@@ -40,8 +38,7 @@ export default async function BackupPage() {
           </CardHeader>
           <CardContent>
             <CardDescription>
-              Backups include the data, the schema version, and the app version. Restore into any
-              PropDesk Africa instance — fresh, live, or recovered.
+              Backups include your workspace data in a portable format you can keep, inspect, and restore when needed.
             </CardDescription>
           </CardContent>
         </Card>
@@ -64,7 +61,7 @@ export default async function BackupPage() {
           </CardHeader>
           <CardContent>
             <CardDescription>
-              Up to 50 recent backups are kept in your database. Older ones download but aren't indexed.
+              Recent backups stay available in your workspace so you can recover confidently without leaving the product.
             </CardDescription>
           </CardContent>
         </Card>
@@ -72,11 +69,6 @@ export default async function BackupPage() {
 
       <BackupManager initialBackups={backups} appVersion={APP_VERSION} />
 
-      <div className="flex justify-end">
-        <Button asChild variant="ghost" size="sm">
-          <Link href="/dashboard/settings/system">System info & patches →</Link>
-        </Button>
-      </div>
     </div>
   )
 }

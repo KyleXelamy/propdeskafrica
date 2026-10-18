@@ -36,7 +36,6 @@ import Image from "next/image"
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: Home },
   { name: "Properties", href: "/dashboard/properties", icon: Building2 },
-  { name: "Map", href: "/dashboard/properties/map", icon: Map },
   { name: "Tenants", href: "/dashboard/tenants", icon: Users },
   { name: "Contacts", href: "/dashboard/contacts", icon: Contact },
   { name: "Finances", href: "/dashboard/finances", icon: DollarSign },
@@ -73,14 +72,16 @@ function SidebarContent({ userEmail, userName, companyName, onNavigate }: Sideba
     <div className="flex h-full min-h-0 flex-col border-r border-sidebar-border bg-sidebar">
       {/* Logo */}
       <div className="flex min-h-16 items-center gap-3 border-b border-sidebar-border px-4 md:px-5">
-        <Image
-          src="/propdesk-africa-logo.png"
-          alt="PropDesk Africa"
-          width={38}
-          height={38}
-          className="size-9 shrink-0 rounded-xl object-cover"
-          priority
-        />
+        <span className="size-9 shrink-0 overflow-hidden rounded-xl bg-transparent">
+          <Image
+            src="/propdesk-africa-logo.png"
+            alt="PropDesk Africa"
+            width={38}
+            height={38}
+            className="h-full w-full scale-[1.42] object-cover"
+            priority
+          />
+        </span>
         <div className="min-w-0">
           <p className="truncate text-sm font-semibold text-sidebar-foreground">PropDesk Africa</p>
           <p className="truncate text-[11px] uppercase tracking-[0.14em] text-sidebar-foreground/55">{companyName || "Workspace"}</p>
@@ -98,10 +99,10 @@ function SidebarContent({ userEmail, userName, companyName, onNavigate }: Sideba
                 href={item.href}
                 onClick={onNavigate}
                 className={cn(
-                  "flex min-h-10 items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-colors touch-manipulation",
+                  "group flex min-h-10 items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-[background-color,color,transform] duration-200 ease-out touch-manipulation focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar",
                   isActive
                     ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                    : "text-sidebar-foreground hover:bg-sidebar-primary hover:text-sidebar-primary-foreground",
+                    : "text-sidebar-foreground hover:-translate-y-px hover:bg-sidebar-primary hover:text-sidebar-primary-foreground",
                 )}
               >
                 <item.icon className="h-4 w-4 flex-shrink-0" />
@@ -159,7 +160,8 @@ export function DashboardSidebar({ userEmail, userName, companyName, avatarUrl }
           <Button
             variant="outline"
             size="icon"
-            className="md:hidden fixed top-4 left-4 z-50 h-10 w-10 bg-background border-2 border-primary/20 shadow-lg hover:bg-primary hover:text-primary-foreground transition-colors"
+            aria-label="Open dashboard navigation"
+            className="fixed left-3 top-3 z-50 size-10 border-2 border-primary/20 bg-background shadow-lg transition-[background-color,color,transform] duration-200 hover:-translate-y-px hover:bg-primary hover:text-primary-foreground focus-visible:ring-2 focus-visible:ring-primary md:hidden"
           >
             <Menu className="h-5 w-5" />
             <span className="sr-only">Open navigation menu</span>
