@@ -46,10 +46,13 @@ export function BrandWordmark({ href, showSubtitle = true, size = "md", classNam
   const inner = (
     <span className={`inline-flex items-center gap-2 ${className || ""}`}>
       <BrandMark size={markSize} />
-      <span className="flex flex-col leading-tight">
-        <span className={`${titleSize} font-bold tracking-tight`}>PropDesk Africa</span>
+      <span className="flex flex-col leading-[0.92]">
+        <span className={`${titleSize} font-black tracking-[-0.045em]`}>
+          <span>PropDesk</span>
+          <span className="ml-1 text-accent">Africa</span>
+        </span>
         {showSubtitle && (
-          <span className={`${subSize} uppercase tracking-[0.18em] text-muted-foreground`}>
+          <span className={`${subSize} mt-1 font-semibold uppercase tracking-[0.2em] text-muted-foreground`}>
             Property operations
           </span>
         )}
