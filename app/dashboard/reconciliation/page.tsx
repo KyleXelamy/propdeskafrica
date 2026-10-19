@@ -5,13 +5,15 @@ import { Badge } from "@/components/ui/badge"
 import { AlertTriangle, CheckCircle2, XCircle, Settings2, ListOrdered } from "lucide-react"
 import Link from "next/link"
 import { ReconciliationRules } from "@/components/reconciliation-rules"
+import { createClient } from "@/lib/supabase/server"
+import { redirect } from "next/navigation"
 
 export const metadata: Metadata = {
   title: "Reconciliation — PropDesk Africa",
   description: "Per-tenant rules that match incoming paybill payments to the right tenant.",
 }
 
-const recentMatches: Array<{ id: string; billRef: string; amount: number; tenant: string; method: string; confidence: number; status: string }> = []
+type RecentMatch = { id: string; billRef: string; amount: number; tenant: string; method: string; confidence: number; status: string }
 
 const methodLabel: Record<string, string> = {
   account_ref: "Account ref",
@@ -23,9 +25,29 @@ const methodLabel: Record<string, string> = {
   unmatched: "Unmatched",
 }
 
-export default function ReconciliationPage() {
+export const dynamic = "force-dynamic"
+
+export default async function ReconciliationPage() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect("/auth/login")
+
+  const [{ data: transactions }, { count: activeRules }] = await Promise.all([
+    supabase.from("c2b_transactions").select("id, trans_id, trans_amount, bill_ref_number, matched_tenant_id, match_method, match_confidence, match_status, created_at, tenants(full_name)").eq("user_id", user.id).order("created_at", { ascending: false }).limit(50),
+    supabase.from("reconciliation_rules").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("active", true),
+  ])
+
+  const recentMatches: RecentMatch[] = (transactions || []).map((transaction: any) => ({
+    id: transaction.trans_id || transaction.id,
+    billRef: transaction.bill_ref_number || "—",
+    amount: Number(transaction.trans_amount || 0),
+    tenant: transaction.tenants?.full_name || "—",
+    method: transaction.match_method || "unmatched",
+    confidence: Number(transaction.match_confidence || 0),
+    status: transaction.match_status || "pending",
+  }))
   const matched = recentMatches.filter((m) => m.status === "matched").length
-  const unmatched = recentMatches.filter((m) => m.status === "unmatched").length
+  const unmatched = recentMatches.filter((m) => m.status === "unmatched" || m.status === "pending").length
   const total = recentMatches.length
   const matchRate = total > 0 ? Math.round((matched / total) * 1000) / 10 : 0
 
@@ -51,7 +73,7 @@ export default function ReconciliationPage() {
             <CardTitle className="text-3xl">{matchRate}%</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-xs text-success">+1.2 pts vs last week</p>
+            <p className="text-xs text-muted-foreground">Based on recorded transactions</p>
           </CardContent>
         </Card>
         <Card>
@@ -75,7 +97,7 @@ export default function ReconciliationPage() {
         <Card>
           <CardHeader className="pb-2">
             <CardDescription>Active rules</CardDescription>
-            <CardTitle className="text-3xl">0</CardTitle>
+            <CardTitle className="text-3xl">{activeRules || 0}</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-xs text-muted-foreground">Default ruleset</p>
