@@ -16,7 +16,6 @@ interface SubStatus {
   reason: string
 }
 
-const STORAGE_KEY = "propdeskafrica.trial-banner.dismissed"
 
 export function TrialBanner() {
   const [status, setStatus] = useState<SubStatus | null>(null)
@@ -24,7 +23,6 @@ export function TrialBanner() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    setDismissed(sessionStorage.getItem(STORAGE_KEY) === "1")
     fetch("/api/subscription")
       .then((r) => r.ok ? r.json() : null)
       .then((d) => { if (d) setStatus(d) })
@@ -66,7 +64,7 @@ export function TrialBanner() {
             </Button>
             {status.days_left > 3 && (
               <button
-                onClick={() => { sessionStorage.setItem(STORAGE_KEY, "1"); setDismissed(true) }}
+                onClick={() => setDismissed(true)}
                 className="text-muted-foreground hover:text-foreground p-1"
                 aria-label="Dismiss"
               >

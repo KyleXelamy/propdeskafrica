@@ -106,10 +106,11 @@ export async function updateProfile(formData: FormData) {
   }
 
   {
-    const slug = profileData.company_name.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 80)
+    const baseSlug = profileData.company_name.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 64) || "workspace"
+    const slug = `${baseSlug}-${user.id.slice(0, 8)}`
     const { data: existingCompany } = await supabase.from("companies").select("id").eq("owner_id", user.id).maybeSingle()
     const companyResult = existingCompany
-      ? await supabase.from("companies").update({ name: profileData.company_name, slug }).eq("id", existingCompany.id)
+      ? await supabase.from("companies").update({ name: profileData.company_name, slug }).eq("id", existingCompany.id).eq("owner_id", user.id)
       : await supabase.from("companies").insert({ owner_id: user.id, name: profileData.company_name, slug })
     if (companyResult.error) {
       console.warn("[propdeskafrica] company workspace table unavailable; profile name was saved", companyResult.error.message)

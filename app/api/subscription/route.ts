@@ -48,6 +48,7 @@ export const GET = withAuth(async (_req, { supabase, userId }) => {
     return successResponse({ ...status, plan_name: planName })
   }
   // Supabase fallback
+  await supabase.rpc("ensure_subscription", { p_user: userId }).catch(() => null)
   const { data, error } = await supabase
     .from("subscriptions")
     .select("*, plans(name)")
@@ -66,7 +67,8 @@ export const GET = withAuth(async (_req, { supabase, userId }) => {
       reason: "no_subscription",
     })
   }
-  const trialExpired = data.status === "trialing" && data.trial_ends_at && new Date(data.trial_ends_at) < new Date()
+  const trialExpired = data.status === "trialing" && data.trial_ends_at && new Date(data.trial_ends_at) <= new Date()
+  const effectiveReason = trialExpired ? "trial_ended" : data.status
   const isActive = !trialExpired && !["canceled", "expired", "past_due"].includes(data.status)
   const daysLeft = isActive
     ? Math.max(0, Math.ceil(
@@ -81,7 +83,7 @@ export const GET = withAuth(async (_req, { supabase, userId }) => {
     days_left: daysLeft,
     plan: data.plan_code,
     plan_name: (data as any).plans?.name || null,
-    reason: trialExpired ? "trial_ended" : data.status,
+    reason: effectiveReason,
   })
 })
 
@@ -95,14 +97,36 @@ export const GET = withAuth(async (_req, { supabase, userId }) => {
  */
 export const PATCH = withAuth(async (req, { supabase, userId }) => {
   const body = await req.json().catch(() => ({})) as any
-  if (body.cancel === true) {
+  if (body.cancel === true || body.reactivate === true) {
+    const { data: current, error: currentError } = await supabase
+      .from("subscriptions")
+      .select("status, plan_code, current_period_end, trial_ends_at")
+      .eq("user_id", userId)
+      .single()
+    if (currentError || !current) return errorResponse("Subscription not found", 404)
+
+    if (body.cancel === true) {
+      if (["canceled", "expired"].includes(current.status)) return successResponse(current)
+      const { data, error } = await supabase
+        .from("subscriptions")
+        .update({ status: "canceled", canceled_at: new Date().toISOString(), cancel_at: current.current_period_end || new Date().toISOString() })
+        .eq("user_id", userId)
+        .select()
+        .single()
+      if (error) return errorResponse("Unable to cancel subscription", 500)
+      await supabase.from("subscription_events").insert({ user_id: userId, event: "canceled", from_plan: current.plan_code, to_plan: current.plan_code, from_status: current.status, to_status: "canceled", reason: "user_request", actor: userId })
+      return successResponse(data)
+    }
+
+    const nextStatus = current.current_period_end && new Date(current.current_period_end) > new Date() ? "active" : "trialing"
     const { data, error } = await supabase
       .from("subscriptions")
-      .update({ status: "canceled", canceled_at: new Date().toISOString() })
+      .update({ status: nextStatus, canceled_at: null, cancel_at: null, trial_ends_at: nextStatus === "trialing" ? current.trial_ends_at : null })
       .eq("user_id", userId)
       .select()
       .single()
-    if (error) return errorResponse(error.message, 500)
+    if (error) return errorResponse("Unable to reactivate subscription", 500)
+    await supabase.from("subscription_events").insert({ user_id: userId, event: "reactivated", from_plan: current.plan_code, to_plan: current.plan_code, from_status: current.status, to_status: nextStatus, reason: "user_request", actor: userId })
     return successResponse(data)
   }
   if (body.plan) {

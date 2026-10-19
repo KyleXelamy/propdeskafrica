@@ -151,7 +151,8 @@ export function reconcile(
 
     if (rule.match_by === "phone") {
       const tenant = ctx.tenants.find((t) =>
-        t.phone && phonesMatch(t.phone, txn.msisdn),
+        t.phone && phonesMatch(t.phone, txn.msisdn) &&
+        (!rule.config.only_active_tenants || t.is_active !== false),
       )
       if (tenant) {
         return {

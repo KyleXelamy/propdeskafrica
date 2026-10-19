@@ -5,13 +5,17 @@ import { Badge } from "@/components/ui/badge"
 import { AlertTriangle, CheckCircle2, XCircle, Settings2, ListOrdered } from "lucide-react"
 import Link from "next/link"
 import { ReconciliationRules } from "@/components/reconciliation-rules"
+import { ReconciliationReviewQueue } from "@/components/reconciliation-review-queue"
+import { createClient } from "@/lib/supabase/server"
+import { redirect } from "next/navigation"
 
 export const metadata: Metadata = {
   title: "Reconciliation — PropDesk Africa",
   description: "Per-tenant rules that match incoming paybill payments to the right tenant.",
 }
 
-const recentMatches: Array<{ id: string; billRef: string; amount: number; tenant: string; method: string; confidence: number; status: string }> = []
+type RecentMatch = { id: string; billRef: string; amount: number; tenant: string; tenantId?: string; method: string; confidence: number; status: string }
+type TenantOption = { id: string; full_name: string }
 
 const methodLabel: Record<string, string> = {
   account_ref: "Account ref",
@@ -23,9 +27,31 @@ const methodLabel: Record<string, string> = {
   unmatched: "Unmatched",
 }
 
-export default function ReconciliationPage() {
+export const dynamic = "force-dynamic"
+
+export default async function ReconciliationPage() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect("/auth/login")
+
+  const [{ data: transactions }, { count: activeRules }, { data: tenantOptions }] = await Promise.all([
+    supabase.from("c2b_transactions").select("id, trans_id, trans_amount, bill_ref_number, matched_tenant_id, match_method, match_confidence, match_status, created_at, tenants(full_name)").eq("user_id", user.id).order("created_at", { ascending: false }).limit(50),
+    supabase.from("reconciliation_rules").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("active", true),
+    supabase.from("tenants").select("id, full_name").eq("user_id", user.id).eq("is_active", true).order("full_name"),
+  ])
+
+  const recentMatches: RecentMatch[] = (transactions || []).map((transaction: any) => ({
+    id: transaction.trans_id || transaction.id,
+    billRef: transaction.bill_ref_number || "—",
+    amount: Number(transaction.trans_amount || 0),
+    tenant: transaction.tenants?.full_name || "—",
+    tenantId: transaction.matched_tenant_id || undefined,
+    method: transaction.match_method || "unmatched",
+    confidence: Number(transaction.match_confidence || 0),
+    status: transaction.match_status || "pending",
+  }))
   const matched = recentMatches.filter((m) => m.status === "matched").length
-  const unmatched = recentMatches.filter((m) => m.status === "unmatched").length
+  const unmatched = recentMatches.filter((m) => m.status === "unmatched" || m.status === "pending").length
   const total = recentMatches.length
   const matchRate = total > 0 ? Math.round((matched / total) * 1000) / 10 : 0
 
@@ -51,7 +77,7 @@ export default function ReconciliationPage() {
             <CardTitle className="text-3xl">{matchRate}%</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-xs text-success">+1.2 pts vs last week</p>
+            <p className="text-xs text-muted-foreground">Based on recorded transactions</p>
           </CardContent>
         </Card>
         <Card>
@@ -75,7 +101,7 @@ export default function ReconciliationPage() {
         <Card>
           <CardHeader className="pb-2">
             <CardDescription>Active rules</CardDescription>
-            <CardTitle className="text-3xl">0</CardTitle>
+            <CardTitle className="text-3xl">{activeRules || 0}</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-xs text-muted-foreground">Default ruleset</p>
@@ -108,54 +134,7 @@ export default function ReconciliationPage() {
           <CardDescription>Every match is logged. Click a row to inspect.</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="overflow-hidden rounded-lg border">
-            <table className="w-full">
-              <thead className="bg-muted/50">
-                <tr className="text-left text-xs uppercase tracking-wider text-muted-foreground">
-                  <th className="px-4 py-3">Transaction</th>
-                  <th className="px-4 py-3">Bill ref</th>
-                  <th className="px-4 py-3 text-right">Amount</th>
-                  <th className="px-4 py-3">Tenant</th>
-                  <th className="px-4 py-3">Method</th>
-                  <th className="px-4 py-3 text-right">Confidence</th>
-                  <th className="px-4 py-3">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y">
-                {recentMatches.map((m) => (
-                  <tr key={m.id} className="hover:bg-muted/30">
-                    <td className="px-4 py-4 font-mono text-xs">{m.id}</td>
-                    <td className="px-4 py-4 font-mono text-xs text-muted-foreground">
-                      {m.billRef}
-                    </td>
-                    <td className="px-4 py-4 text-right text-sm font-semibold">
-                      KES {m.amount.toLocaleString()}
-                    </td>
-                    <td className="px-4 py-4 text-sm">
-                      {m.tenant === "—" ? <span className="text-muted-foreground">—</span> : m.tenant}
-                    </td>
-                    <td className="px-4 py-4 text-sm">{methodLabel[m.method]}</td>
-                    <td className="px-4 py-4 text-right">
-                      <span className="font-mono text-xs">
-                        {m.confidence > 0 ? Math.round(m.confidence * 100) + "%" : "—"}
-                      </span>
-                    </td>
-                    <td className="px-4 py-4">
-                      {m.status === "matched" ? (
-                        <Badge className="bg-success/15 text-success">
-                          <CheckCircle2 className="mr-1 size-3" /> Matched
-                        </Badge>
-                      ) : (
-                        <Badge className="bg-warning/15 text-warning">
-                          <XCircle className="mr-1 size-3" /> Unmatched
-                        </Badge>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <ReconciliationReviewQueue matches={recentMatches} tenants={(tenantOptions || []) as TenantOption[]} methodLabel={methodLabel} />
         </CardContent>
       </Card>
 

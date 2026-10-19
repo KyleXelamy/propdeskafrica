@@ -40,9 +40,10 @@ async function getSubscriptionState() {
       .eq("user_id", user.id)
       .maybeSingle()
     if (data) {
-      const trialExpired = data.status === "trialing" && data.trial_ends_at && new Date(data.trial_ends_at) < new Date()
+      const trialExpired = data.status === "trialing" && data.trial_ends_at && new Date(data.trial_ends_at) <= new Date()
       status = {
         is_active: !trialExpired && !["canceled","expired","past_due"].includes(data.status),
+        has_subscription: true,
         is_trialing: data.status === "trialing",
         trial_expired: trialExpired,
         days_left: data.current_period_end

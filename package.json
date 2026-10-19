@@ -26,7 +26,8 @@
     "db:ping": "tsx -e \"import('./lib/db/neon').then(m => m.pingDb()).then(r => console.log(JSON.stringify(r)))\"",
     "templates:prebuild": "tsx scripts/prebuild-templates.ts",
     "prebuild": "node scripts/check-use-client.js",
-    "check:client": "node scripts/check-use-client.js"
+    "check:client": "node scripts/check-use-client.js",
+    "test": "vitest run"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -99,6 +100,7 @@
     "tailwindcss": "^4.1.9",
     "tsx": "^4.23.15",
     "tw-animate-css": "1.3.3",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "5.0.1"
   }
 }
