@@ -48,6 +48,7 @@ export const GET = withAuth(async (_req, { supabase, userId }) => {
     return successResponse({ ...status, plan_name: planName })
   }
   // Supabase fallback
+  await supabase.rpc("ensure_subscription", { p_user: userId }).catch(() => null)
   const { data, error } = await supabase
     .from("subscriptions")
     .select("*, plans(name)")
@@ -66,7 +67,8 @@ export const GET = withAuth(async (_req, { supabase, userId }) => {
       reason: "no_subscription",
     })
   }
-  const trialExpired = data.status === "trialing" && data.trial_ends_at && new Date(data.trial_ends_at) < new Date()
+  const trialExpired = data.status === "trialing" && data.trial_ends_at && new Date(data.trial_ends_at) <= new Date()
+  const effectiveReason = trialExpired ? "trial_ended" : data.status
   const isActive = !trialExpired && !["canceled", "expired", "past_due"].includes(data.status)
   const daysLeft = isActive
     ? Math.max(0, Math.ceil(
@@ -81,7 +83,7 @@ export const GET = withAuth(async (_req, { supabase, userId }) => {
     days_left: daysLeft,
     plan: data.plan_code,
     plan_name: (data as any).plans?.name || null,
-    reason: trialExpired ? "trial_ended" : data.status,
+    reason: effectiveReason,
   })
 })
 
