@@ -50,9 +50,9 @@ const neonDb: Db = {
     const sql = getDb()
     let inserted = 0, updated = 0, skipped = 0
     for (const row of rows) {
-      // Re-stamp user_id on every row so we can never restore into
-      // another user's workspace.
-      const safe = { ...row, user_id: userId }
+      // Re-stamp ownership on every row while preserving stable record IDs.
+      // Profiles use their user ID as the primary key; all other records use user_id.
+      const safe = table === "user_profiles" ? { ...row, id: userId, user_id: userId } : { ...row, user_id: userId }
       try {
         if (onConflict === "skip") {
           const result = await (sql as any).unsafe(
@@ -237,7 +237,7 @@ export async function restoreBackup(
     }
     if (rows.length === 0) continue
 
-    const sanitized: SanitisedRow[] = rows.map(sanitiseRow)
+    const sanitized: SanitisedRow[] = (options.tables?.length ? rows.filter((row) => options.tables?.includes(table)) : rows).map(sanitiseRow)
     beforeCounts[table] = await db.count(table, userId)
     if (options.dry_run) {
       afterCounts[table] = beforeCounts[table] + sanitized.length

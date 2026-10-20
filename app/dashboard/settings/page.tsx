@@ -57,9 +57,10 @@ export default async function SettingsPage() {
 
   return (
     <div className="space-y-6 pt-2 md:pt-0">
-      <div>
-        <h1 className="text-2xl md:text-3xl font-bold text-foreground">Settings</h1>
-        <p className="text-sm md:text-base text-muted-foreground">Manage your account, workspace name, preferences and security</p>
+      <div className="rounded-2xl border bg-gradient-to-br from-card to-muted/30 p-5 md:p-7">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Workspace control</p>
+        <h1 className="mt-2 text-2xl font-semibold tracking-tight text-foreground md:text-3xl">Settings</h1>
+        <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">Keep your workspace identity, preferences, security, and records aligned with how your team operates.</p>
       </div>
 
       <Tabs defaultValue="profile" className="space-y-4">

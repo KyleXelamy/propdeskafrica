@@ -224,9 +224,8 @@ export function BackupManager({ initialBackups, appVersion }: { initialBackups: 
               </>
             )}
           </Button>
-          <p className="text-sm text-muted-foreground">
-              Includes your workspace records, payment history, documents, and activity history.
-          </p>
+          <p className="text-sm text-muted-foreground">Includes your workspace records, payment history, documents, and activity history.</p>
+          <a href="/backup-replication-fixture.json" download="backup-replication-fixture.json" className="inline-flex items-center justify-center rounded-md border border-primary/30 bg-primary/5 px-3 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary/10">Download test backup file</a>
         </CardContent>
       </Card>
 
@@ -352,11 +351,7 @@ export function BackupManager({ initialBackups, appVersion }: { initialBackups: 
                 </Button>
                 {autoSaveStatus && <span className="text-xs text-muted-foreground">{autoSaveStatus}</span>}
               </div>
-              <p className="text-xs text-muted-foreground">
-                <AlertTriangle className="mr-1 inline size-3" />
-                Trigger <code className="rounded bg-muted px-1">POST /api/backup/auto</code> from Vercel Cron / GitHub Actions on your cadence. Set
-                <code className="ml-1 rounded bg-muted px-1">BACKUP_CRON_SECRET</code> env var to gate the endpoint.
-              </p>
+              <p className="text-xs text-muted-foreground"><AlertTriangle className="mr-1 inline size-3" />Automatic copies are created privately on the schedule you select.</p>
             </div>
           )}
         </CardContent>

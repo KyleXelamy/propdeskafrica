@@ -5,7 +5,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { X } from "lucide-react"
 
-const STORAGE_KEY = "propdeskafrica_cookie_consent_v1"
+const STORAGE_KEY = "propdeskafrica_cookie_consent_v2"
 
 /**
  * Pre-rebrand key. Consent is a legal record, so we never drop it on the
@@ -61,11 +61,11 @@ export function CookieConsent() {
     <div
       role="dialog"
       aria-label="Cookie preferences"
-      className="fixed inset-x-4 bottom-4 z-50 mx-auto max-w-3xl rounded-2xl border border-border bg-card p-5 shadow-2xl sm:p-6"
+      className="fixed inset-x-3 bottom-3 z-50 mx-auto max-w-xl rounded-xl border border-border/80 bg-card/95 p-4 shadow-[0_18px_55px_-24px_hsl(var(--foreground)/0.45)] backdrop-blur sm:inset-x-auto sm:right-5 sm:bottom-5 sm:p-5"
     >
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="text-sm font-semibold">A small note about cookies 🍪</p>
+          <p className="text-sm font-semibold tracking-tight">Privacy preferences</p>
           <p className="mt-2 text-sm leading-6 text-muted-foreground">
             We use essential cookies to keep you signed in and a small set of analytics cookies to
             understand how the site is used. We never use third-party advertising trackers.{" "}

@@ -62,12 +62,8 @@ export async function updateNotifications(formData: FormData) {
     }, { onConflict: "user_id" })
 
   if (error) {
-    // If the column doesn't exist yet, fall back to logging so settings
-    // still work locally before the user runs the latest migration.
-    console.warn(
-      "[propdeskafrica] notification preferences not persisted — column missing?",
-      error,
-    )
+    console.error("[propdeskafrica] notification preferences update error", error)
+    throw new Error("Failed to update notification preferences")
   }
 
   revalidatePath("/dashboard/settings")
