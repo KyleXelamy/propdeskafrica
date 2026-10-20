@@ -107,7 +107,7 @@ export function BackupManager({ initialBackups, appVersion }: { initialBackups: 
     }
     const backup = data.backup
     if (!backup?.payload) {
-      alert("Backup payload unavailable. Set SUPABASE_SERVICE_ROLE_KEY in production to enable large backup downloads.")
+      alert("This backup is temporarily unavailable. Please try again shortly.")
       return
     }
     const blob = new Blob([JSON.stringify(backup.payload, null, 2)], { type: "application/json" })
@@ -197,7 +197,7 @@ export function BackupManager({ initialBackups, appVersion }: { initialBackups: 
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-semibold">v{appVersion}</div>
-            <p className="text-xs text-muted-foreground">Backups include schema + payload</p>
+            <p className="text-xs text-muted-foreground">Private workspace copy</p>
           </CardContent>
         </Card>
       </div>
@@ -225,7 +225,7 @@ export function BackupManager({ initialBackups, appVersion }: { initialBackups: 
             )}
           </Button>
           <p className="text-sm text-muted-foreground">
-            Includes: properties, tenants, payments, expenses, maintenance, documents, contacts, quotations, damages, paybills, C2B, reconciliation rules, audit log.
+              Includes your workspace records, payment history, documents, and activity history.
           </p>
         </CardContent>
       </Card>
@@ -298,9 +298,9 @@ export function BackupManager({ initialBackups, appVersion }: { initialBackups: 
 
       <Card>
         <CardHeader>
-          <CardTitle>Auto-backup</CardTitle>
+            <CardTitle>Auto-backup</CardTitle>
           <CardDescription>
-            Optional — schedule automatic backups. Stored in your backup list and never leave your database.
+            Optional — schedule automatic backups for your workspace.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
