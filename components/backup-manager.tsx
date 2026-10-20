@@ -225,7 +225,7 @@ export function BackupManager({ initialBackups, appVersion }: { initialBackups: 
             )}
           </Button>
           <p className="text-sm text-muted-foreground">Includes your workspace records, payment history, documents, and activity history.</p>
-          <a href="/backup-replication-fixture.json" download className="text-sm font-medium text-primary underline-offset-4 hover:underline">Download a replication test file</a>
+          <a href="/backup-replication-fixture.json" download="backup-replication-fixture.json" className="inline-flex items-center justify-center rounded-md border border-primary/30 bg-primary/5 px-3 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary/10">Download test backup file</a>
         </CardContent>
       </Card>
 
