@@ -38,11 +38,21 @@ export const POST = withAuth(async (request, { userId }) => {
     )
   }
 
-  console.info("[paybill] new account", { userId, ...parsed.data })
-  return NextResponse.json({
-    ok: true,
-    message: "Paybill registered. Update your Daraja C2B validation URL to start receiving payments.",
-  })
+  const number = parsed.data.number.replace(/\s+/g, "")
+  if (!/^\d{5,7}$/.test(number)) return NextResponse.json({ error: "Enter a valid 5–7 digit Till or PayBill number." }, { status: 400 })
+  const { createServiceClient } = await import("@/lib/supabase/service")
+  const supabase = createServiceClient()
+  const { data: account, error } = await supabase.from("paybills").insert({ user_id: userId, label: parsed.data.label, number, type: parsed.data.type, c2b_validation_url: parsed.data.c2b_validation_url || null }).select("id, label, number, type, active, created_at").single()
+  if (error?.code === "23505") return NextResponse.json({ error: "That account is already configured." }, { status: 409 })
+  if (error) return NextResponse.json({ error: "Could not save this payment account." }, { status: 500 })
+  const { data: properties } = await supabase.from("properties").select("id").eq("user_id", userId).in("id", parsed.data.property_ids)
+  if ((properties || []).length !== parsed.data.property_ids.length) {
+    await supabase.from("paybills").delete().eq("id", account.id).eq("user_id", userId)
+    return NextResponse.json({ error: "One or more selected properties are not available." }, { status: 400 })
+  }
+  const { error: linkError } = await supabase.from("paybill_properties").insert(parsed.data.property_ids.map((property_id) => ({ paybill_id: account.id, property_id, user_id: userId })))
+  if (linkError) return NextResponse.json({ error: "Account saved, but property assignment failed." }, { status: 500 })
+  return NextResponse.json({ ok: true, paybill: account, message: "Payment account saved. Connect its Daraja callback before going live." }, { status: 201 })
 })
 
 void Type

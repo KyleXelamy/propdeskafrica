@@ -7,6 +7,7 @@ import Link from "next/link"
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { PLANS } from "@/lib/pricing"
+import { SubscriptionControls } from "@/components/subscription-controls"
 
 export const dynamic = "force-dynamic"
 
@@ -136,11 +137,7 @@ export default async function BillingPage({
                   Change plan <ArrowRight className="h-4 w-4 ml-1" />
                 </Link>
               </Button>
-              {!isTrialing && (
-                <form action="/api/subscription" method="post">
-                  {/* Using fetch wrapper would need JS — just link to a confirm */}
-                </form>
-              )}
+              {!isTrialing && <SubscriptionControls canceled={status?.reason === "canceled"} />}
             </div>
           </CardContent>
         </Card>
