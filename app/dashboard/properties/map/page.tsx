@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
+import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ArrowLeft, MapPin, RefreshCw } from "lucide-react"
@@ -66,10 +67,13 @@ async function loadProperties(): Promise<MapProperty[]> {
   return []
 }
 
-export default async function PropertiesMapPage() {
-  const properties = await loadProperties()
+export default async function PropertiesMapPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
+  const query = ((await searchParams).q || "").trim().toLowerCase()
+  const allProperties = await loadProperties()
+  const properties = query ? allProperties.filter((property) => [property.name, property.address, property.city, property.county].filter(Boolean).join(" ").toLowerCase().includes(query)) : allProperties
   const geocoded = properties.length
   const total = await countAll()
+  const locations = Object.entries(properties.reduce<Record<string, number>>((groups, property) => { const key = property.city || property.county || "Unspecified"; groups[key] = (groups[key] || 0) + 1; return groups }, {})).sort((a, b) => b[1] - a[1])
 
   return (
     <div className="space-y-6">
@@ -86,6 +90,7 @@ export default async function PropertiesMapPage() {
             Every geocoded property pinned. Hover for quick stats; click to open.
           </p>
         </div>
+        <form className="flex gap-2" method="get"><Input name="q" defaultValue={query} placeholder="Search city, county, or property" aria-label="Search locations" /><Button type="submit" variant="outline" size="sm">Search</Button></form>
         <div className="flex gap-2">
           <Button variant="outline" size="sm">
             <RefreshCw className="mr-2 size-3.5" /> Re-geocode all
@@ -116,6 +121,8 @@ export default async function PropertiesMapPage() {
       </div>
 
       <PropertyMap properties={properties} height={560} />
+
+      <Card><CardHeader><CardTitle>Portfolio by location</CardTitle><CardDescription>Real property concentration by city or county.</CardDescription></CardHeader><CardContent className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">{locations.slice(0, 8).map(([location, count]) => <div key={location} className="rounded-lg border p-3"><p className="text-sm font-medium">{location}</p><p className="mt-1 text-2xl font-semibold">{count}</p><p className="text-xs text-muted-foreground">properties</p></div>)}</CardContent></Card>
 
       <Card>
         <CardHeader>
