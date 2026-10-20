@@ -34,10 +34,11 @@ export default async function ReconciliationPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect("/auth/login")
 
-  const [{ data: transactions }, { count: activeRules }, { data: tenantOptions }] = await Promise.all([
+  const [{ data: transactions }, { count: activeRules }, { data: tenantOptions }, { data: auditEvents }] = await Promise.all([
     supabase.from("c2b_transactions").select("id, trans_id, trans_amount, bill_ref_number, matched_tenant_id, match_method, match_confidence, match_status, created_at, tenants(full_name)").eq("user_id", user.id).order("created_at", { ascending: false }).limit(50),
     supabase.from("reconciliation_rules").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("active", true),
     supabase.from("tenants").select("id, full_name").eq("user_id", user.id).eq("is_active", true).order("full_name"),
+    supabase.from("reconciliation_audit").select("id, decision, notes, created_at, matched_tenant_id").eq("user_id", user.id).order("created_at", { ascending: false }).limit(8),
   ])
 
   const recentMatches: RecentMatch[] = (transactions || []).map((transaction: any) => ({
@@ -135,6 +136,16 @@ export default async function ReconciliationPage() {
         </CardHeader>
         <CardContent>
           <ReconciliationReviewQueue matches={recentMatches} tenants={(tenantOptions || []) as TenantOption[]} methodLabel={methodLabel} />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Decision history</CardTitle>
+          <CardDescription>Recent manual and automated decisions retained for review.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          {(auditEvents || []).length === 0 ? <p className="text-sm text-muted-foreground">No decisions have been recorded yet.</p> : (auditEvents || []).map((event) => <div key={event.id} className="flex items-center justify-between gap-4 rounded-lg border p-3 text-sm"><div><p className="font-medium capitalize">{String(event.decision).replace(/_/g, " ")}</p><p className="text-xs text-muted-foreground">{event.notes || "Decision recorded"}</p></div><time className="shrink-0 text-xs text-muted-foreground">{new Date(event.created_at).toLocaleString()}</time></div>)}
         </CardContent>
       </Card>
 
