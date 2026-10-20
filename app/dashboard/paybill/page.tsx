@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Wallet, TrendingUp, AlertTriangle, Loader2 } from "lucide-react"
 import { LivePaybillFeed } from "@/components/live-paybill-feed"
+import { PaybillAccountForm } from "@/components/paybill-account-form"
 import { createClient } from "@/lib/supabase/client"
 import { useEffect, useState } from "react"
 
@@ -122,6 +123,8 @@ export default function PaybillPage() {
           </ol>
         </CardContent>
       </Card>
+
+      <PaybillAccountForm />
 
       {/* Paybills */}
       {error && <Card className="border-destructive/50 bg-destructive/5"><CardContent className="pt-6 text-sm text-destructive">{error}</CardContent></Card>}
