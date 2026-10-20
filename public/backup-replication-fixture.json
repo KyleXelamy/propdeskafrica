@@ -1,0 +1,19 @@
+{
+  "schema_version": 11,
+  "app_version": "fixture",
+  "generated_at": "2026-10-20T00:00:00.000Z",
+  "user": { "id": "workspace" },
+  "counts": { "user_profiles": 1, "properties": 2, "tenants": 2, "rent_payments": 2, "expenses": 1, "maintenance_requests": 1, "documents": 1, "contacts": 1, "damages": 1, "quotations": 1 },
+  "data": {
+    "user_profiles": [{ "id": "workspace", "full_name": "Brian Kiarie Ngugi", "company_name": "RayElite Ltd", "phone": "0758034649", "city": "Kerugoya", "county": "Kirinyaga", "address": "773-10300", "currency": "KES", "timezone": "Africa/Nairobi" }],
+    "properties": [{ "id": "fixture-property-001", "name": "RayElite Court", "address": "773-10300", "city": "Kerugoya", "county": "Kirinyaga", "property_type": "residential", "status": "active" }, { "id": "fixture-property-002", "name": "Market Street Apartments", "address": "Kerugoya town", "city": "Kerugoya", "county": "Kirinyaga", "property_type": "residential", "status": "active" }],
+    "tenants": [{ "id": "fixture-tenant-001", "full_name": "Amina Wanjiku", "phone": "0712345678", "property_id": "fixture-property-001", "unit_number": "A-02", "monthly_rent": 18000, "is_active": true }, { "id": "fixture-tenant-002", "full_name": "Peter Mwangi", "phone": "0723456789", "property_id": "fixture-property-002", "unit_number": "B-04", "monthly_rent": 22000, "is_active": true }],
+    "rent_payments": [{ "id": "fixture-payment-001", "tenant_id": "fixture-tenant-001", "property_id": "fixture-property-001", "amount": 18000, "payment_date": "2026-10-05", "method": "mpesa", "status": "completed", "reference": "FIXTURE-001" }, { "id": "fixture-payment-002", "tenant_id": "fixture-tenant-002", "property_id": "fixture-property-002", "amount": 22000, "payment_date": "2026-10-06", "method": "mpesa", "status": "completed", "reference": "FIXTURE-002" }],
+    "expenses": [{ "id": "fixture-expense-001", "property_id": "fixture-property-001", "amount": 3500, "category": "repairs", "description": "Gate maintenance", "expense_date": "2026-10-08" }],
+    "maintenance_requests": [{ "id": "fixture-maintenance-001", "property_id": "fixture-property-002", "title": "Replace hallway light", "status": "open", "priority": "normal" }],
+    "documents": [{ "id": "fixture-document-001", "property_id": "fixture-property-001", "name": "Lease agreement - A02", "document_type": "lease" }],
+    "contacts": [{ "id": "fixture-contact-001", "name": "Kiptoo Electricals", "phone": "0700112233", "category": "vendor" }],
+    "damages": [{ "id": "fixture-damage-001", "property_id": "fixture-property-001", "description": "Paint scuff in corridor", "status": "open" }],
+    "quotations": [{ "id": "fixture-quote-001", "property_id": "fixture-property-002", "vendor_name": "Kiptoo Electricals", "amount": 4800, "status": "pending" }]
+  }
+}

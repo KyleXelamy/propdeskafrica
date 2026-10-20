@@ -131,15 +131,15 @@ export default function PaybillPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Your paybills &amp; tills</CardTitle>
-          <CardDescription>One entry per Safaricom account number you own.</CardDescription>
+          <CardTitle>Payment accounts</CardTitle>
+          <CardDescription>PayBill business numbers and Till numbers are managed separately because tenants use them differently.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="overflow-hidden rounded-lg border">
             <table className="w-full">
               <thead className="bg-muted/50">
                 <tr className="text-left text-xs uppercase tracking-wider text-muted-foreground">
-                  <th className="px-4 py-3">Account</th>
+                  <th className="px-4 py-3">Payment route</th>
                   <th className="px-4 py-3">Properties</th>
                   <th className="px-4 py-3 text-right">Matched</th>
                   <th className="px-4 py-3">Last payment</th>
@@ -164,7 +164,7 @@ export default function PaybillPage() {
                         <div>
                           <p className="text-sm font-semibold">{p.label}</p>
                           <p className="font-mono text-xs text-muted-foreground">
-                            {p.type} · {p.number}
+                            {p.type === "paybill" ? "PayBill business number" : "Till number"} · {p.number}
 
                           </p>
                         </div>
