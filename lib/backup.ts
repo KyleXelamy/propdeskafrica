@@ -196,7 +196,7 @@ export async function exportBackup(
     schema_version: 11,
     app_version: APP_VERSION,
     generated_at: new Date().toISOString(),
-    user: { id: userId, email: userEmail },
+    user: { id: "workspace" },
     counts,
     data,
   }

@@ -9,7 +9,7 @@ import { Database, FileText, History } from "lucide-react"
 export const dynamic = "force-dynamic"
 export const metadata = {
   title: "Backup & restore • PropDesk Africa",
-  description: "Back up your entire workspace or restore from a previous backup. No data leaves your database.",
+  description: "Create a private copy of your workspace or restore from a previous backup.",
 }
 
 export default async function BackupPage() {
@@ -38,7 +38,7 @@ export default async function BackupPage() {
           </CardHeader>
           <CardContent>
             <CardDescription>
-              Backups include your workspace data in a portable format you can keep, inspect, and restore when needed.
+              Keep a private copy of your workspace data and restore it when needed.
             </CardDescription>
           </CardContent>
         </Card>
@@ -49,8 +49,7 @@ export default async function BackupPage() {
           </CardHeader>
           <CardContent>
             <CardDescription>
-              Open the file in any editor. Inspect, audit, or hand it to your accountant. No
-              proprietary format, no lock-in.
+              Download a portable copy for your records or secure off-site storage.
             </CardDescription>
           </CardContent>
         </Card>

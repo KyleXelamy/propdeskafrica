@@ -17,11 +17,27 @@ export function ReconciliationReviewQueue({ matches, tenants, methodLabel }: Pro
   const [status, setStatus] = useState<"all" | "matched" | "review">("all")
   const [working, setWorking] = useState<string | null>(null)
   const [message, setMessage] = useState("")
+  const [selected, setSelected] = useState<string[]>([])
   const visible = useMemo(() => matches.filter((match) => {
     const haystack = `${match.id} ${match.billRef} ${match.tenant}`.toLowerCase()
     const statusMatches = status === "all" || (status === "matched" ? match.status === "matched" : match.status !== "matched")
     return statusMatches && haystack.includes(query.toLowerCase())
   }), [matches, query, status])
+
+  function toggleSelected(id: string) {
+    setSelected((current) => current.includes(id) ? current.filter((value) => value !== id) : [...current, id])
+  }
+
+  async function rejectSelected() {
+    if (!selected.length) return
+    setWorking("bulk")
+    setMessage("")
+    const response = await fetch("/api/reconciliation/bulk", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ transaction_ids: selected, decision: "rejected" }) })
+    const body = await response.json().catch(() => ({}))
+    setWorking(null)
+    if (response.ok) setSelected([])
+    setMessage(response.ok ? `${body.processed || selected.length} transactions rejected and audited.` : body.error || "Unable to update transactions.")
+  }
 
   async function resolve(id: string, decision: "matched" | "rejected") {
     setWorking(id)
@@ -35,12 +51,15 @@ export function ReconciliationReviewQueue({ matches, tenants, methodLabel }: Pro
 
   return <div className="space-y-4">
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex items-center gap-2">
+        <Button type="button" size="sm" variant="outline" disabled={!selected.length || working === "bulk"} onClick={rejectSelected}>Reject selected ({selected.length})</Button>
+      </div>
       <div className="relative w-full sm:max-w-xs"><Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" /><Input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search transaction, reference, tenant" className="pl-9" /></div>
       <div className="flex gap-1 rounded-lg border p-1" role="group" aria-label="Filter reconciliation decisions">
         {(["all", "review", "matched"] as const).map((item) => <Button key={item} type="button" size="sm" variant={status === item ? "secondary" : "ghost"} onClick={() => setStatus(item)}>{item === "all" ? "All" : item === "review" ? "Needs review" : "Matched"}</Button>)}
       </div>
     </div>
     {message && <p className="rounded-lg bg-muted px-3 py-2 text-sm text-muted-foreground" role="status">{message}</p>}
-    {visible.length === 0 ? <p className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">No transactions match this view.</p> : <div className="overflow-x-auto rounded-lg border"><table className="w-full min-w-[860px]"><thead className="bg-muted/50"><tr className="text-left text-xs uppercase tracking-wider text-muted-foreground"><th className="px-4 py-3">Transaction</th><th className="px-4 py-3">Bill ref</th><th className="px-4 py-3 text-right">Amount</th><th className="px-4 py-3">Tenant</th><th className="px-4 py-3">Method</th><th className="px-4 py-3 text-right">Confidence</th><th className="px-4 py-3">Decision</th><th className="px-4 py-3 text-right">Action</th></tr></thead><tbody className="divide-y">{visible.map((match) => <tr key={match.id} className="hover:bg-muted/30"><td className="px-4 py-4 font-mono text-xs">{match.id}</td><td className="px-4 py-4 font-mono text-xs text-muted-foreground">{match.billRef}</td><td className="px-4 py-4 text-right text-sm font-semibold">KES {match.amount.toLocaleString()}</td><td className="px-4 py-4 text-sm">{match.tenant}</td><td className="px-4 py-4 text-sm">{methodLabel[match.method] || match.method}</td><td className="px-4 py-4 text-right font-mono text-xs">{match.confidence > 0 ? `${Math.round(match.confidence * 100)}%` : "—"}</td><td className="px-4 py-4">{match.status === "matched" ? <Badge className="bg-success/15 text-success"><CheckCircle2 className="mr-1 size-3" />Matched</Badge> : <Badge className="bg-warning/15 text-warning"><XCircle className="mr-1 size-3" />Needs review</Badge>}</td><td className="px-4 py-4 text-right">{match.status !== "matched" && <div className="flex items-center justify-end gap-2"><select aria-label={`Tenant for ${match.id}`} value={selectedTenant[match.id] || match.tenantId || ""} onChange={(event) => setSelectedTenant((current) => ({ ...current, [match.id]: event.target.value }))} className="h-9 max-w-[180px] rounded-md border bg-background px-2 text-xs"><option value="">Select tenant</option>{tenants.map((tenant) => <option key={tenant.id} value={tenant.id}>{tenant.full_name}</option>)}</select><Button size="sm" variant="outline" disabled={working === match.id} onClick={() => resolve(match.id, "rejected")}>Reject</Button><Button size="sm" disabled={working === match.id || !(selectedTenant[match.id] || match.tenantId)} onClick={() => resolve(match.id, "matched")}>{working === match.id ? <Loader2 className="size-3 animate-spin" /> : "Confirm"}</Button></div>}</td></tr>)}</tbody></table></div>}
+    {visible.length === 0 ? <p className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">No transactions match this view.</p> : <div className="overflow-x-auto rounded-lg border"><table className="w-full min-w-[860px]"><thead className="bg-muted/50"><tr className="text-left text-xs uppercase tracking-wider text-muted-foreground"><th className="px-4 py-3"><span className="sr-only">Select</span></th><th className="px-4 py-3">Transaction</th><th className="px-4 py-3">Bill ref</th><th className="px-4 py-3 text-right">Amount</th><th className="px-4 py-3">Tenant</th><th className="px-4 py-3">Method</th><th className="px-4 py-3 text-right">Confidence</th><th className="px-4 py-3">Decision</th><th className="px-4 py-3 text-right">Action</th></tr></thead><tbody className="divide-y">{visible.map((match) => <tr key={match.id} className="hover:bg-muted/30"><td className="px-4 py-4"><input type="checkbox" aria-label={`Select ${match.id}`} checked={selected.includes(match.id)} onChange={() => toggleSelected(match.id)} disabled={match.status === "matched"} /></td><td className="px-4 py-4 font-mono text-xs">{match.id}</td><td className="px-4 py-4 font-mono text-xs text-muted-foreground">{match.billRef}</td><td className="px-4 py-4 text-right text-sm font-semibold">KES {match.amount.toLocaleString()}</td><td className="px-4 py-4 text-sm">{match.tenant}</td><td className="px-4 py-4 text-sm">{methodLabel[match.method] || match.method}</td><td className="px-4 py-4 text-right font-mono text-xs">{match.confidence > 0 ? `${Math.round(match.confidence * 100)}%` : "—"}</td><td className="px-4 py-4">{match.status === "matched" ? <Badge className="bg-success/15 text-success"><CheckCircle2 className="mr-1 size-3" />Matched</Badge> : <Badge className="bg-warning/15 text-warning"><XCircle className="mr-1 size-3" />Needs review</Badge>}</td><td className="px-4 py-4 text-right">{match.status !== "matched" && <div className="flex items-center justify-end gap-2"><select aria-label={`Tenant for ${match.id}`} value={selectedTenant[match.id] || match.tenantId || ""} onChange={(event) => setSelectedTenant((current) => ({ ...current, [match.id]: event.target.value }))} className="h-9 max-w-[180px] rounded-md border bg-background px-2 text-xs"><option value="">Select tenant</option>{tenants.map((tenant) => <option key={tenant.id} value={tenant.id}>{tenant.full_name}</option>)}</select><Button size="sm" variant="outline" disabled={working === match.id} onClick={() => resolve(match.id, "rejected")}>Reject</Button><Button size="sm" disabled={working === match.id || !(selectedTenant[match.id] || match.tenantId)} onClick={() => resolve(match.id, "matched")}>{working === match.id ? <Loader2 className="size-3 animate-spin" /> : "Confirm"}</Button></div>}</td></tr>)}</tbody></table></div>}
   </div>
 }

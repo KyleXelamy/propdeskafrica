@@ -29,6 +29,10 @@ export const POST = withAuth(async (req, { supabase, userId }) => {
     .single()
   if (planErr || !planRow) throw new HttpError("Plan not found", 404)
   const amount = Number(planRow.price_kes)
+  if (!Number.isSafeInteger(amount) || amount <= 0) throw new HttpError("Plan pricing is unavailable", 503)
+
+  const { data: pending } = await supabase.from("subscription_payments").select("id, checkout_request_id, status").eq("user_id", userId).eq("plan_code", plan).in("status", ["initiated", "pending"]).order("created_at", { ascending: false }).limit(1).maybeSingle()
+  if (pending?.checkout_request_id) return successResponse({ status: "initiated", checkout_request_id: pending.checkout_request_id, tx_id: pending.id, reused: true })
 
   if (!darajaConfigured() && process.env.MPESA_SANDBOX_MOCK !== "1") {
     return errorResponse("M-Pesa not configured. Set MPESA_SANDBOX_MOCK=1 or supply credentials.", 503)

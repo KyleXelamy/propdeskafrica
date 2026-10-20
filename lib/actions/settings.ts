@@ -32,7 +32,7 @@ export async function updatePreferences(formData: FormData) {
 
   const { error } = await supabase
     .from("user_profiles")
-    .upsert({ user_id: user.id, ...preferencesData, updated_at: new Date().toISOString() })
+    .upsert({ user_id: user.id, ...preferencesData, updated_at: new Date().toISOString() }, { onConflict: "user_id" })
 
   if (error) {
     console.error("[propdeskafrica] preferences update error", error)
@@ -59,7 +59,7 @@ export async function updateNotifications(formData: FormData) {
       user_id: user.id,
       notification_preferences: notifications,
       updated_at: new Date().toISOString(),
-    })
+    }, { onConflict: "user_id" })
 
   if (error) {
     // If the column doesn't exist yet, fall back to logging so settings
@@ -98,7 +98,7 @@ export async function updateProfile(formData: FormData) {
 
   const { error } = await supabase
     .from("user_profiles")
-    .upsert({ user_id: user.id, ...profileData, updated_at: new Date().toISOString() })
+    .upsert({ user_id: user.id, ...profileData, updated_at: new Date().toISOString() }, { onConflict: "user_id" })
 
   if (error) {
     console.error("[propdeskafrica] profile update error", error)

@@ -93,7 +93,7 @@ export default function TemplatesPage() {
   useEffect(() => {
     fetch("/api/templates")
       .then((r) => r.json())
-      .then((d) => setTemplates(Array.isArray(d) ? d : []))
+      .then((d) => setTemplates(Array.isArray(d) ? d : Array.isArray(d?.data) ? d.data : []))
       .catch(() => setTemplates([]))
   }, [])
 
@@ -134,13 +134,18 @@ export default function TemplatesPage() {
   const handlePreview = async () => {
     if (!selected) return
     setPreview(null)
+    setError(null)
     const r = await fetch(`/api/templates/${selected.id}/preview`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ fields }),
     })
     const d = await r.json().catch(() => null)
-    setPreview(d)
+    if (!r.ok) {
+      setError(d?.error || "Preview unavailable")
+      return
+    }
+    setPreview(d?.data || d)
   }
 
   return (
@@ -272,7 +277,7 @@ export default function TemplatesPage() {
                 {downloading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Download className="h-4 w-4 mr-2" />}
                 Download .docx
               </Button>
-              <Button variant="outline" onClick={handlePreview}>
+              <Button variant="outline" onClick={handlePreview} disabled={!selected}>
                 Preview
               </Button>
               <Button variant="ghost" onClick={() => { setFields({}); setPreview(null) }}>
