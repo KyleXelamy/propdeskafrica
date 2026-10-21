@@ -35,7 +35,7 @@ export const POST = withAuth(async (req, { supabase, userId }) => {
   if (pending?.checkout_request_id) return successResponse({ status: "initiated", checkout_request_id: pending.checkout_request_id, tx_id: pending.id, reused: true })
 
   if (!darajaConfigured() && process.env.MPESA_SANDBOX_MOCK !== "1") {
-    return errorResponse("M-Pesa not configured. Set MPESA_SANDBOX_MOCK=1 or supply credentials.", 503)
+    return errorResponse("Mobile payment is temporarily unavailable. Please try card payment or try again later.", 503)
   }
 
   const result = await stkPush({

@@ -21,12 +21,13 @@ export const POST = withAuth(async (req, { supabase, userId }) => {
   const { data: authUser } = await supabase.auth.getUser()
 
   const session = await stripe.checkout.sessions.create({
-    mode: "payment",
+    mode: "subscription",
     line_items: [{
       price_data: {
         currency: "kes",
         product_data: { name: planRow.name, description: "PropDesk Africa monthly subscription" },
         unit_amount: Number(planRow.price_kes) * 100,
+        recurring: { interval: "month" },
       },
       quantity: 1,
     }],

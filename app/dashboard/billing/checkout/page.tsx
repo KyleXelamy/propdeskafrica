@@ -32,10 +32,11 @@ export default function CheckoutPage() {
   const [cardLoading, setCardLoading] = useState(false)
 
   useEffect(() => {
-    fetch("/api/plans").then((r) => r.json()).then((plans) => {
-      const p = plans.find((p: Plan) => p.code === planCode)
+    fetch("/api/plans").then((r) => r.json()).then((payload) => {
+      const plans = Array.isArray(payload) ? payload : payload?.data || []
+      const p = plans.find((item: Plan) => item.code === planCode)
       setPlan(p || null)
-    })
+    }).catch(() => setError("Unable to load subscription plans. Please refresh and try again."))
   }, [planCode])
 
   useEffect(() => {
@@ -120,7 +121,7 @@ export default function CheckoutPage() {
         </Button>
         <h1 className="text-2xl md:text-3xl font-bold text-foreground mt-2">Subscribe to {plan?.name || "PropDesk Africa"}</h1>
         <p className="text-sm md:text-base text-muted-foreground">
-          Pay with M-Pesa. You&apos;ll get an STK push on your phone to enter your PIN.
+          Complete your subscription securely. Choose a mobile prompt or card payment below.
         </p>
       </div>
 
@@ -204,10 +205,10 @@ export default function CheckoutPage() {
               )}
               <Button type="submit" className="w-full bg-[#4caf50] hover:bg-[#449b48]" disabled={pushing || !plan}>
                 <Smartphone className="h-4 w-4 mr-2" />
-                Send STK push
+Pay by mobile prompt
               </Button>
               <p className="text-xs text-muted-foreground text-center">
-                You&apos;ll receive an M-Pesa prompt on your phone.
+You&apos;ll receive a secure payment prompt on your phone.
               </p>
               <div className="relative py-1 text-center text-xs text-muted-foreground before:absolute before:left-0 before:right-0 before:top-1/2 before:border-t">
                 <span className="relative bg-card px-2">or</span>

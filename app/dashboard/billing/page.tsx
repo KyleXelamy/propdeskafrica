@@ -147,14 +147,14 @@ export default async function BillingPage({
       <div id="plans" className="space-y-3 pt-4">
         <h2 className="text-xl font-semibold">Pick a plan</h2>
         <p className="text-sm text-muted-foreground">
-          Pay securely with M-Pesa STK Push or card, or get in touch for a manual invoice.
+          Choose a plan to activate your workspace. Pay by mobile prompt or card; your access updates after payment confirmation.
         </p>
 
         <div className="grid gap-4 md:grid-cols-3">
           {plans.map((p) => {
             const isCurrent = p.code === status?.plan && status?.is_active
             return (
-              <Card key={p.code} className={p.highlight ? "border-primary ring-1 ring-primary/20" : ""}>
+              <Card key={p.code} id={`plan-${p.code}`} className={p.highlight ? "border-primary ring-1 ring-primary/20" : ""}>
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-lg">{p.name}</CardTitle>

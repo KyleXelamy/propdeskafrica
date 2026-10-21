@@ -34,10 +34,12 @@ export async function POST(req: NextRequest) {
         completed_at: new Date().toISOString(),
         result_desc: "Stripe checkout completed",
       }).eq("stripe_session_id", paymentId).eq("user_id", userId)
+      const stripeSubscription = typeof session.subscription === "string" ? await getStripe().subscriptions.retrieve(session.subscription) : null
       await supabase.from("subscriptions").update({
         status: "active",
         plan_code: "pro",
-        current_period_end: new Date(Date.now() + 30 * 86400000).toISOString(),
+        current_period_start: stripeSubscription?.items.data[0]?.current_period_start ? new Date(stripeSubscription.items.data[0].current_period_start * 1000).toISOString() : new Date().toISOString(),
+        current_period_end: stripeSubscription?.items.data[0]?.current_period_end ? new Date(stripeSubscription.items.data[0].current_period_end * 1000).toISOString() : new Date(Date.now() + 30 * 86400000).toISOString(),
       }).eq("user_id", userId)
     }
   }
