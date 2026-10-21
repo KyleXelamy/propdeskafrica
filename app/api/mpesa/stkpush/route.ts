@@ -43,7 +43,7 @@ export const POST = withAuth(async (req, { supabase, userId }) => {
 
   if (!darajaConfigured() && process.env.MPESA_SANDBOX_MOCK !== "1") {
     return errorResponse(
-      "M-Pesa not configured. Set MPESA_SANDBOX_MOCK=1 in .env.local for mock mode, or set MPESA_CONSUMER_KEY/SECRET/SHORTCODE/PASSKEY/CALLBACK_URL for real.",
+      "Payments are temporarily unavailable. Please try again later.",
       503,
     )
   }

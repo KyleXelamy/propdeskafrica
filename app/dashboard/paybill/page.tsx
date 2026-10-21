@@ -43,7 +43,7 @@ export default function PaybillPage() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Paybill</h1>
           <p className="mt-1 text-muted-foreground">
-            Configure your Safaricom paybill &amp; till numbers. We detect, match and reconcile every payment.
+            Set up the payment destinations your tenants use. PayBill uses a business number and account reference; Till uses a Till number and amount.
           </p>
         </div>
         <p className="text-sm text-muted-foreground">Paybill records come from your database.</p>
@@ -100,18 +100,18 @@ export default function PaybillPage() {
             {[
               {
                 n: 1,
-                title: "Add your paybill",
-                body: "Paste your paybill / till number and the C2B validation URL we give you to Daraja. Done once.",
+                title: "Choose a destination",
+                body: "Use PayBill when each payment needs an account reference. Use Till when tenants pay directly to one number.",
               },
               {
                 n: 2,
-                title: "Tenants pay normally",
-                body: "Tenants pay to your number via the M-Pesa menu — no app, no login, no friction. The account reference carries the tenant ID.",
+                title: "Share simple instructions",
+                body: "Tenants can pay from their phone. PayBill payments include the account reference; Till payments only need the Till number and amount.",
               },
               {
                 n: 3,
-                title: "It just shows up",
-                body: "Payments land in your PropDesk Africa dashboard within 60 seconds, matched to the right tenant, property and lease.",
+                title: "Review incoming payments",
+                body: "Incoming payments appear in your workspace and can be matched to the right tenant and property.",
               },
             ].map((s) => (
               <li key={s.n} className="rounded-2xl border bg-card p-6">

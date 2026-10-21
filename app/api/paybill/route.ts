@@ -16,6 +16,10 @@ const CreateSchema = z.object({
   type: Type,
   property_ids: z.array(z.string().uuid()).min(1).max(50),
   c2b_validation_url: z.string().url().optional(),
+}).superRefine((value, context) => {
+  const digits = value.number.replace(/\\s+/g, "")
+  const valid = value.type === "till" ? /^\\d{6}$/.test(digits) : /^\\d{5,7}$/.test(digits)
+  if (!valid) context.addIssue({ code: z.ZodIssueCode.custom, path: ["number"], message: value.type === "till" ? "Enter a 6-digit Till number." : "Enter a 5–7 digit business number." })
 })
 
 export const runtime = "nodejs"
@@ -39,7 +43,8 @@ export const POST = withAuth(async (request, { userId }) => {
   }
 
   const number = parsed.data.number.replace(/\s+/g, "")
-  if (!/^\d{5,7}$/.test(number)) return NextResponse.json({ error: "Enter a valid 5–7 digit Till or PayBill number." }, { status: 400 })
+  const validNumber = parsed.data.type === "till" ? /^\d{6}$/.test(number) : /^\d{5,7}$/.test(number)
+  if (!validNumber) return NextResponse.json({ error: parsed.data.type === "till" ? "Enter a 6-digit Till number." : "Enter a 5–7 digit business number." }, { status: 400 })
   const { createServiceClient } = await import("@/lib/supabase/service")
   const supabase = createServiceClient()
   const { data: account, error } = await supabase.from("paybills").insert({ user_id: userId, label: parsed.data.label, number, type: parsed.data.type, c2b_validation_url: parsed.data.c2b_validation_url || null }).select("id, label, number, type, active, created_at").single()
