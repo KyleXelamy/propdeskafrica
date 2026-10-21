@@ -70,7 +70,7 @@ async function processConfirmation(body: C2BConfirmationRequest) {
   // `paybills.number` column).
   const owner = await resolveOwnerByShortCode(body.BusinessShortCode)
   if (!owner) {
-    console.warn("[c2b] no paybill registered for", body.BusinessShortCode)
+    console.warn("[c2b] payment destination not found", { shortCode: body.BusinessShortCode })
     return
   }
   txn.paybill_id = owner.paybill_id
