@@ -56,7 +56,7 @@ export function TrialBanner() {
         <Sparkles className="h-4 w-4 text-primary" />
         <AlertDescription className="flex flex-wrap items-center justify-between gap-2 w-full">
           <span>
-            <strong>{status.days_left} day{status.days_left === 1 ? "" : "s"} left</strong> in your trial of {status.plan_name || "Pro"}.
+            <strong>Your 14-day trial is active</strong> — {status.days_left} day{status.days_left === 1 ? "" : "s"} left on {status.plan_name || "Pro"}.
           </span>
           <div className="flex items-center gap-1">
             <Button asChild size="sm" variant="outline" className="bg-background text-foreground hover:bg-muted">
