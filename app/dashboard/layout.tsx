@@ -45,6 +45,26 @@ export default async function DashboardLayout({
     redirect("/auth/verify-email?email=" + encodeURIComponent(user.email || ""))
   }
 
+  // Start the first-time 14-day trial as soon as a verified user enters the app.
+  // The unique user_id constraint makes this safe on every dashboard request.
+  const { data: existingSubscription } = await supabase
+    .from("subscriptions")
+    .select("id")
+    .eq("user_id", user.id)
+    .maybeSingle()
+
+  if (!existingSubscription) {
+    const startsAt = new Date()
+    const trialEndsAt = new Date(startsAt.getTime() + 14 * 24 * 60 * 60 * 1000)
+    await supabase.from("subscriptions").insert({
+      user_id: user.id,
+      plan_code: "pro",
+      status: "trialing",
+      trial_starts_at: startsAt.toISOString(),
+      trial_ends_at: trialEndsAt.toISOString(),
+    })
+  }
+
   // Pull avatar/name in the same pass — sidebar needs them on every page.
   const { data: profile } = await supabase
     .from("user_profiles")
