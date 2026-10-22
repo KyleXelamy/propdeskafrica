@@ -41,12 +41,12 @@ export default function PaybillPage() {
     <div className="space-y-8">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Paybill</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Payment destinations</h1>
           <p className="mt-1 text-muted-foreground">
             Set up the payment destinations your tenants use. PayBill uses a business number and account reference; Till uses a Till number and amount.
           </p>
         </div>
-        <p className="text-sm text-muted-foreground">Paybill records come from your database.</p>
+        <p className="text-sm text-muted-foreground">Keep tenant payment instructions accurate and easy to share.</p>
       </header>
 
       {/* Top stats */}
@@ -92,8 +92,8 @@ export default function PaybillPage() {
       {/* How it works */}
       <Card>
         <CardHeader>
-          <CardTitle>How paybill matching works</CardTitle>
-          <CardDescription>Three simple steps.</CardDescription>
+          <CardTitle>Choose the right payment route</CardTitle>
+          <CardDescription>PayBill and Till are different payment destinations. Set up the one your tenants use.</CardDescription>
         </CardHeader>
         <CardContent>
           <ol className="grid gap-4 lg:grid-cols-3">
@@ -124,6 +124,11 @@ export default function PaybillPage() {
         </CardContent>
       </Card>
 
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card className="border-primary/20 bg-primary/[0.03]"><CardHeader><CardTitle className="text-lg">PayBill</CardTitle><CardDescription>Best when every tenant payment needs a unique account reference.</CardDescription></CardHeader><CardContent className="space-y-2 text-sm"><p><strong>Tenant enters:</strong> business number, account reference, and amount.</p><p className="text-muted-foreground">Use the tenant or lease reference you give them so incoming payments can be matched.</p></CardContent></Card>
+        <Card><CardHeader><CardTitle className="text-lg">Till</CardTitle><CardDescription>Best for direct payments to one Till number.</CardDescription></CardHeader><CardContent className="space-y-2 text-sm"><p><strong>Tenant enters:</strong> Till number and amount.</p><p className="text-muted-foreground">There is no account reference field on a Till payment.</p></CardContent></Card>
+      </div>
+
       <PaybillAccountForm />
 
       {/* Paybills */}
@@ -150,7 +155,7 @@ export default function PaybillPage() {
                 {loading ? (
                   <tr><td colSpan={5} className="px-4 py-10 text-center"><Loader2 className="mx-auto size-5 animate-spin" /></td></tr>
                 ) : paybills.length === 0 ? (
-                  <tr><td colSpan={5} className="px-4 py-10 text-center text-muted-foreground">No paybills configured yet.</td></tr>
+                  <tr><td colSpan={5} className="px-4 py-10 text-center text-muted-foreground">No payment destinations configured yet.</td></tr>
                 ) : paybills.map((p) => {
                   const paybillTransactions = transactions.filter((t) => t.paybill_id === p.id)
                   const paybillUnmatched = paybillTransactions.filter((t) => t.match_status !== "matched").length

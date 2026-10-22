@@ -147,7 +147,7 @@ export default async function BillingPage({
       <div id="plans" className="space-y-3 pt-4">
         <h2 className="text-xl font-semibold">Pick a plan</h2>
         <p className="text-sm text-muted-foreground">
-          Choose a plan to activate your workspace. Pay by mobile prompt or card; your access updates after payment confirmation.
+          Your workspace starts with a 14-day Pro trial. Choose a plan before it ends to keep access uninterrupted.
         </p>
 
         <div className="grid gap-4 md:grid-cols-3">
