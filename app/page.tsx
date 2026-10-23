@@ -1,7 +1,7 @@
 import Link from "next/link"
 import {
   ArrowRight, ArrowUpRight, BarChart3, Banknote, Building2, Check, ChevronRight, CircleDollarSign,
-  FileText, Layers, Lock, MessageSquare, Receipt, ShieldCheck, Smartphone, Sparkles, Users, Wrench,
+  FileText, Layers, Lock, MapPinned, MessageSquare, Receipt, ShieldCheck, Smartphone, Sparkles, Users, Wrench,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { features } from "@/lib/content/marketing"
@@ -11,7 +11,7 @@ import * as Icons from "lucide-react"
 import { PLANS, formatPrice } from "@/lib/pricing"
 
 const featureIcons: Record<string, React.ComponentType<{ className?: string }>> = {
-  Banknote, Users, Wrench, FileText, BarChart3, Receipt, Building2, Layers,
+  Banknote, Users, Wrench, FileText, BarChart3, Receipt, Building2, Layers, MapPinned,
 }
 
 
