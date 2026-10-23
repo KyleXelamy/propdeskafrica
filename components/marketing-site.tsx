@@ -28,6 +28,7 @@ const navSections: MegaSection[] = [
         items: [
           { label: "Reports & exports", href: "/features/reports", description: "Cashflow, arrears, occupancy, yield." },
           { label: "Expenses & receipts", href: "/features/expenses", description: "Snap, recur, forget." },
+          { label: "Property map & analytics", href: "/features/property-map-analytics", description: "See locations, occupancy and portfolio concentration." },
           { label: "Multi-property", href: "/features/multi-property", description: "Mixed-use portfolios in one workspace." },
           { label: "Developer API", href: "/features/developer-api", description: "REST, webhooks, OpenAPI spec." },
         ],

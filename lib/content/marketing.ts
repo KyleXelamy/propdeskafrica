@@ -32,6 +32,23 @@ export const features: Feature[] = [
       "https://images.unsplash.com/photo-1556742502-ec7c0e9f34b1?auto=format&fit=crop&w=1600&q=80",
   },
   {
+    slug: "property-map-analytics",
+    name: "Property map & analytics",
+    tagline: "See where your portfolio is, at a glance.",
+    summary:
+      "Plot every property on a live map, understand which locations carry your portfolio, and move from a pin to the people, occupancy and rent behind it.",
+    bullets: [
+      "Live property pins by location",
+      "Portfolio concentration by town and county",
+      "Occupancy and rent context by area",
+      "Select a property to open its location details",
+      "Built for real portfolio data, not map mockups",
+    ],
+    icon: "MapPinned",
+    image:
+      "/propdesk-property-operations.png",
+  },
+  {
     slug: "tenant-records",
     name: "Tenant records",
     tagline: "Every tenant. Every contact. Every lease.",
