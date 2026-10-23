@@ -74,6 +74,8 @@ export default async function PropertiesMapPage({ searchParams }: { searchParams
   const geocoded = properties.length
   const total = await countAll()
   const locations = Object.entries(properties.reduce<Record<string, number>>((groups, property) => { const key = property.city || property.county || "Unspecified"; groups[key] = (groups[key] || 0) + 1; return groups }, {})).sort((a, b) => b[1] - a[1])
+  const occupied = properties.filter((property) => property.status === "rented").length
+  const monthlyRent = properties.reduce((sum, property) => sum + (property.rent_amount || 0), 0)
 
   return (
     <div className="space-y-6">
@@ -99,7 +101,7 @@ export default async function PropertiesMapPage({ searchParams }: { searchParams
       </header>
 
       {/* Stats */}
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         <Card>
           <CardHeader className="pb-2">
             <CardDescription>On the map</CardDescription>
@@ -118,7 +120,10 @@ export default async function PropertiesMapPage({ searchParams }: { searchParams
             <CardTitle className="text-3xl">{Math.max(0, total - geocoded)}</CardTitle>
           </CardHeader>
         </Card>
+        <Card><CardHeader className="pb-2"><CardDescription>Occupied</CardDescription><CardTitle className="text-3xl">{occupied}</CardTitle><p className="text-xs text-muted-foreground">of mapped properties</p></CardHeader></Card>
+        <Card><CardHeader className="pb-2"><CardDescription>Monthly rent</CardDescription><CardTitle className="text-xl">KES {monthlyRent.toLocaleString()}</CardTitle><p className="text-xs text-muted-foreground">from mapped records</p></CardHeader></Card>
       </div>
+      <div className="grid gap-3 sm:grid-cols-2"><Card><CardHeader className="pb-2"><CardDescription>Top location</CardDescription><CardTitle className="text-2xl">{locations[0]?.[0] || "—"}</CardTitle><p className="text-xs text-muted-foreground">{locations[0] ? `${locations[0][1]} properties` : "Add location data to see concentration"}</p></CardHeader></Card><Card><CardHeader className="pb-2"><CardDescription>Coverage</CardDescription><CardTitle className="text-2xl">{total ? Math.round((geocoded / total) * 100) : 0}%</CardTitle><p className="text-xs text-muted-foreground">of properties mapped</p></CardHeader></Card></div>
 
       <PropertyMap properties={properties} height={560} />
 
