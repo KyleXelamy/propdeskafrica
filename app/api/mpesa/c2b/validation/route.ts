@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server"
 import {
+  authenticateMpesaCallback,
   buildC2BValidationResponse,
-  isFromSafaricom,
   parseBillRef,
   type C2BValidationRequest,
 } from "@/lib/mpesa/daraja"
@@ -16,7 +16,8 @@ import { createClient } from "@/lib/supabase/server"
  * place we get to decide whether a paybill / till payment goes through.
  *
  * We accept if:
- *   - the request is from a configured Safaricom IP (or non-prod)
+ *   - the request is from a configured Safaricom IP (the allowlist MUST be
+ *     configured — an unset allowlist rejects the callback)
  *   - the BillRefNumber either matches a known tenant UUID, a short
  *     account code, OR the phone number matches an active tenant
  *
@@ -24,13 +25,26 @@ import { createClient } from "@/lib/supabase/server"
  *   - the request is unsigned / from an unknown IP
  *   - the BillRefNumber is required and missing
  *
- * Public endpoint — no auth, but IP-allowlisted in production via
- * MPESA_ALLOWED_CALLBACK_IPS.
+ * Public endpoint — no auth, but IP-allowlisted via
+ * MPESA_ALLOWED_CALLBACK_IPS. The allowlist is evaluated against the
+ * platform-set client address (x-vercel-forwarded-for / cf-connecting-ip /
+ * x-real-ip), never the client-controllable x-forwarded-for header
+ * (INFRA-004 / AUTHZ-011). When MPESA_CALLBACK_SECRET is configured the
+ * shared secret is required as a second factor.
  */
 export const runtime = "nodejs"
 
 export async function POST(request: NextRequest) {
-  if (!isFromSafaricom(request.headers.get("x-forwarded-for"))) {
+  const auth = authenticateMpesaCallback(request.headers, {
+    requireSecret: false,
+    requireIpAllowlist: true,
+  })
+  if (!auth.ok) {
+    console.warn("[api/mpesa/c2b/validation] rejected", {
+      reason: auth.reason,
+      ip: auth.ip,
+      ipSource: auth.ipSource,
+    })
     return NextResponse.json(buildC2BValidationResponse(false, "Forbidden"), { status: 403 })
   }
 

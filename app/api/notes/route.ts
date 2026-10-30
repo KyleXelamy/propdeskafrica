@@ -1,4 +1,4 @@
-import { withAuth, successResponse, errorResponse, pickFields, blankToNull, toBool, HttpError } from "@/lib/api"
+import { withAuth, successResponse, errorResponse, pickFields, blankToNull, toBool, HttpError, dbError } from "@/lib/api"
 import type { NextRequest } from "next/server"
 
 const NOTE_FIELDS = [
@@ -27,7 +27,7 @@ export const GET = withAuth(async (req: NextRequest, { supabase, userId }) => {
   if (tenantId) query = query.eq("tenant_id", tenantId)
 
   const { data, error } = await query
-  if (error) return errorResponse(error.message, 500)
+  if (error) return dbError("notes", error, 500)
   return successResponse(data)
 })
 
@@ -54,6 +54,6 @@ export const POST = withAuth(async (req: NextRequest, { supabase, userId }) => {
     .select("*, properties(name, address), tenants(full_name)")
     .single()
 
-  if (error) return errorResponse(error.message, 500)
+  if (error) return dbError("notes", error, 500)
   return successResponse(data, 201)
 })

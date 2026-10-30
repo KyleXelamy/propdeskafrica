@@ -1,6 +1,12 @@
 import { NextResponse, type NextRequest } from "next/server"
-import { withAuth } from "@/lib/api"
-import { exportBackup, recordBackup, listBackups } from "@/lib/backup"
+import { withAuth, errorResponse, dbError } from "@/lib/api"
+import {
+  exportBackup,
+  recordBackup,
+  listBackups,
+  assertAllowedBackupTable,
+  BackupValidationError,
+} from "@/lib/backup"
 import { backupFilename, formatSize, BACKUP_TABLES } from "@/lib/system"
 import { uploadBackup, BACKUP_SIZE_LIMIT } from "@/lib/storage"
 
@@ -34,8 +40,25 @@ export const POST = withAuth(async (request, { userId, supabase }) => {
   } = await supabase.auth.getUser()
   const email = authUser?.email
 
+  // The table name ends up in an SQL identifier, so it must be allowlisted
+  // BEFORE it reaches the export. An unknown table is rejected outright.
+  let requestedTables: string[] | undefined
+  if (body?.tables && body.tables.length > 0) {
+    requestedTables = []
+    for (const table of body.tables) {
+      try {
+        requestedTables.push(assertAllowedBackupTable(table))
+      } catch (err) {
+        if (err instanceof BackupValidationError) {
+          return errorResponse(err.message, 400)
+        }
+        throw err
+      }
+    }
+  }
+
   const payload = await exportBackup(userId, email, {
-    tables: body?.tables,
+    tables: requestedTables,
   })
   const rowCount = Object.values(payload.counts).reduce((a, b) => a + b, 0)
   const json = JSON.stringify(payload, null, 2)

@@ -18,6 +18,9 @@ yarn-error.log*
 
 # env files
 .env*
+# …but the template IS tracked — it contains placeholders only, and it is the
+# documentation of what the deployment needs.
+!.env.example
 
 # vercel
 .vercel

@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server"
-import { withAuth } from "@/lib/api"
+import { withAuth, dbError } from "@/lib/api"
 import { z } from "zod"
 import { neonConfigured, getDb } from "@/lib/db/neon"
 import { createClient } from "@/lib/supabase/server"
@@ -68,7 +68,7 @@ export const GET = withAuth(async (_request, { userId }) => {
     .eq("user_id", userId)
     .order("priority", { ascending: false })
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return dbError("reconciliation/rules", error, 500)
   }
   if (data && data.length > 0) {
     return NextResponse.json({ count: data.length, rules: data })
@@ -128,6 +128,6 @@ export const POST = withAuth(async (request, { userId }) => {
     })
     .select()
     .single()
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) return dbError("reconciliation/rules", error, 500)
   return NextResponse.json({ ok: true, rule: data })
 })

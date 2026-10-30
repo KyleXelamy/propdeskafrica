@@ -12,6 +12,7 @@ create or replace function public.prune_old_backups()
 returns integer
 language plpgsql
 security definer
+set search_path = public, pg_temp
 as $$
 declare
   pruned integer;
@@ -29,7 +30,15 @@ begin
 end;
 $$;
 
-grant execute on function public.prune_old_backups() to service_role, authenticated;
+-- INFRA-016: a SECURITY DEFINER function is executable by PUBLIC by
+-- default, so `grant execute ... to service_role, authenticated` did not
+-- stop `anon` (or any registered user) from pruning EVERY tenant's backup
+-- history. Revoke from PUBLIC/anon/authenticated and grant only to the
+-- service role, which is the only caller (the backup cron).
+revoke execute on function public.prune_old_backups() from public;
+revoke execute on function public.prune_old_backups() from anon;
+revoke execute on function public.prune_old_backups() from authenticated;
+grant execute on function public.prune_old_backups() to service_role;
 
 -- Updated_at for the new columns is already handled by touch_updated_at
 -- if the table has that trigger; if not, create it idempotently.

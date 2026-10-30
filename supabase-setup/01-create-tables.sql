@@ -321,13 +321,53 @@ CREATE TRIGGER on_auth_user_created
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
 -- =====================================================================
--- 12.  STORAGE BUCKET FOR DOCUMENTS
+-- 12.  STORAGE BUCKET FOR DOCUMENTS  (PRIVATE — signed URLs only)
 -- =====================================================================
+-- CRYPTO-005 / INFRA-013: the bucket used to be created with `public = true`,
+-- which made every identity document (national ID scans, passports, lease
+-- agreements) world-readable at a stable URL and rendered the storage
+-- policies below inert for reads.
+--
+-- The bucket is now PRIVATE:
+--   * reads go through `createSignedUrl(path, 300)` — a 5 minute URL that the
+--     API only issues to the authenticated owner of the object;
+--   * the RLS policies below are therefore enforced on reads as well as
+--     writes, because an anonymous request carries no `auth.uid()` and
+--     therefore matches no row.
+--
+-- Object layout (the first path segment MUST be the owner's user id):
+--   {userId}/{timestamp}-{sanitised-name}.{ext}                  documents
+--   {userId}/property-photos/{propertyId}/{uuid}.{ext}           property photos
+--
+-- `ON CONFLICT (id) DO UPDATE` (not DO NOTHING) so that re-running this
+-- script on an existing project FLIPS AN EXISTING PUBLIC BUCKET TO PRIVATE.
+-- See audit/deliverable-storage-infra.md -> SECURITY ROLLOUT NOTE for the
+-- order of operations (migrate the stored URLs BEFORE applying this file).
 INSERT INTO storage.buckets (id, name, public)
-VALUES ('documents', 'documents', true)
-ON CONFLICT (id) DO NOTHING;
+VALUES ('documents', 'documents', false)
+ON CONFLICT (id) DO UPDATE SET public = false;
+
+-- Defence in depth: cap the object size at the app's own upload limit
+-- (10 MB) and pin the accepted content types to the ones the upload route
+-- validates. Both are bucket settings — no schema change.
+UPDATE storage.buckets
+SET file_size_limit = 10485760,
+    allowed_mime_types = ARRAY[
+      'application/pdf',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'image/jpeg',
+      'image/png',
+      'image/gif',
+      'image/webp',
+      'text/plain'
+    ]::text[]
+WHERE id = 'documents';
 
 -- Storage policies — owners can read/write their own files only.
+-- On a private bucket the SELECT policy is what authorises
+-- `createSignedUrl()`, so it has to be owner-scoped exactly like the
+-- write policies.
 DROP POLICY IF EXISTS "Users can upload their own documents" ON storage.objects;
 DROP POLICY IF EXISTS "Users can read their own documents"  ON storage.objects;
 DROP POLICY IF EXISTS "Users can update their own documents" ON storage.objects;
@@ -335,24 +375,33 @@ DROP POLICY IF EXISTS "Users can delete their own documents" ON storage.objects;
 
 CREATE POLICY "Users can upload their own documents" ON storage.objects
   FOR INSERT WITH CHECK (
-    bucket_id = 'documents' AND auth.uid()::text = (storage.foldername(name))[1]
+    bucket_id = 'documents'
+    AND auth.uid() IS NOT NULL
+    AND (storage.foldername(name))[1] = auth.uid()::text
   );
 CREATE POLICY "Users can read their own documents" ON storage.objects
   FOR SELECT USING (
-    bucket_id = 'documents' AND auth.uid()::text = (storage.foldername(name))[1]
+    bucket_id = 'documents'
+    AND auth.uid() IS NOT NULL
+    AND (storage.foldername(name))[1] = auth.uid()::text
   );
 CREATE POLICY "Users can update their own documents" ON storage.objects
   FOR UPDATE USING (
-    bucket_id = 'documents' AND auth.uid()::text = (storage.foldername(name))[1]
+    bucket_id = 'documents'
+    AND auth.uid() IS NOT NULL
+    AND (storage.foldername(name))[1] = auth.uid()::text
   );
 CREATE POLICY "Users can delete their own documents" ON storage.objects
   FOR DELETE USING (
-    bucket_id = 'documents' AND auth.uid()::text = (storage.foldername(name))[1]
+    bucket_id = 'documents'
+    AND auth.uid() IS NOT NULL
+    AND (storage.foldername(name))[1] = auth.uid()::text
   );
 
--- The bucket is public-readable so the app can render the URL directly
--- without a signed-URL round-trip. Files are still scoped per-user via
--- the path prefix (userId/...) enforced by the policies above.
+-- NOTE: no policy grants access to `anon`. Anonymous callers cannot read,
+-- write or sign anything in this bucket; only the service role can, and the
+-- application only uses it for a signed-URL fallback after it has already
+-- verified that the object belongs to the requesting user.
 
 -- =====================================================================
 -- DONE.

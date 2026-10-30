@@ -55,7 +55,15 @@ export async function updateSession(request: NextRequest) {
   const isExternalApi =
     pathname === "/api/health" ||
     pathname === "/api/cron/run" ||
-    pathname === "/api/mpesa/callback"
+    pathname === "/api/mpesa/callback" ||
+    // Safaricom posts the C2B validation and confirmation callbacks
+    // anonymously, so they have to reach the route. The routes themselves
+    // authenticate with the shared secret AND an IP allowlist that fails
+    // closed — an unset allowlist rejects the callback — so opening the
+    // path here does not open the hole. Do not add a path here unless the
+    // route it points at has its own authentication.
+    pathname === "/api/mpesa/c2b/validation" ||
+    pathname === "/api/mpesa/c2b/confirmation"
   const isAuthPage =
     pathname.startsWith("/auth/login") ||
     pathname.startsWith("/auth/sign-up")

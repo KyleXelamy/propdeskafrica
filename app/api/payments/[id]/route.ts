@@ -1,4 +1,4 @@
-import { withAuth, successResponse, errorResponse, pickFields, blankToNull, toNumberOrNull, HttpError } from "@/lib/api"
+import { withAuth, successResponse, errorResponse, pickFields, blankToNull, toNumberOrNull, HttpError, dbError } from "@/lib/api"
 
 const PAYMENT_FIELDS = [
   "tenant_id",
@@ -50,7 +50,7 @@ export const PUT = withAuth(async (req, { supabase, userId }, params) => {
     .select("*, tenants(full_name, email), properties(name, address)")
     .single()
 
-  if (error) return errorResponse(error.message, 500)
+  if (error) return dbError("payments/[id]", error, 500)
   if (!data) return errorResponse("Payment not found", 404)
   return successResponse(data)
 })
@@ -62,7 +62,7 @@ export const DELETE = withAuth(async (_req, { supabase, userId }, params) => {
     .eq("id", params.id)
     .eq("user_id", userId)
 
-  if (error) return errorResponse(error.message, 500)
+  if (error) return dbError("payments/[id]", error, 500)
   if (!count) return errorResponse("Payment not found", 404)
   return successResponse({ success: true })
 })

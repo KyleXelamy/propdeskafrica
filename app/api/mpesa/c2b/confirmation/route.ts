@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server"
-import { isFromSafaricom, parseBillRef, type C2BConfirmationRequest } from "@/lib/mpesa/daraja"
+import { authenticateMpesaCallback, parseBillRef, type C2BConfirmationRequest } from "@/lib/mpesa/daraja"
 import { neonConfigured, getDb } from "@/lib/db/neon"
 import { reconcile, defaultRules, type C2BTransaction, type RuleDef, type TenantCandidate, type MatchContext } from "@/lib/reconcile"
 import { createClient } from "@/lib/supabase/server"
@@ -17,11 +17,28 @@ import { createServiceClient, isServiceRoleConfigured } from "@/lib/supabase/ser
  *   5. Write a reconciliation_audit entry for the decision
  *
  * Public endpoint, no auth (Daraja can't authenticate).
+ *
+ * SECURITY (INFRA-004 / AUTHZ-011): the callback is authenticated by the
+ * Safaricom IP allowlist, which MUST be configured — an unset allowlist
+ * rejects the callback instead of accepting every caller. The allowlist is
+ * evaluated against the platform-set client address (x-vercel-forwarded-for
+ * / cf-connecting-ip / x-real-ip), never the client-controllable
+ * x-forwarded-for header. When MPESA_CALLBACK_SECRET is configured the
+ * shared secret is required as a second factor.
  */
 export const runtime = "nodejs"
 
 export async function POST(request: NextRequest) {
-  if (!isFromSafaricom(request.headers.get("x-forwarded-for"))) {
+  const auth = authenticateMpesaCallback(request.headers, {
+    requireSecret: false,
+    requireIpAllowlist: true,
+  })
+  if (!auth.ok) {
+    console.warn("[api/mpesa/c2b/confirmation] rejected", {
+      reason: auth.reason,
+      ip: auth.ip,
+      ipSource: auth.ipSource,
+    })
     return NextResponse.json({ ResultCode: 1, ResultDesc: "Forbidden" }, { status: 403 })
   }
 

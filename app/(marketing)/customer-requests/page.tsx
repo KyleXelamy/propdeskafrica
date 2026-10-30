@@ -1,7 +1,9 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { ArrowUpRight, MessageSquare, ThumbsUp, Sparkles } from "lucide-react"
+import { ArrowUpRight, Sparkles } from "lucide-react"
 import { FeedbackBoard } from "@/components/feedback-board"
+import { SubmitIdeaForm } from "@/components/submit-idea-form"
+import { roadmap } from "@/lib/content/marketing"
 
 export const metadata: Metadata = {
   title: "Customer requests — PropDesk Africa",
@@ -9,6 +11,17 @@ export const metadata: Metadata = {
 }
 
 export default function CustomerRequestsPage() {
+  // Real numbers, derived from the same roadmap the board renders. These
+  // used to be hardcoded placeholders (128 / 47 / 92%) that had nothing to
+  // do with the actual board.
+  const shipped = roadmap.filter((r) => r.status === "Shipped").length
+  const top = [...roadmap].sort((a, b) => b.votes - a.votes)[0]
+  const stats = [
+    { k: String(roadmap.length), v: "Ideas on the board" },
+    { k: String(shipped), v: "Ideas already shipped" },
+    { k: String(top?.votes ?? 0), v: `Votes on the top request` },
+  ]
+
   return (
     <>
       <section className="relative overflow-hidden bg-primary text-primary-foreground">
@@ -41,11 +54,7 @@ export default function CustomerRequestsPage() {
 
       <section className="bg-background py-12">
         <div className="container-x grid gap-4 md:grid-cols-3">
-          {[
-            { k: "128", v: "Ideas submitted this quarter" },
-            { k: "47", v: "Shipped in the last year" },
-            { k: "92%", v: "Of shipped ideas came from this board" },
-          ].map((s) => (
+          {stats.map((s) => (
             <div key={s.k} className="rounded-2xl border border-border bg-card p-6">
               <p className="text-3xl font-medium tracking-tight">{s.k}</p>
               <p className="mt-2 text-sm text-muted-foreground">{s.v}</p>
@@ -72,5 +81,3 @@ export default function CustomerRequestsPage() {
     </>
   )
 }
-
-import { SubmitIdeaForm } from "@/components/submit-idea-form"

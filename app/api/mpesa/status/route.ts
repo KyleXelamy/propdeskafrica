@@ -1,4 +1,4 @@
-import { withAuth, successResponse, errorResponse, HttpError } from "@/lib/api"
+import { withAuth, successResponse, errorResponse, HttpError, dbError } from "@/lib/api"
 import { stkQuery } from "@/lib/mpesa/daraja"
 
 /**
@@ -18,7 +18,7 @@ export const GET = withAuth(async (req, { supabase, userId }) => {
     .eq("checkout_request_id", checkout)
     .eq("user_id", userId)
     .maybeSingle()
-  if (rowErr) return errorResponse(rowErr.message, 500)
+  if (rowErr) return dbError("mpesa/status", rowErr, 500)
 
   // Already completed/failed locally — short-circuit
   if (row && (row.status === "completed" || row.status === "failed" || row.status === "cancelled")) {
@@ -26,7 +26,10 @@ export const GET = withAuth(async (req, { supabase, userId }) => {
   }
 
   const result = await stkQuery(checkout).catch((e) => ({ error: e.message }))
-  if ((result as any).error) return errorResponse((result as any).error, 502)
+  if ((result as any).error) {
+    console.error("[api] mpesa/status daraja query failed", (result as any).error)
+    return errorResponse("Could not reach the M-Pesa gateway", 502)
+  }
 
   const completed = (result as any).ResultCode === "0"
   const newStatus = (result as any).ResultCode === null || (result as any).ResultCode === undefined

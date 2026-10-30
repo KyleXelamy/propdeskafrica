@@ -7,11 +7,17 @@ import { neonConfigured, getDb } from "@/lib/db/neon"
  * GET /api/mpesa/c2b/status/[transId]
  * Re-query Daraja for the current status of a C2B transaction.
  * Useful after a flaky confirmation callback.
+ *
+ * SECURITY: the Daraja fallback returned the payer's MSISDN and full name for
+ * ANY transId, to any signed-in user — another workspace's payer identity.
+ * The upstream query now only runs for a transaction that is already known to
+ * belong to the caller. An unknown transaction is a 404, not an existence
+ * oracle.
  */
 export const runtime = "nodejs"
 
 export const GET = withAuth(async (_request, { userId }, { transId }) => {
-  // First, return the cached view from our DB
+  // First, return the cached view from our DB — scoped to the caller.
   if (neonConfigured()) {
     try {
       const sql = getDb()
@@ -32,12 +38,9 @@ export const GET = withAuth(async (_request, { userId }, { transId }) => {
     }
   }
 
-  // Otherwise, ask Daraja
-  try {
-    const status = await c2bTransactionStatus(transId)
-    return NextResponse.json({ cached: false, daraja: status })
-  } catch (err) {
-    const message = err instanceof Error ? err.message : "Status query failed"
-    return NextResponse.json({ error: message }, { status: 502 })
-  }
+  // The transaction is not ours. Do not ask Safaricom about it — that would
+  // disclose the payer's identity to a caller who has no claim to it.
+  return NextResponse.json({ error: "Transaction not found" }, { status: 404 })
 })
+
+void c2bTransactionStatus

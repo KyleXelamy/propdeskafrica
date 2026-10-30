@@ -1,4 +1,4 @@
-import { withAuth, successResponse, errorResponse } from "@/lib/api"
+import { withAuth, successResponse, errorResponse, dbError } from "@/lib/api"
 
 /**
  * POST /api/expenses/recurring/run
@@ -16,7 +16,7 @@ export const POST = withAuth(async (_req, { supabase, userId: _ }) => {
         501,
       )
     }
-    return errorResponse(error.message, 500)
+    return dbError("expenses/recurring/run", error, 500)
   }
   return successResponse({ inserted: typeof data === "number" ? data : 0 })
 })

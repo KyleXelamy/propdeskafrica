@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server"
-import { withAuth } from "@/lib/api"
+import { withAuth, dbError } from "@/lib/api"
 import { z } from "zod"
 
 /**
@@ -23,7 +23,7 @@ export const GET = withAuth(async (_request, { supabase, userId }) => {
     .eq("owner_id", userId)
     .maybeSingle()
 
-  if (companyError) return NextResponse.json({ error: companyError.message }, { status: 500 })
+  if (companyError) return dbError("company", companyError, 500)
   if (!company) return NextResponse.json({ workspace: null })
 
   const [{ data: team }, { data: landlords }] = await Promise.all([
@@ -52,7 +52,7 @@ export const POST = withAuth(async (request, { supabase, userId }) => {
     .upsert({ company_id: company.id, name: parsed.data.name, email: parsed.data.email, role: parsed.data.role }, { onConflict: "company_id,email" })
     .select("id, name, email, role, accepted_at")
     .single()
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) return dbError("company", error, 500)
 
   return NextResponse.json({ ok: true, member, message: `Teammate ${parsed.data.email} was added to the workspace.` })
 })

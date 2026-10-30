@@ -2,15 +2,21 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { ArrowUpRight, CheckCircle2, AlertCircle } from "lucide-react"
 import { statusIncidents } from "@/lib/content/site"
+import { checkSystemHealth } from "@/lib/system-health"
 
 export const metadata: Metadata = {
   title: "Status — PropDesk Africa",
   description: "Current availability of PropDesk Africa services.",
 }
 
-const allOperational = true
+export const dynamic = "force-dynamic"
 
-export default function StatusPage() {
+export default async function StatusPage() {
+  // A real probe, not a hardcoded "all good". The public ping route reads the
+  // same helper, so this page can never disagree with the machine-readable
+  // status API.
+  const health = await checkSystemHealth()
+  const allOperational = health.ok
   return (
     <main className="min-h-screen bg-background text-foreground">
       <section className="relative overflow-hidden bg-primary text-primary-foreground">
@@ -19,7 +25,7 @@ export default function StatusPage() {
           <p className="text-xs font-semibold uppercase tracking-[0.25em] text-accent">System status</p>
           <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-5">
             <h1 className="text-5xl font-medium leading-[0.98] tracking-[-0.05em] sm:text-6xl">
-              All systems operational
+              {allOperational ? "All systems operational" : "We are investigating a disruption"}
             </h1>
             <span
               className={`inline-flex items-center gap-2 self-start rounded-full px-3 py-1.5 text-xs font-semibold sm:self-auto ${
@@ -34,7 +40,7 @@ export default function StatusPage() {
           </div>
           <p className="mt-4 max-w-xl text-base text-primary-foreground/65">
             Updated continuously. Subscribe to{" "}
-            <Link href="/api/status" className="underline">
+            <Link href="/api/system/ping" className="underline">
               our status API
             </Link>{" "}
             for machine-readable output.
@@ -48,11 +54,24 @@ export default function StatusPage() {
             <div className="flex items-center justify-between gap-6 p-5">
               <div>
                 <p className="text-base font-medium">PropDesk Africa</p>
-                <p className="mt-1 text-sm text-muted-foreground">The application is available for customers.</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {allOperational
+                    ? "The application is available for customers."
+                    : "The application is reachable, but a dependency is not responding."}
+                </p>
               </div>
-              <span className="inline-flex shrink-0 items-center gap-2 rounded-full bg-success/15 px-3 py-1.5 text-xs font-medium text-success">
-                <CheckCircle2 className="size-3.5" /> Operational
-              </span>
+              {allOperational ? (
+                <span className="inline-flex shrink-0 items-center gap-2 rounded-full bg-success/15 px-3 py-1.5 text-xs font-medium text-success">
+                  <CheckCircle2 className="size-3.5" /> Operational
+                </span>
+              ) : (
+                <span className="inline-flex shrink-0 items-center gap-2 rounded-full bg-warning/15 px-3 py-1.5 text-xs font-medium text-warning">
+                  <AlertCircle className="size-3.5" /> Degraded
+                </span>
+              )}
+            </div>
+            <div className="border-t border-border px-5 py-3 text-xs text-muted-foreground">
+              Last checked {new Date(health.timestamp).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" })} · {health.db} · {health.latency_ms}ms
             </div>
           </div>
         </div>

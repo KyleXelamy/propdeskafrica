@@ -32,7 +32,8 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       },
     })
   } catch (e: any) {
-    return errorResponse(e?.message || "Render failed", 500)
+    console.error("[api] templates/docx render failed", e)
+    return errorResponse("Render failed", 500)
   }
 }
 

@@ -1,4 +1,4 @@
-import { withAuth, successResponse, errorResponse, HttpError } from "@/lib/api"
+import { withAuth, successResponse, errorResponse, HttpError, dbError } from "@/lib/api"
 
 /**
  * POST /api/tenants/[id]/invite
@@ -9,6 +9,12 @@ import { withAuth, successResponse, errorResponse, HttpError } from "@/lib/api"
  * `email`. We don't actually send an email (that would need SMTP) — we
  * assume the tenant has already signed up via /auth/sign-up. Once linked,
  * the tenant can be onboarded and the landlord/agent can see the record in /dashboard.
+ *
+ * SECURITY: `tenant_users.user_id` is UNIQUE — one auth account maps to one
+ * tenant portal link. The upsert used to conflict on `user_id` alone, so
+ * inviting an account that was ALREADY linked to another landlord's tenant
+ * silently REASSIGNED that link to the caller. Every link is now checked
+ * against the caller's own tenants before it is written.
  */
 export const POST = withAuth(async (req, { supabase, userId }, params) => {
   const body = await req.json().catch(() => null)
@@ -23,7 +29,7 @@ export const POST = withAuth(async (req, { supabase, userId }, params) => {
     .eq("id", params.id)
     .eq("user_id", userId)
     .maybeSingle()
-  if (tErr) return errorResponse(tErr.message, 500)
+  if (tErr) return dbError("tenants/[id]/invite", tErr, 500)
   if (!tenant) throw new HttpError("Tenant not found", 404)
 
   // Resolve the auth user id from email via the admin API
@@ -42,7 +48,31 @@ export const POST = withAuth(async (req, { supabase, userId }, params) => {
     )
   }
 
-  // Create the link (or update if existing)
+  // If this auth account already has a portal link, it must be a link the
+  // CALLER owns. Otherwise we would be taking another landlord's tenant
+  // portal away from them.
+  const { data: existingLink } = await supabase
+    .from("tenant_users")
+    .select("id, tenant_id")
+    .eq("user_id", matched.id)
+    .maybeSingle()
+
+  if (existingLink && existingLink.tenant_id !== tenant.id) {
+    const { data: existingTenant } = await supabase
+      .from("tenants")
+      .select("user_id")
+      .eq("id", existingLink.tenant_id)
+      .maybeSingle()
+
+    if (!existingTenant || existingTenant.user_id !== userId) {
+      throw new HttpError(
+        "That email is already linked to another tenant record and cannot be re-invited here.",
+        409,
+      )
+    }
+  }
+
+  // Create the link (or update if it is already this caller's own link)
   const { data, error } = await supabase
     .from("tenant_users")
     .upsert(
@@ -57,16 +87,26 @@ export const POST = withAuth(async (req, { supabase, userId }, params) => {
     )
     .select()
     .single()
-  if (error) return errorResponse(error.message, 500)
+  if (error) return dbError("tenants/[id]/invite", error, 500)
   return successResponse(data)
 })
 
 export const DELETE = withAuth(async (_req, { supabase, userId }, params) => {
   // Unlink a tenant from any auth user.
+  // The tenant must belong to the caller, otherwise this endpoint could
+  // unlink any landlord's tenant portal.
+  const { data: tenant } = await supabase
+    .from("tenants")
+    .select("id")
+    .eq("id", params.id)
+    .eq("user_id", userId)
+    .maybeSingle()
+  if (!tenant) throw new HttpError("Tenant not found", 404)
+
   const { error } = await supabase
     .from("tenant_users")
     .delete()
     .eq("tenant_id", params.id)
-  if (error) return errorResponse(error.message, 500)
+  if (error) return dbError("tenants/[id]/invite", error, 500)
   return successResponse({ ok: true })
 })

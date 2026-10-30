@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server"
-import { withAuth } from "@/lib/api"
+import { withAuth, dbError } from "@/lib/api"
 import { z } from "zod"
 
 /**
@@ -28,7 +28,7 @@ export const GET = withAuth(async (_request, { userId }) => {
   const { createServiceClient } = await import("@/lib/supabase/service")
   const supabase = createServiceClient()
   const { data, error } = await supabase.from("paybills").select("id, label, number, type, active, created_at").eq("user_id", userId).order("created_at", { ascending: false })
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) return dbError("paybill", error, 500)
   return NextResponse.json({ count: data?.length ?? 0, paybills: data ?? [] })
 })
 

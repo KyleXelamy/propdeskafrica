@@ -23,7 +23,7 @@ export default function PaybillPage() {
         supabase.from("c2b_transactions").select("id, paybill_id, trans_amount, match_status, created_at").order("created_at", { ascending: false }),
       ])
       if (paybillsResult.error || transactionsResult.error) {
-        setError(paybillsResult.error?.message || transactionsResult.error?.message || "Could not load paybill data")
+        setError("Could not load paybill data")
       } else {
         setPaybills(paybillsResult.data || [])
         setTransactions(transactionsResult.data || [])

@@ -1,11 +1,16 @@
 import { NextResponse, type NextRequest } from "next/server"
 import { z } from "zod"
+import { checkRateLimit, clientIdentifier } from "@/lib/api/rate-limit"
+import { insertSubmission, reference } from "@/lib/api/public-submissions"
 
 /**
  * POST /api/contact
- * Public endpoint used by /contact page form.
- * In production this writes to a `contact_submissions` Supabase table and
- * fires a notification email. For now it validates and acks.
+ * Public endpoint used by the /contact page form.
+ *
+ * The submission is now STORED in `contact_submissions` AND the visitor still
+ * gets a prefilled mailto so they can send it from their own mail client.
+ * It used to only build the mailto — nothing was recorded on the server, so
+ * a visitor who never pressed Send left no trace at all.
  */
 const ContactSchema = z.object({
   first_name: z.string().trim().min(1).max(80),
@@ -20,7 +25,19 @@ const ContactSchema = z.object({
 
 export const runtime = "nodejs"
 
+const RATE_LIMIT = 5
+const RATE_WINDOW_MS = 60_000
+
 export async function POST(request: NextRequest) {
+  const ip = clientIdentifier(request)
+  const limit = checkRateLimit(`contact:${ip}`, RATE_LIMIT, RATE_WINDOW_MS)
+  if (!limit.ok) {
+    return NextResponse.json(
+      { error: "Too many messages sent. Please try again shortly." },
+      { status: 429, headers: { "Retry-After": String(limit.resetInSeconds) } },
+    )
+  }
+
   try {
     const json = await request.json().catch(() => null)
     const parsed = ContactSchema.safeParse(json)
@@ -38,12 +55,28 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: true })
     }
 
-    // Stub: in production persist to Supabase + send email via Resend.
-    console.info("[contact] new message", {
-      email: payload.email,
-      topic: payload.topic,
-      name: `${payload.first_name} ${payload.last_name}`,
-    })
+    const ref = reference("MSG")
+    try {
+      await insertSubmission("contact_submissions", {
+        kind: "contact",
+        first_name: payload.first_name,
+        last_name: payload.last_name,
+        email: payload.email.toLowerCase(),
+        company: payload.company || null,
+        topic: payload.topic,
+        message: payload.message,
+        reference: ref,
+      })
+    } catch (err) {
+      console.error("[api/contact] store failed", err)
+      return NextResponse.json(
+        { error: "We could not record your message right now. Please try again shortly." },
+        { status: 503 },
+      )
+    }
+
+    // Log the fact, not the message body. Free-text contact messages are PII.
+    console.info("[contact] message stored", { ref, topic: payload.topic })
 
     const subject = `[PropDesk Africa] ${payload.topic} — ${payload.first_name} ${payload.last_name}`
     const emailBody = [
@@ -51,6 +84,7 @@ export async function POST(request: NextRequest) {
       `Email: ${payload.email}`,
       `Company / portfolio: ${payload.company || "Not provided"}`,
       `Topic: ${payload.topic}`,
+      `Reference: ${ref}`,
       "",
       "Message:",
       payload.message,
@@ -66,8 +100,4 @@ export async function POST(request: NextRequest) {
     console.error("[api/contact] failed", err)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
-}
-
-export async function GET() {
-  return NextResponse.json({ error: "Method not allowed" }, { status: 405 })
 }

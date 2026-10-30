@@ -1,4 +1,4 @@
-import { withAuth, successResponse, errorResponse, pickFields, blankToNull, toNumberOrNull, HttpError } from "@/lib/api"
+import { withAuth, successResponse, errorResponse, pickFields, blankToNull, toNumberOrNull, HttpError, dbError } from "@/lib/api"
 import type { NextRequest } from "next/server"
 
 const PAYMENT_FIELDS = [
@@ -47,7 +47,7 @@ export const GET = withAuth(async (req: NextRequest, { supabase, userId }) => {
   }
 
   const { data, error } = await query
-  if (error) return errorResponse(error.message, 500)
+  if (error) return dbError("payments", error, 500)
   return successResponse(data)
 })
 
@@ -59,6 +59,28 @@ export const POST = withAuth(async (req: NextRequest, { supabase, userId }) => {
   if (amount === null) throw new HttpError("amount is required", 400)
   if (!blankToNull(fields.tenant_id)) throw new HttpError("tenant_id is required", 400)
   if (!blankToNull(fields.property_id)) throw new HttpError("property_id is required", 400)
+
+  // Every referenced row must belong to the caller. Without this check a
+  // landlord could file a payment against another landlord's property or
+  // tenant by id.
+  const propertyId = blankToNull(fields.property_id) as string
+  const tenantId = blankToNull(fields.tenant_id) as string
+
+  const { data: property } = await supabase
+    .from("properties")
+    .select("id")
+    .eq("id", propertyId)
+    .eq("user_id", userId)
+    .maybeSingle()
+  if (!property) throw new HttpError("Property not found", 404)
+
+  const { data: tenant } = await supabase
+    .from("tenants")
+    .select("id")
+    .eq("id", tenantId)
+    .eq("user_id", userId)
+    .maybeSingle()
+  if (!tenant) throw new HttpError("Tenant not found", 404)
 
   // Auto-fill payment_date from paid_date if not provided
   const insert = {
@@ -80,6 +102,6 @@ export const POST = withAuth(async (req: NextRequest, { supabase, userId }) => {
     .select("*, tenants(full_name, email), properties(name, address)")
     .single()
 
-  if (error) return errorResponse(error.message, 500)
+  if (error) return dbError("payments", error, 500)
   return successResponse(data, 201)
 })

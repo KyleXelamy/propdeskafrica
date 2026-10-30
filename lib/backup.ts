@@ -6,8 +6,201 @@
 
 import { neonConfigured, getDb } from "@/lib/db/neon"
 import { createClient } from "@/lib/supabase/server"
-import { APP_VERSION, BACKUP_TABLES, type BackupPayload, type RestoreOptions, type RestoreResult, type SanitisedRow, sanitiseRow, BackupPayloadSchema, RestoreOptionsSchema } from "@/lib/system"
+import { APP_VERSION, BACKUP_TABLES, CURRENT_SCHEMA_VERSION, type BackupPayload, type RestoreOptions, type RestoreResult, type SanitisedRow, sanitiseRow, BackupPayloadSchema, RestoreOptionsSchema } from "@/lib/system"
 import { uploadBackup, getBackupSignedUrl, BACKUP_SIZE_LIMIT } from "@/lib/storage"
+
+/* ------------------------------------------------------------------ *
+ * SQL identifier validation
+ * ------------------------------------------------------------------ *
+ * The backup subsystem builds raw SQL. Two identifiers can reach it from a
+ * request: the TABLE name (POST /api/backup body, and the ?table= segment of
+ * /api/backup/csv/[table]) and the COLUMN names (the keys of a row in an
+ * uploaded backup file).
+ *
+ * A column name is especially dangerous: a backup row's keys are fully
+ * attacker-controlled (BackupPayloadSchema uses z.record(z.any())), and they
+ * were interpolated straight into the INSERT as quoted identifiers WITHOUT
+ * escaping the embedded double quote. A key such as
+ *
+ *   name") values (($1::text || (select current_user))) --
+ *
+ * produced a valid statement that executed arbitrary SQL and wrote the result
+ * into a row the attacker owns. Both identifiers are now validated against a
+ * strict pattern AND against the table's real column list before any SQL
+ * string is built.
+ */
+
+const SAFE_IDENTIFIER = /^[a-z_][a-z0-9_]*$/
+
+export class BackupValidationError extends Error {
+  readonly status = 400
+  constructor(message: string) {
+    super(message)
+    this.name = "BackupValidationError"
+  }
+}
+
+/** True when `name` is a plain lowercase Postgres identifier. */
+export function isSafeIdentifier(name: unknown): name is string {
+  return typeof name === "string" && SAFE_IDENTIFIER.test(name)
+}
+
+/**
+ * Every table that may be exported or restored. The table name is an
+ * identifier, so it is interpolated into SQL — it must never be caller
+ * controlled.
+ */
+export const BACKUP_TABLE_ALLOWLIST: ReadonlySet<string> = new Set(BACKUP_TABLES as readonly string[])
+
+/** Throws unless `table` is an allowlisted, syntactically safe table name. */
+export function assertAllowedBackupTable(table: unknown): string {
+  if (!isSafeIdentifier(table)) {
+    throw new BackupValidationError("Invalid table name")
+  }
+  if (!BACKUP_TABLE_ALLOWLIST.has(table)) {
+    throw new BackupValidationError(`Table "${table}" is not an allowed backup table`)
+  }
+  return table
+}
+
+/**
+ * The column that identifies the owning user for a given table.
+ * `user_profiles` is keyed by the user id itself; everything else carries a
+ * `user_id` column.
+ */
+export function ownerColumnFor(table: string): string {
+  return table === "user_profiles" ? "id" : "user_id"
+}
+
+/**
+ * Cache of the real column set of each backup table, read once per process
+ * from information_schema. Cached so the restore path does not query the
+ * catalogue for every row.
+ */
+const columnCache = new Map<string, Promise<ReadonlySet<string>>>()
+
+export async function loadAllowedColumns(
+  sql: ReturnType<typeof getDb>,
+  table: string,
+): Promise<ReadonlySet<string>> {
+  const cached = columnCache.get(table)
+  if (cached) return cached
+
+  const pending = (async () => {
+    const rows = (await (sql as any).unsafe(
+      `select column_name from information_schema.columns
+        where table_schema = 'public' and table_name = $1`,
+      [table],
+    )) as Array<{ column_name?: string }>
+    return new Set((rows ?? []).map((r) => String(r.column_name)))
+  })()
+
+  columnCache.set(table, pending)
+  return pending
+}
+
+/** Drop the cached column lists. Used by tests and after a schema change. */
+export function resetBackupColumnCache(): void {
+  columnCache.clear()
+}
+
+export type RestoreMode = "skip" | "replace" | "merge"
+
+export interface BuiltStatement {
+  sql: string
+  values: unknown[]
+  columns: string[]
+}
+
+/**
+ * Build the COUNT used to size one table for one user.
+ */
+export function buildExportCount(table: string, keyColumn: string): string {
+  assertAllowedBackupTable(table)
+  if (!isSafeIdentifier(keyColumn)) {
+    throw new BackupValidationError("Invalid owner column")
+  }
+  return `select count(*)::int as n from public.${table} where ${keyColumn} = $1`
+}
+
+/**
+ * Build the SELECT used to export one table for one user.
+ * Pure — the table name must already be allowlisted.
+ */
+export function buildExportSelect(table: string, keyColumn: string): string {
+  assertAllowedBackupTable(table)
+  if (!isSafeIdentifier(keyColumn)) {
+    throw new BackupValidationError("Invalid owner column")
+  }
+  return `select * from public.${table} where ${keyColumn} = $1`
+}
+
+/**
+ * Build the INSERT used to restore one row.
+ *
+ * PURE and unit-testable: it takes the table's real column set as an
+ * argument, so it needs no database.
+ *
+ * Throws BackupValidationError — and therefore builds NO SQL at all — when the
+ * table is not allowlisted, the row has no columns, a column name fails the
+ * identifier pattern, or a column is not one of the table's real columns.
+ * Values are always bound as $n parameters and never interpolated.
+ */
+export function buildRestoreInsert(
+  table: string,
+  row: Record<string, unknown>,
+  allowedColumns: readonly string[],
+  mode: RestoreMode,
+  conflictColumns: readonly string[] = [],
+): BuiltStatement {
+  assertAllowedBackupTable(table)
+
+  const allowed = new Set(allowedColumns)
+  const columns = Object.keys(row)
+  if (columns.length === 0) {
+    throw new BackupValidationError("Restore row contains no columns")
+  }
+
+  for (const column of columns) {
+    if (!isSafeIdentifier(column)) {
+      throw new BackupValidationError(`Unsafe column name rejected: ${JSON.stringify(column)}`)
+    }
+    if (!allowed.has(column)) {
+      throw new BackupValidationError(
+        `Unknown column "${column}" for table "${table}" — restore rejected`,
+      )
+    }
+  }
+
+  const values = columns.map((c) => row[c])
+  const placeholders = columns.map((_, i) => `$${i + 1}`)
+  const quoted = columns.map((c) => `"${c}"`)
+
+  let sql = `insert into public.${table} (${quoted.join(",")}) values (${placeholders.join(",")})`
+
+  if (mode === "skip") {
+    sql += " on conflict do nothing"
+  } else {
+    if (conflictColumns.length === 0) {
+      throw new BackupValidationError(`Restore mode "${mode}" requires conflict columns`)
+    }
+    for (const c of conflictColumns) {
+      if (!allowed.has(c)) {
+        throw new BackupValidationError(`Unknown conflict column "${c}"`)
+      }
+    }
+    const target = conflictColumns.map((c) => `"${c}"`).join(",")
+    const assignments = columns
+      .filter((c) => !conflictColumns.includes(c))
+      .map((c) => `"${c}" = $${columns.indexOf(c) + 1}`)
+    sql += ` on conflict (${target}) do update set `
+    sql += assignments.length
+      ? assignments.join(",")
+      : `"${conflictColumns[0]}" = excluded."${conflictColumns[0]}"`
+  }
+
+  return { sql, values, columns }
+}
 
 type Db = {
   // Returns a flat array of objects for a table
@@ -23,12 +216,13 @@ type Db = {
 const neonDb: Db = {
   async select(table, userId) {
     const sql = getDb()
-    // We rely on the user_id column existing on every table we back up.
-    // Where it doesn't (e.g. user_profiles keyed by user_id as PK), we read
-    // by id instead.
-    const keyCol = table === "user_profiles" ? "id" : "user_id"
+    // The table name is an SQL identifier — it must be allowlisted before it
+    // reaches the statement. Throws BackupValidationError for a bad table.
+    assertAllowedBackupTable(table)
+    const keyCol = ownerColumnFor(table)
+    const statement = buildExportSelect(table, keyCol)
     try {
-      const rows = await (sql as any).unsafe(`select * from public.${table} where ${keyCol} = $1`, [userId]) as any[]
+      const rows = await (sql as any).unsafe(statement, [userId]) as any[]
       return rows.map(sanitiseRow)
     } catch (err) {
       console.warn(`[backup] neon select failed for ${table}`, err)
@@ -37,9 +231,11 @@ const neonDb: Db = {
   },
   async count(table, userId) {
     const sql = getDb()
-    const keyCol = table === "user_profiles" ? "id" : "user_id"
+    assertAllowedBackupTable(table)
+    const keyCol = ownerColumnFor(table)
+    const statement = buildExportCount(table, keyCol)
     try {
-      const rows = await (sql as any).unsafe(`select count(*)::int as n from public.${table} where ${keyCol} = $1`, [userId]) as any[]
+      const rows = await (sql as any).unsafe(statement, [userId]) as any[]
       return rows[0]?.n ?? 0
     } catch {
       return 0
@@ -49,47 +245,48 @@ const neonDb: Db = {
     if (rows.length === 0) return { inserted: 0, updated: 0, skipped: 0 }
     const sql = getDb()
     let inserted = 0, updated = 0, skipped = 0
+    // The table's REAL column set, read once per process from the catalogue.
+    // Every row's keys are checked against it before any SQL is built, so an
+    // attacker-controlled column name can never reach an identifier position.
+    let allowedColumns: ReadonlySet<string>
+    try {
+      allowedColumns = await loadAllowedColumns(sql, table)
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "unknown"
+      console.warn(`[backup] could not read the column list for ${table}`, message)
+      return { inserted: 0, updated: 0, skipped: rows.length, error: `Could not read the column list for ${table}` }
+    }
+    if (allowedColumns.size === 0) {
+      return { inserted: 0, updated: 0, skipped: rows.length, error: `Unknown table ${table}` }
+    }
+
     for (const row of rows) {
       // Re-stamp ownership on every row while preserving stable record IDs.
       // Profiles use their user ID as the primary key; all other records use user_id.
       const safe = table === "user_profiles" ? { ...row, id: userId, user_id: userId } : { ...row, user_id: userId }
       try {
-        if (onConflict === "skip") {
-          const result = await (sql as any).unsafe(
-            `insert into public.${table} (${Object.keys(safe).map((k) => `"${k}"`).join(",")})
-             values (${Object.keys(safe).map((_, i) => `$${i + 1}`).join(",")})
-             on conflict do nothing`,
-            Object.values(safe),
-          ) as any
-          inserted += result.length ?? 1
-        } else if (onConflict === "replace") {
-          const result = await (sql as any).unsafe(
-            `insert into public.${table} (${Object.keys(safe).map((k) => `"${k}"`).join(",")})
-             values (${Object.keys(safe).map((_, i) => `$${i + 1}`).join(",")})
-             on conflict (id) do update set ${Object.keys(safe)
-               .filter((k) => k !== "id")
-               .map((k) => `"${k}" = $${Object.keys(safe).indexOf(k) + 1}`)
-               .join(", ")}`,
-            Object.values(safe),
-          ) as any
-          updated += result.length ?? 1
-        } else {
-          // merge
-          const result = await (sql as any).unsafe(
-            `insert into public.${table} (${Object.keys(safe).map((k) => `"${k}"`).join(",")})
-             values (${Object.keys(safe).map((_, i) => `$${i + 1}`).join(",")})
-             on conflict (id) do update set ${Object.keys(safe)
-               .filter((k) => k !== "id")
-               .map((k) => `"${k}" = excluded."${k}"`)
-               .join(", ")}`,
-            Object.values(safe),
-          ) as any
-          updated += result.length ?? 1
+        // Build the statement through the validated builder. It throws before
+        // producing any SQL when a column name is unsafe or unknown.
+        const conflictColumns = onConflict === "skip" ? [] : ["id"]
+        if (conflictColumns.length > 0 && !("id" in safe)) {
+          skipped++
+          console.warn(`[backup] row skipped for ${table}: the "${onConflict}" mode needs an id column`)
+          continue
         }
+        const statement = buildRestoreInsert(
+          table,
+          safe,
+          [...allowedColumns],
+          onConflict,
+          conflictColumns,
+        )
+        const result = await (sql as any).unsafe(statement.sql, statement.values) as any
+        if (onConflict === "skip") inserted += result?.length ?? 1
+        else updated += result?.length ?? 1
       } catch (err) {
         skipped++
         const message = err instanceof Error ? err.message : "unknown"
-        console.warn(`[backup] row insert failed for ${table}`, message)
+        console.warn(`[backup] row insert rejected for ${table}`, message)
       }
     }
     return { inserted, updated, skipped }
@@ -184,7 +381,10 @@ export async function exportBackup(
   opts: ExportOptions = {},
 ): Promise<BackupPayload> {
   const db = getDbLayer()
-  const tables = opts.tables && opts.tables.length > 0 ? opts.tables : [...BACKUP_TABLES]
+  const requested = opts.tables && opts.tables.length > 0 ? opts.tables : [...BACKUP_TABLES]
+  // Defence in depth: even if a caller forgets to validate, the library
+  // refuses any table that is not allowlisted.
+  const tables = requested.map((table) => assertAllowedBackupTable(table))
   const counts: Record<string, number> = {}
   const data: Record<string, SanitisedRow[]> = {}
   for (const table of tables) {
@@ -193,10 +393,10 @@ export async function exportBackup(
     data[table] = rows
   }
   return {
-    schema_version: 11,
+    schema_version: CURRENT_SCHEMA_VERSION,
     app_version: APP_VERSION,
     generated_at: new Date().toISOString(),
-    user: { id: "workspace" },
+    user: { id: userId, email: userEmail },
     counts,
     data,
   }
@@ -229,6 +429,50 @@ export async function restoreBackup(
   const afterCounts: Record<string, number> = {}
   const tablesRestored: string[] = []
   const errors: Array<{ table: string; error: string }> = []
+
+  // PRE-FLIGHT: validate every row of every table BEFORE writing anything.
+  // A restore that contains an unsafe or unknown column is rejected outright
+  // rather than partially applied, so the database can never end up half
+  // restored.
+  const dbLayer = db as unknown as { preflight?: (table: string) => Promise<string[]> }
+  for (const [table, rows] of Object.entries(parse.data.data)) {
+    if (!BACKUP_TABLES.includes(table as any)) {
+      errors.push({ table, error: "Unknown table — skipped" })
+      continue
+    }
+    if (rows.length === 0) continue
+    let allowed: ReadonlySet<string>
+    try {
+      allowed = await loadAllowedColumns(getDb(), table)
+    } catch {
+      // The catalogue is unavailable — fall back to the identifier check only
+      // and let the per-row builder apply the real column allowlist.
+      allowed = new Set<string>()
+    }
+    const allowedSet = new Set(allowed)
+    for (const row of rows) {
+      for (const column of Object.keys(row)) {
+        if (!isSafeIdentifier(column)) {
+          return {
+            status: "failed",
+            before_counts: {},
+            after_counts: {},
+            tables_restored: [],
+            errors: [{ table, error: `Unsafe column name in the backup file: ${JSON.stringify(column)}` }],
+          }
+        }
+        if (allowedSet.size > 0 && !allowedSet.has(column) && column !== "user_id" && column !== "id") {
+          return {
+            status: "failed",
+            before_counts: {},
+            after_counts: {},
+            tables_restored: [],
+            errors: [{ table, error: `Unknown column "${column}" for table "${table}"` }],
+          }
+        }
+      }
+    }
+  }
 
   for (const [table, rows] of Object.entries(parse.data.data)) {
     if (!BACKUP_TABLES.includes(table as any)) {

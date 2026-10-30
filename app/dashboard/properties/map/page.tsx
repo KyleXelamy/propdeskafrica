@@ -150,8 +150,9 @@ async function countAll(): Promise<number> {
       const sql = getDb()
       const rows = await sql`select count(*)::int as n from public.properties`
       return rows[0]?.n ?? 0
-    } catch {
-      // fall through
+    } catch (err) {
+      // Neon is unreachable — fall back to Supabase rather than reporting 0.
+      console.warn("[properties map] neon count failed, falling back to supabase", err)
     }
   }
   const supa = await createClient()

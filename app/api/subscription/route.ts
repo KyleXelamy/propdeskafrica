@@ -1,4 +1,4 @@
-import { withAuth, successResponse, errorResponse, HttpError } from "@/lib/api"
+import { withAuth, successResponse, errorResponse, HttpError, dbError } from "@/lib/api"
 import { getDb, neonConfigured } from "@/lib/db/neon"
 import { createClient } from "@/lib/supabase/server"
 
@@ -54,7 +54,7 @@ export const GET = withAuth(async (_req, { supabase, userId }) => {
     .select("*, plans(name)")
     .eq("user_id", userId)
     .maybeSingle()
-  if (error) return errorResponse(error.message, 500)
+  if (error) return dbError("subscription", error, 500)
   if (!data) {
     return successResponse({
       has_subscription: false,
@@ -138,7 +138,7 @@ export const PATCH = withAuth(async (req, { supabase, userId }) => {
       .eq("user_id", userId)
       .select()
       .single()
-    if (error) return errorResponse(error.message, 500)
+    if (error) return dbError("subscription", error, 500)
     return successResponse(data)
   }
   throw new HttpError("Provide plan or cancel", 400)

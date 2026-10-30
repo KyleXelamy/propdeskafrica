@@ -579,6 +579,11 @@ export type Template = {
   format: "PDF" | "DOCX" | "CSV"
   region: string
   downloadPath?: string
+  /**
+   * The statute(s) the template is built on. Kept short and factual —
+   * the full legal-position notes live in lib/templates/templates.ts.
+   */
+  legalBasis?: string
 }
 
 export const templates: Template[] = [
@@ -586,7 +591,9 @@ export const templates: Template[] = [
     slug: "kenya-residential-lease",
     name: "Kenya Residential Lease (1-year)",
     category: "Lease",
-    description: "Plain-English residential lease compliant with the Kenya Landlord & Tenant Act.",
+    description:
+      "Plain-English residential lease for Kenyan homes, citing the correct residential framework.",
+    legalBasis: "Rent Restriction Act, Cap 296; Law of Contract Act, Cap 23; Distress for Rent Act, Cap 293",
     downloads: 28,
     format: "DOCX",
     region: "Kenya",
@@ -596,6 +603,7 @@ export const templates: Template[] = [
     name: "Kenya Month-to-Month Agreement",
     category: "Lease",
     description: "Short-form lease for month-to-month tenancies.",
+    legalBasis: "Law of Contract Act, Cap 23; Rent Restriction Act, Cap 296",
     downloads: 24,
     format: "DOCX",
     region: "Kenya",
@@ -686,6 +694,7 @@ export const templates: Template[] = [
     name: "Kenya Commercial Lease (3-year)",
     category: "Lease",
     description: "Commercial lease template with CAM and escalation clauses.",
+    legalBasis: "Law of Contract Act, Cap 23",
     downloads: 20,
     format: "DOCX",
     region: "Kenya",

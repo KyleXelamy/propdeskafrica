@@ -1,4 +1,4 @@
-import { withAuth, successResponse, errorResponse, pickFields, blankToNull, toNumberOrNull, toBool, HttpError } from "@/lib/api"
+import { withAuth, successResponse, errorResponse, pickFields, blankToNull, toNumberOrNull, toBool, HttpError, dbError } from "@/lib/api"
 import type { NextRequest } from "next/server"
 
 const EXPENSE_FIELDS = [
@@ -41,7 +41,7 @@ export const GET = withAuth(async (_req, { supabase, userId }) => {
   }
 
   const { data, error } = await query
-  if (error) return errorResponse(error.message, 500)
+  if (error) return dbError("expenses", error, 500)
   return successResponse(data)
 })
 
@@ -74,6 +74,6 @@ export const POST = withAuth(async (req: NextRequest, { supabase, userId }) => {
     .select("*, properties(name, address)")
     .single()
 
-  if (error) return errorResponse(error.message, 500)
+  if (error) return dbError("expenses", error, 500)
   return successResponse(data, 201)
 })

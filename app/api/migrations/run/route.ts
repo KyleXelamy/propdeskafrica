@@ -1,3 +1,4 @@
+import { timingSafeEqualString } from "@/lib/api/secure-compare"
 import { NextResponse, type NextRequest } from "next/server"
 import { z } from "zod"
 import { neonConfigured, getDb } from "@/lib/db/neon"
@@ -46,7 +47,7 @@ async function checkAccess(request: NextRequest): Promise<NextResponse | null> {
     return user ? null : NextResponse.json({ error: "Forbidden" }, { status: 403 })
   }
 
-  if (expected && got === expected) return null
+  if (expected && timingSafeEqualString(got, expected)) return null
 
   if (process.env.NODE_ENV !== "production") {
     const supabase = await createClient()

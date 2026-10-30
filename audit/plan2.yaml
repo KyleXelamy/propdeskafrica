@@ -1,0 +1,513 @@
+version: 1
+plan:
+  name: 'PropDesk Africa — hardening round 2 (M-Pesa, storage/infra, encryption core)'
+  max_concurrency: 4
+  max_consecutive_failures: 3
+  max_cycles: 6
+tasks:
+  - id: harden-mpesa
+    title: 'Harden the M-Pesa payment path'
+    assigned_to: Coder
+    verified_by: Verifier
+    timeout_ms: 1800000
+    prompt: |
+      You are fixing confirmed HIGH severity payment-integrity bugs in the PropDesk
+      Africa repo at /workspace/propdesk (Next.js 16 App Router, TypeScript strict,
+      Safaricom Daraja M-Pesa, Supabase auth, Neon Postgres, vitest).
+
+      READ FIRST:
+      - /workspace/propdesk/audit/ENVIRONMENT.md  (environment setup, the 54 pre-existing
+        tsc errors that are the BASELINE and not yours, the severity ladder, ground rules)
+      - /workspace/propdesk/audit/findings/infra.json  (findings INFRA-004, INFRA-005,
+        INFRA-006, INFRA-007)
+      - /workspace/propdesk/audit/findings/authz.json  (finding AUTHZ-005)
+      Each finding has the exact file, lines, evidence and proposed fix. Open the cited
+      lines yourself before changing anything.
+
+      ## YOUR FILES — you own EXACTLY these and no others
+      - lib/mpesa/daraja.ts
+      - app/api/mpesa/callback/route.ts
+      - app/api/mpesa/c2b/confirmation/route.ts
+      - app/api/mpesa/c2b/validation/route.ts
+      - app/api/mpesa/c2b/register/route.ts
+      - app/api/mpesa/stkpush/route.ts
+
+      DO NOT touch app/api/mpesa/c2b/status/[transId]/route.ts (already fixed), or ANY
+      file outside your list. Other agents are working on those right now. If a fix
+      seems to need a file you do not own, implement what you can and document the rest.
+
+      ## WHAT TO FIX
+
+      ### 1. INFRA-004 — the C2B IP allowlist FAILS OPEN
+      app/api/mpesa/c2b/confirmation/route.ts and app/api/mpesa/c2b/validation/route.ts
+      authenticate the Safaricom callback with an IP allowlist, and
+      lib/mpesa/daraja.ts:268-283 treats an UNSET MPESA_ALLOWED_CALLBACK_IPS as
+      "allow everything". A deployment that forgets the env var accepts a forged
+      callback from any IP, and a forged callback marks invoices paid.
+      FIX: fail CLOSED. An unset or empty allowlist must REJECT the callback. Also
+      accept the shared callback secret (MPESA_CALLBACK_SECRET) as a second factor
+      when it is configured.
+
+      ### 2. INFRA-005 — the callback trusts the FIRST x-forwarded-for hop
+      app/api/mpesa/callback/route.ts:38-41 reads the first `x-forwarded-for` entry
+      when checking the allowlist. That header is attacker-controlled: sending
+      `X-Forwarded-For: <safaricom-ip>` passes the check.
+      FIX: do not use a client-controllable header for an authorisation decision.
+      Prefer the platform's trusted header (Vercel provides `x-vercel-forwarded-for`
+      and `x-real-ip`) and treat the forwarded header as untrusted. The fail-closed
+      secret check from item 1 must be the real control.
+
+      ### 3. INFRA-006 — the callback marks an invoice paid without checking the amount
+      app/api/mpesa/callback/route.ts:69-103 marks the invoice paid but never compares
+      the settled amount to the amount owed. A payment of KES 1 satisfies a KES 50,000
+      invoice.
+      FIX: compare the settled amount with the invoice amount before writing. On a
+      mismatch do NOT mark it paid — record it as a mismatch and surface it. Handle
+      rounding explicitly (exact match, or a documented small tolerance) and put the
+      rule in a comment.
+
+      ### 4. INFRA-007 — a paid subscription is granted for free in the wrong environment
+      lib/mpesa/daraja.ts:47,143-151,203-212 grants a paid subscription when
+      `MPESA_ENV` is not "production" OR when `MPESA_SANDBOX_MOCK=1`. A misconfigured
+      production deployment (MPESA_ENV unset, or the sandbox flag accidentally on)
+      hands out paid plans for free.
+      FIX: the mock path must be impossible to reach by accident in production. Require
+      BOTH `MPESA_SANDBOX_MOCK === "1"` AND `NODE_ENV !== "production"`, and make an
+      ABSENT or BLANK `MPESA_ENV` mean "not sandbox" (never "sandbox"). The library
+      must never report a successful payment that did not happen.
+      NOTE: app/api/subscription/checkout-status/route.ts is NOT yours — it reads the
+      result of the library. Make the library safe and document exactly what that
+      route must also check.
+
+      ### 5. AUTHZ-005 — any signed-in user can re-point the platform's Daraja URLs
+      app/api/mpesa/c2b/register/route.ts:22-46 lets any authenticated user reconfigure
+      the platform-wide Daraja validation/confirmation callback URLs using the
+      platform's own merchant credentials.
+      FIX: restrict this to an authorised operator. Check how the app models roles and
+      ownership (read the code — do not invent a scheme) and require it here. If the
+      app has no admin concept at all, implement an explicit allowlist via an env var
+      (e.g. MPESA_ADMIN_EMAILS) and document that the owner MUST set it.
+
+      ## CONSTRAINTS
+      - Do NOT change the database schema (no migrations, no new columns).
+      - Do NOT change a route's public request/response contract unless a fix
+        absolutely requires it; if you must, document it loudly in your report.
+      - Match the existing style: TypeScript strict, 2-space indent, zod for validation,
+        the existing `withAuth`/`withDbAuth` wrappers, `errorResponse`/`jsonError`.
+      - Run `npx tsc --noEmit` in /workspace/propdesk. THE BASELINE IS 54 PRE-EXISTING
+        ERRORS (audit/baseline/tsc-baseline.log). Your obligation is ZERO NEW errors
+        from your files. Report before/after counts.
+      - Run `npm test`. The baseline suite is now 2 files / 30 tests passing. It must
+        still pass.
+      - Add a vitest regression test for each fix you make where the logic is pure or
+        can be isolated (e.g. lib/mpesa/*.test.ts). Keep tests hermetic: no network,
+        no database, no Supabase. Name each test after the finding id it protects and
+        put `// protects INFRA-004` above it.
+      - Do NOT run `git commit`. Do NOT run `npm install`. Do NOT modify the audit/
+        directory except writing your own deliverable file.
+
+      ## REPORT
+      Write /workspace/propdesk/audit/deliverable-mpesa-hardening.md:
+      - each finding id, status (FIXED / WONT_FIX / PARTIAL) and why
+      - files changed, one line each
+      - the EXACT commands you ran and their REAL output (tests, tsc before/after)
+      - a "what an attacker tries next" note for the payment path
+      - anything left PARTIAL/WONT_FIX and exactly what is needed to finish it
+      Be honest. If a test fails, say so with the output. Do not weaken an assertion
+      to make it pass.
+    verify_prompt: |
+      READ-ONLY adversarial verification. Do NOT edit, create or delete any project file.
+      You are verifying the M-Pesa hardening in /workspace/propdesk.
+
+      1. Read the actual diff: `git -C /workspace/propdesk status --porcelain` and
+         `git -C /workspace/propdesk diff 467c500 -- lib/mpesa app/api/mpesa`.
+         For every changed file, read the real code, not the producer's summary.
+      2. For EACH of INFRA-004, INFRA-005, INFRA-006, INFRA-007, AUTHZ-005, independently
+         determine from the source whether the vulnerability is actually closed. Do not
+         trust the producer's claim. Write a throwaway probe ONLY under /tmp if you need
+         to exercise code — never inside the repo.
+      3. Specifically test the fail-closed behaviour: with MPESA_ALLOWED_CALLBACK_IPS
+         unset or empty, is a callback rejected? With MPESA_SANDBOX_MOCK unset, is
+         MPESA_ENV unset, or is NODE_ENV=production, can the mock path be reached?
+         Can a forged `X-Forwarded-For` header alone satisfy the allowlist?
+      4. Confirm a payment whose amount does not match the invoice cannot mark the
+         invoice paid.
+      5. Run `npm test` and `npx tsc --noEmit` YOURSELF and report the real results.
+         The baseline is 30 passing tests and 54 pre-existing tsc errors; a NEW test
+         file is expected, and the tsc error count must not exceed 54.
+      6. Check for regressions: does the M-Pesa callback still work for a LEGITIMATE
+         Safaricom callback with a valid secret and a matching amount? Did any fix
+         break the normal payment path?
+      7. Confirm no secret is logged, and that no new NEXT_PUBLIC_ variable or
+         literal key material was introduced.
+
+      End your report with a line that reads exactly `VERDICT: PASS` or
+      `VERDICT: FAIL`. Without that explicit line the task is treated as failed.
+
+      FAIL if: any of the five findings is not actually closed; the fail-closed
+      behaviour does not hold; a legitimate callback path is broken; the test suite
+      fails; new type errors were introduced; or a secret is exposed.
+      On FAIL, list each problem with file:line and the probe output that proves it.
+
+  - id: harden-storage-infra
+    title: 'Make storage private, lock down RPC grants, add CSP, patch the vulnerable Next.js'
+    assigned_to: Coder
+    verified_by: Verifier
+    timeout_ms: 1800000
+    prompt: |
+      You are fixing confirmed CRITICAL/HIGH infrastructure bugs in the PropDesk Africa
+      repo at /workspace/propdesk (Next.js 16 App Router, TypeScript strict, Supabase
+      Auth + Storage, Vercel, vitest).
+
+      READ FIRST:
+      - /workspace/propdesk/audit/ENVIRONMENT.md  (environment setup, the 54 pre-existing
+        tsc errors that are the BASELINE and not yours, the severity ladder, ground rules)
+      - /workspace/propdesk/audit/findings/infra.json  (INFRA-003 already fixed elsewhere —
+        ignore it; your ids are INFRA-013, INFRA-016, INFRA-021 and the headers item)
+      - /workspace/propdesk/audit/findings/crypto.json  (CRYPTO-005, CRYPTO-006)
+      - /workspace/propdesk/audit/INDEPENDENT_FINDINGS.md  (item IND-010 is yours)
+      Open the cited lines yourself before changing anything.
+
+      ## YOUR FILES — you own EXACTLY these and no others
+      - supabase-setup/01-create-tables.sql
+      - supabase-setup/02-add-missing-columns.sql
+      - supabase-setup/12-auto-backup.sql
+      - supabase-setup/13-paybill-counters.sql
+      - app/api/documents/route.ts
+      - app/api/documents/[id]/route.ts
+      - app/api/documents/upload/route.ts
+      - app/api/properties/[id]/photos/route.ts
+      - next.config.mjs
+      - package.json
+
+      DO NOT touch any other file. Other agents are editing lib/mpesa/**, app/api/mpesa/**,
+      lib/backup.ts, lib/api/**, app/api/backup/**, app/api/tenants/**, app/api/payments/**,
+      db/migrations/** and lib/crypto/** right now. Touching them corrupts their work.
+
+      ## WHAT TO FIX
+
+      ### 1. CRYPTO-005 / INFRA-013 — the `documents` Storage bucket is PUBLIC
+      supabase-setup/01-create-tables.sql:326-328 creates the documents bucket with
+      `public = true`, so every tenant identity document is served from a public URL
+      and the storage RLS policies are inert for reads.
+      FIX:
+      - Make the bucket PRIVATE and make the RLS policies (lines ~336-355) actually
+        meaningful for a private bucket (owner-scoped USING clauses).
+      - Serve documents via SHORT-LIVED SIGNED URLs instead of public URLs.
+        lib/storage.ts already has `getBackupSignedUrl` — read it and follow the same
+        pattern. You do NOT own lib/storage.ts; if the fix needs a change there,
+        implement the signed-URL creation locally in the routes you own using the same
+        Supabase Storage API, or document precisely what lib/storage.ts needs.
+      - The signed URL must be bound to the requesting owner, and short-lived
+        (a few minutes, not hours).
+      - supabase-setup/02-add-missing-columns.sql also references the bucket — keep the
+        two files consistent.
+
+      ### 2. CRYPTO-006 — property photos land in the same public bucket
+      app/api/properties/[id]/photos/route.ts:57,59-70,96 uploads property photos into
+      the same bucket. After the bucket is private they must be served through the same
+      signed-URL path, and the upload must verify the property belongs to the caller.
+
+      ### 3. INFRA-016 — SECURITY DEFINER RPCs executable by anon/authenticated
+      supabase-setup/13-paybill-counters.sql:8-20 and supabase-setup/12-auto-backup.sql:11-32
+      define SECURITY DEFINER functions with broad EXECUTE grants, letting anon or
+      authenticated callers tamper across tenants.
+      FIX: REVOKE EXECUTE from anon and authenticated, and GRANT it only to service_role
+      (or another controlled role). Keep the function behaviour identical for legitimate
+      callers. The SQL must be additive/safe — no DROP of tables or columns.
+
+      ### 4. INFRA-021 — next@16.3.8 is inside the affected range of two critical RCE advisories
+      package.json declares `"next": "^16.3.8"` and 16.3.8 is installed. The affected
+      ranges are 16.0.0–16.4.0 for:
+      - GHSA-2464-fhr4-w9xw — unauthenticated RCE in the Image Optimization API with SVG
+      - GHSA-673q-mjm6-r5xr — unauthenticated RCE in `use cache` functions
+      - GHSA-p3m5-59mp-jv5r — DoS in App Router using Server Actions
+      FIX: upgrade `next` to the latest 16.x (16.4.3 is available) in package.json AND
+      run the install so the lockfile and node_modules match. Then run `npm test` and
+      `npx tsc --noEmit` to prove the upgrade did not break anything.
+      NOTE: the repo sets `images.unoptimized: true`, which may reduce the reachability
+      of the image-optimizer advisory — but the other two advisories still apply and a
+      patched version is simply correct. Say in your report which advisories remain
+      theoretically reachable under the current config.
+
+      ### 5. IND-010 — no Content-Security-Policy, incomplete HSTS
+      next.config.mjs `headers()` sets X-Content-Type-Options, Referrer-Policy, HSTS,
+      Permissions-Policy and X-Frame-Options — but NO Content-Security-Policy at all,
+      and the HSTS value lacks `includeSubDomains` and `preload`.
+      FIX: add a Content-Security-Policy and harden HSTS. The app is React 19 / Next 16
+      App Router, uses react-leaflet, recharts, and Supabase in the browser. A CSP that
+      breaks the app is WORSE than no CSP — so if you are not certain the app will
+      still work, ship `Content-Security-Policy-Report-Only` and say so explicitly in
+      your report, with exactly what the owner must do to switch to enforcing mode.
+      Do not remove any existing header.
+
+      ### 6. While you are in the upload path (small, safe)
+      app/api/documents/upload/route.ts: validate the content type AND the file
+      extension, enforce a size limit, and sanitise the stored filename so it cannot
+      contain path separators or traverse directories.
+
+      ## CONSTRAINTS
+      - Do NOT change the database schema. The SQL you own may only change POLICIES,
+        GRANTS, REVOKEs and bucket visibility — additive/safe SQL only.
+      - Do NOT change a route's public request/response contract unless a fix
+        absolutely requires it; if you must, document it loudly.
+      - Run `npx tsc --noEmit`. THE BASELINE IS 54 PRE-EXISTING ERRORS
+        (audit/baseline/tsc-baseline.log). Your obligation is ZERO NEW errors from
+        your files. Report before/after counts. The `next` upgrade may itself surface
+        new type errors — if so, FIX them (they are caused by your change) or report
+        them precisely.
+      - Run `npm test`. The baseline suite is 2 files / 30 tests passing. It must still
+        pass after the upgrade.
+      - Do NOT run `git commit` for the source changes (the owner commits). Do NOT
+        modify the audit/ directory except writing your own deliverable file.
+
+      ## REPORT
+      Write /workspace/propdesk/audit/deliverable-storage-infra.md:
+      - each finding id, status (FIXED / WONT_FIX / PARTIAL) and why
+      - files changed, one line each, and the exact next/package.json version bump
+      - the EXACT commands you ran and their REAL output (npm audit, npm test,
+        tsc before/after, the build if you run it)
+      - a SECURITY ROLLOUT NOTE for the owner: making the bucket private requires the
+        live Supabase project to be updated, existing public URLs will stop working,
+        and any row in the database holding a public URL needs migrating. Say exactly
+        what to do, in order.
+      - the CSP you shipped (report-only or enforcing), the exact header value, and
+        what to test before switching to enforcing
+      - anything left PARTIAL/WONT_FIX and exactly what is needed to finish it
+      Be honest. If something fails, say so with the output. Do not weaken anything to
+      make it look green.
+    verify_prompt: |
+      READ-ONLY adversarial verification. Do NOT edit, create or delete any project file.
+      You are verifying the storage/infra hardening in /workspace/propdesk.
+
+      1. Read the real diff for your scope:
+         `git -C /workspace/propdesk diff 467c500 -- supabase-setup app/api/documents
+          app/api/properties next.config.mjs package.json package-lock.json`
+         Read the actual code, not the producer's summary.
+      2. Verify the bucket is now PRIVATE everywhere it is created (both SQL files) and
+         that the RLS policies would actually DENY a cross-tenant read. Reason as a
+         Postgres/Supabase policy expert about the USING clause. A policy that permits
+         all authenticated users is a FAIL.
+      3. Verify every path that previously returned a PUBLIC file_url now returns a
+         short-lived signed URL bound to the owner. Grep for leftover `publicUrl`,
+         `getPublicUrl`, `file_url` returned raw, and any remaining public-bucket reads.
+      4. Verify the SECURITY DEFINER functions no longer grant EXECUTE to anon or
+         authenticated. Check for other SECURITY DEFINER functions in the SQL you own
+         that were missed.
+      5. Verify `next` is >= 16.4.1 in package.json AND that the installed version
+         matches the lockfile. Run `npm ls next` and `npm audit` and report the real
+         output. Confirm the two critical RCE advisories no longer apply.
+      6. Verify the CSP header is actually present in next.config.mjs and that the
+         existing headers were not removed. Say whether it is report-only or enforcing.
+      7. Run `npm test` and `npx tsc --noEmit` YOURSELF and report the real results.
+         Baseline: 30 passing tests, 54 pre-existing tsc errors.
+      8. Check for regressions: did making the bucket private break a legitimate
+         document/photo download path? Did the next upgrade break the build?
+
+      End your report with a line that reads exactly `VERDICT: PASS` or
+      `VERDICT: FAIL`. Without that explicit line the task is treated as failed.
+
+      FAIL if: the bucket is still public anywhere; a policy would allow cross-tenant
+      reads; a public URL is still returned to a client; anon/authenticated can still
+      execute the SECURITY DEFINER functions; the vulnerable Next.js version is still
+      in package.json or installed; no CSP header exists; the test suite fails; or new
+      type errors were introduced.
+
+  - id: build-encryption-core
+    title: 'Build the encryption-at-rest core (AES-256-GCM, key registry, blind index, backfill)'
+    assigned_to: Coder
+    verified_by: Verifier
+    timeout_ms: 1800000
+    prompt: |
+      You are building the encryption-at-rest core for the PropDesk Africa repo at
+      /workspace/propdesk (Next.js 16 App Router, TypeScript strict, Node 22, vitest 5).
+      The design has already been written and reviewed — your job is to MATERIALISE it.
+
+      READ FIRST:
+      - /workspace/propdesk/audit/design/encryption-design.md — the authoritative design.
+        Section 6 is the exact source for lib/crypto/field-encryption.ts (roughly lines
+        268-843). Section 7 is the exact source for lib/crypto/pii-columns.ts (roughly
+        lines 844-1237). Section 4 (key material + env var names + how to generate),
+        Section 5 (envelope format), Section 9 (blind index), Section 10.2 (the
+        timing-safe comparison pattern) and Section 11 (read path / write path /
+        backfill) are the behavioural references.
+      - /workspace/propdesk/audit/ENVIRONMENT.md — environment setup, the 54 pre-existing
+        tsc errors that are the BASELINE and not yours, the severity ladder, ground rules.
+      - /workspace/propdesk/audit/findings/crypto.json — the findings this closes
+        (CRYPTO-001, CRYPTO-002, CRYPTO-003, CRYPTO-007 and friends).
+
+      ## YOUR FILES — you own EXACTLY these and no others
+      CREATE:
+      - lib/crypto/field-encryption.ts
+      - lib/crypto/pii-columns.ts
+      - lib/crypto/field-encryption.test.ts
+      - scripts/backfill-encryption.ts
+      - db/migrations/005-encryption.sql
+      MODIFY (one line only):
+      - package.json — add exactly one entry to the existing `scripts` block:
+        `"db:encrypt-backfill": "tsx scripts/backfill-encryption.ts"`
+        Do not reformat or reorder anything else in package.json. Do not add dependencies.
+
+      DO NOT touch db/migrations/001-core.sql, 002-support.sql or 004-marketing-forms.sql —
+      another agent owns 004 and it is already written. DO NOT touch lib/backup.ts,
+      lib/api/**, app/**, supabase-setup/** or next.config.mjs.
+
+      ## THE REAL SCHEMA — use THIS, not an invented one
+      The design document's example plan may reference tables that do not exist in this
+      project. The actual PII-bearing columns are:
+      - public.tenants: full_name, first_name, last_name, email, phone, national_id
+        (db/migrations/001-core.sql:76-94). `national_id` is the most sensitive.
+      - public.c2b_transactions: msisdn, first_name, middle_name, last_name
+        (supabase-setup/10-holy-grail.sql:90-115). `msisdn` is the payer's phone.
+      - public.mpesa_transactions: check db/migrations/002-support.sql for its columns
+        and include any phone/msisdn/name columns that exist.
+      Build PII_COLUMNS from what actually exists. `national_id` and `msisdn` must be in
+      it. Columns that need to be searched (email, phone, msisdn) get a blind index.
+
+      ## WHAT TO BUILD
+
+      ### 1. lib/crypto/field-encryption.ts
+      The exact source from design section 6. It must export at minimum:
+      - `encryptField(value: string): string` — AES-256-GCM via node:crypto, a fresh
+        random 12-byte IV per call, authTag, and the versioned base64 envelope
+      - `decryptField(ciphertext: string): string` — MUST verify the authTag and MUST
+        throw on tampering; must never silently return garbage
+      - `decryptFieldWithRotation(ciphertext: string): string` — decrypts under an older
+        key id and re-encrypts under the active key
+      - `isEncryptedField(value: string): boolean`
+      - `blindIndex(value: string): string` — HMAC-SHA256 with a SEPARATE key
+      - `blindIndexCandidates(value: string): string[]` — the lookup candidates for a
+        Kenyan phone number (0712345678 / 254712345678 / +254712345678 / 712345678)
+      - `timingSafeEqualString(a: string, b: string): boolean` — correct guard for
+        crypto.timingSafeEqual (it THROWS on unequal lengths, so compare lengths first)
+      - `getKeyRegistry()`, `resetKeyRegistry()` — the registry is cached, and
+        resetKeyRegistry() is how tests rebuild it after changing process.env
+      Follow the design exactly for the envelope format, the env var names
+      (PROPDESK_ENCRYPTION_KEYS / PROPDESK_BLIND_INDEX_KEYS) and the key-rotation
+      procedure. Do NOT invent a different envelope or a different env var name.
+
+      ### 2. lib/crypto/pii-columns.ts
+      The per-column encryption plan (table, column, mode, blind-index kind) built from
+      the REAL schema above, plus helpers to encrypt a row on write and decrypt a row on
+      read. A row helper must be idempotent on write (an already-encrypted value is left
+      alone) and must NOT throw on a plaintext legacy value on read — during the migration
+      window a plaintext value must still read back correctly, and should be flagged as
+      needing migration. This backward compatibility is required.
+
+      ### 3. lib/crypto/field-encryption.test.ts
+      A REAL vitest file (style reference: /workspace/propdesk/lib/reconcile.test.ts).
+      Assertions that must exist:
+      - round trip: encrypt -> decrypt === original (empty string, unicode, long string)
+      - two encryptions of the SAME plaintext produce DIFFERENT ciphertexts (random IV)
+      - tampering with the ciphertext or the auth tag makes decrypt THROW
+      - a ciphertext written under an older key id still decrypts, and re-encrypts under
+        the active key
+      - blindIndex is stable for equal inputs and differs for different inputs
+      - blindIndexCandidates returns multiple candidates for a Kenyan phone number
+      - timingSafeEqualString returns true for equal strings, false for different ones,
+        and does NOT THROW when the lengths differ
+      - a plaintext legacy value is detected by isEncryptedField === false
+      Set the env vars INSIDE the test file with deterministic 32-byte base64 test keys,
+      and call resetKeyRegistry() between tests so the cached registry is rebuilt.
+
+      ### 4. scripts/backfill-encryption.ts
+      A standalone, IDEMPOTENT, dry-run-capable backfill that walks the PII columns and
+      encrypts any value still in plaintext. It must:
+      - accept --dry-run (the DEFAULT is no writes) and --table=<name>
+      - print a summary (rows scanned / rows encrypted / rows skipped)
+      - NEVER log a PII value — only counts and ids
+      - use the repo's existing Neon access pattern (getDb() from @/lib/db/neon and the
+        `sql.unsafe(text, params)` bound-parameter style used in lib/backup.ts) — bind
+        values as parameters, never interpolate them
+      - exit non-zero on error, and exit cleanly (0) with a clear message when no
+        database is configured
+      Run `npx tsx scripts/backfill-encryption.ts --dry-run` and show the real output.
+
+      ### 5. db/migrations/005-encryption.sql
+      Idempotent, additive-only, plain-Postgres (Neon-compatible) — same style as
+      db/migrations/001-core.sql. It must add the blind-index columns and indexes that
+      the per-column plan needs, e.g.
+        ALTER TABLE public.tenants ADD COLUMN IF NOT EXISTS email_blind_index text;
+        ALTER TABLE public.tenants ADD COLUMN IF NOT EXISTS phone_blind_index text;
+        CREATE INDEX IF NOT EXISTS tenants_email_blind_index_idx ON public.tenants (email_blind_index);
+        ...and the equivalent for every other searched column in your plan.
+      Use `if not exists` everywhere and DO NOT drop, rename or alter the type of any
+      existing column. Use the same `create extension if not exists "pgcrypto"` header
+      style as the other migrations.
+
+      ## CONSTRAINTS
+      - Key material comes from an ENV VAR ONLY. Never hardcoded, never logged, never
+        returned to a client, never in a NEXT_PUBLIC_ variable. If the key env var is
+        missing or the wrong length, the helper must FAIL LOUDLY with an actionable
+        message — never a silent default or a no-op.
+      - Do NOT change the database schema beyond the additive blind-index columns in
+        005-encryption.sql.
+      - Run `npx tsc --noEmit`. THE BASELINE IS 54 PRE-EXISTING ERRORS
+        (audit/baseline/tsc-baseline.log). Your obligation is ZERO NEW errors from your
+        files. Report before/after counts.
+      - Run `npm test`. The baseline suite is 2 files / 30 tests passing; yours adds
+        more. All must pass.
+      - Do NOT run `git commit`. Do NOT run `npm install`. Do NOT modify the audit/
+        directory except writing your own deliverable file.
+
+      ## REPORT
+      Write /workspace/propdesk/audit/deliverable-encryption-core.md:
+      - the files you created, with line counts
+      - the EXACT commands you ran and their REAL output (vitest for your file, the
+        whole suite, tsc before/after, the backfill dry-run)
+      - the env vars now required and the command to generate each key
+      - an INTEGRATION CHECKLIST: the precise call sites in OTHER files that must now
+        encrypt on write and decrypt on read, with file paths and function names, taken
+        from design section 11. This is what another engineer will implement — be
+        precise.
+      - the exact SQL from 005-encryption.sql and the order to apply it
+      - anything you could not implement and why
+      Be honest. If a test fails, say so with the output. Do not weaken an assertion to
+      make it pass.
+    verify_prompt: |
+      READ-ONLY adversarial cryptographic verification. Do NOT edit, create or delete any
+      project file.
+      You are verifying the encryption core in /workspace/propdesk.
+
+      1. Read lib/crypto/field-encryption.ts line by line. Check the AES-256-GCM usage
+         is cryptographically CORRECT: a 12-byte random IV, the right key length, the
+         authTag retrieved AND verified on decrypt, no IV reuse, and an unambiguous
+         envelope encoding. A decrypt that ignores the auth tag and returns garbage is
+         an automatic FAIL. A decrypt that silently returns plaintext for a corrupt
+         value is an automatic FAIL.
+      2. Check key handling: grep the whole repo for the key env var names and confirm
+         the material is never hardcoded, never in a NEXT_PUBLIC_ variable, never
+         logged, and never returned in an API response. Confirm a missing or wrong-length
+         key fails LOUDLY rather than falling back to a default.
+      3. Run the tests YOURSELF:
+         `cd /workspace/propdesk && npx vitest run lib/crypto/field-encryption.test.ts`
+         and `npx vitest run` (the whole suite).
+         Report the real output. The suite baseline before your change was 30 passing
+         tests; yours must be 30 + your new tests, all green.
+      4. Write your OWN throwaway probe under /tmp (never inside the repo) that imports
+         the module and checks, independently of the producer's tests:
+         - encrypt -> decrypt round trip
+         - two encryptions of the same plaintext differ
+         - flipping one byte of the ciphertext makes decrypt THROW
+         - a value encrypted under key id A still decrypts after A is retired but B is
+           active, and re-encrypts under B
+         - timingSafeEqualString does not throw on a length mismatch
+      5. Run `npx tsc --noEmit` and report the real count. The baseline is 54
+         pre-existing errors; yours must add none.
+      6. Check lib/crypto/pii-columns.ts against the REAL schema: every table and column
+         it names must exist in db/migrations/*.sql or supabase-setup/*.sql. A plan that
+         references a table that does not exist (users, landlords, applications, payments)
+         is a FAIL — fix the plan, not the schema.
+      7. Check db/migrations/005-encryption.sql is idempotent and additive only: no DROP,
+         no RENAME, no type change, `if not exists` on every create.
+      8. Check the backfill script is genuinely idempotent, defaults to no writes, and
+         never prints a PII value.
+
+      End your report with a line that reads exactly `VERDICT: PASS` or
+      `VERDICT: FAIL`. Without that explicit line the task is treated as failed.
+
+      FAIL if: the crypto is subtly wrong (IV reuse, missing tag verification, ambiguous
+      encoding); the key is exposed anywhere; the plaintext legacy path throws instead
+      of passing through; the PII plan references tables that do not exist; the
+      migration is destructive; the test suite fails; or new type errors were
+      introduced. On FAIL, list each problem with file:line and the probe output.

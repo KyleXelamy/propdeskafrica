@@ -17,10 +17,10 @@ const channels = [
   },
   {
     icon: Users,
-    name: "Forum",
-    description: "Long-form discussions, feature debates and product feedback.",
-    href: "/community/forum",
-    cta: "Visit the forum",
+    name: "Resources",
+    description: "Long-form guides, feature walkthroughs and product notes.",
+    href: "/resources",
+    cta: "Browse resources",
   },
   {
     icon: Github,
@@ -31,10 +31,10 @@ const channels = [
   },
   {
     icon: Calendar,
-    name: "Office hours",
-    description: "Weekly 1-hour video call with the founders. Every Thursday, 4pm EAT.",
-    href: "/community/office-hours",
-    cta: "Reserve a slot",
+    name: "Talk to the team",
+    description: "Send us a question and we will reply within one business day.",
+    href: "/contact",
+    cta: "Get in touch",
   },
 ]
 
@@ -89,8 +89,8 @@ export default function CommunityPage() {
           <p className="mt-5 text-base leading-7 text-muted-foreground">
             Our community is professional and welcoming. We don't tolerate harassment, we assume good
             intent, and we close threads that go in circles. Full{" "}
-            <Link href="/community/code-of-conduct" className="font-medium text-primary underline">
-              code of conduct →
+            <Link href="/legal/acceptable-use" className="font-medium text-primary underline">
+              acceptable use policy →
             </Link>
           </p>
         </div>

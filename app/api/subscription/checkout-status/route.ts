@@ -1,5 +1,5 @@
-import { withAuth, successResponse, errorResponse } from "@/lib/api"
-import { stkQuery } from "@/lib/mpesa/daraja"
+import { withAuth, successResponse, errorResponse, dbError } from "@/lib/api"
+import { stkQuery, darajaConfig } from "@/lib/mpesa/daraja"
 import { createClient } from "@supabase/supabase-js"
 
 /**
@@ -20,14 +20,39 @@ export const GET = withAuth(async (req, { supabase, userId }) => {
     .eq("checkout_request_id", checkout)
     .eq("user_id", userId)
     .maybeSingle()
-  if (rowErr) return errorResponse(rowErr.message, 500)
+  if (rowErr) return dbError("subscription/checkout-status", rowErr, 500)
 
   if (row && (row.status === "active" || row.status === "subscribed" || row.status === "failed")) {
     return successResponse(row)
   }
 
   const result = await stkQuery(checkout).catch((e) => ({ error: e.message })) as any
-  if (result.error) return errorResponse(result.error, 502)
+  if (result.error) {
+    console.error("[api] subscription/checkout-status daraja query failed", result.error)
+    return errorResponse("Could not reach the M-Pesa gateway", 502)
+  }
+
+  // INFRA-007: the library refuses to mock outside development/test, but the
+  // entitlement decision lives HERE, so it has to refuse a mocked result too.
+  // A simulated Daraja response must never activate a paid plan — not even in
+  // a development environment where the mock is legitimately reachable.
+  if (result.mocked) {
+    console.warn("[api] subscription/checkout-status refused a MOCKED Daraja result", {
+      checkout,
+    })
+    return errorResponse("Payment could not be verified", 502)
+  }
+
+  // INFRA-007, second half: in a production runtime the entitlement may only
+  // come from the real Daraja gateway. A sandbox response must not activate a
+  // paid plan in production, whatever the transport looked like. (A sandbox
+  // runtime is left alone so the flow can still be exercised in staging.)
+  if (process.env.NODE_ENV === "production" && darajaConfig().env !== "production") {
+    console.warn("[api] subscription/checkout-status refused a non-production Daraja result", {
+      checkout,
+    })
+    return errorResponse("Payment could not be verified", 502)
+  }
 
   const completed = result.ResultCode === "0"
   const newStatus = result.ResultCode === null ? "pending" : completed ? "active" : "failed"

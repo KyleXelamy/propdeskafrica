@@ -1,4 +1,4 @@
-import { withAuth, errorResponse } from "@/lib/api"
+import { withAuth, errorResponse, dbError } from "@/lib/api"
 import { NextResponse, type NextRequest } from "next/server"
 
 /**
@@ -32,7 +32,7 @@ export const GET = withAuth(async (req: NextRequest, { supabase, userId }) => {
     properties.error || tenants.error || payments.error || expenses.error ||
     maintenance.error || notes.error || documents.error
   if (anyError) {
-    return errorResponse(anyError.message || "Failed to load export data", 500)
+    return dbError("export", anyError, 500)
   }
 
   const stamp = new Date().toISOString().slice(0, 10)

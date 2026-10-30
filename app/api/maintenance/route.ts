@@ -1,4 +1,4 @@
-import { withAuth, successResponse, errorResponse, pickFields, blankToNull, toNumberOrNull, HttpError } from "@/lib/api"
+import { withAuth, successResponse, errorResponse, pickFields, blankToNull, toNumberOrNull, HttpError, dbError } from "@/lib/api"
 import type { NextRequest } from "next/server"
 
 const MAINTENANCE_FIELDS = [
@@ -35,7 +35,7 @@ export const GET = withAuth(async (req: NextRequest, { supabase, userId }) => {
   if (priority) query = query.eq("priority", priority)
 
   const { data, error } = await query
-  if (error) return errorResponse(error.message, 500)
+  if (error) return dbError("maintenance", error, 500)
   return successResponse(data)
 })
 
@@ -69,6 +69,6 @@ export const POST = withAuth(async (req: NextRequest, { supabase, userId }) => {
     .select("*, properties(name, address), tenants(full_name)")
     .single()
 
-  if (error) return errorResponse(error.message, 500)
+  if (error) return dbError("maintenance", error, 500)
   return successResponse(data, 201)
 })

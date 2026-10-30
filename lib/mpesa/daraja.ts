@@ -5,22 +5,37 @@
  *   - OAuth access token (sandbox + production)
  *   - Lipa Na M-Pesa Online (STK Push)
  *   - STK Push transaction status query
- *   - Callback signature validation (IP allowlist — production only)
+ *   - C2B register / validation / confirmation helpers
+ *   - Callback authentication (shared secret + IP allowlist)
  *
  * Reads credentials from environment variables:
  *
- *   MPESA_ENV                "sandbox" | "production"  (default: sandbox)
+ *   MPESA_ENV                "sandbox" | "production"
+ *                            ONLY the exact value "sandbox" selects the Daraja
+ *                            sandbox. Anything else — including unset, blank or
+ *                            a typo — is treated as PRODUCTION (INFRA-007).
+ *                            The sandbox is never the default.
  *   MPESA_CONSUMER_KEY       string
  *   MPESA_CONSUMER_SECRET    string
  *   MPESA_SHORTCODE          string  (PayBill or Till number, e.g. 174379)
  *   MPESA_PASSKEY            string  (Lipa Na M-Pesa passkey, given by Safaricom)
  *   MPESA_CALLBACK_URL       string  (publicly reachable HTTPS endpoint)
  *   MPESA_INITIATOR_NAME     string  (optional, for B2C — not used here)
- *   MPESA_ALLOWED_CALLBACK_IPS  comma-separated CIDRs (optional)
+ *   MPESA_CALLBACK_SECRET    string  (shared secret for callback auth)
+ *   MPESA_ALLOWED_CALLBACK_IPS  comma-separated CIDRs / IPs of the Safaricom
+ *                            callback ranges. MANDATORY for the C2B
+ *                            callbacks; optional (defence in depth) for the
+ *                            STK callback. Unset/empty never means "allow
+ *                            everything" (INFRA-004).
+ *   MPESA_ADMIN_EMAILS       comma-separated e-mail addresses of the
+ *                            platform operators allowed to re-point the
+ *                            platform-wide Daraja URLs (AUTHZ-005).
  *
  * For local development without real credentials, set MPESA_SANDBOX_MOCK=1
- * and the helper will return synthetic (but real-shaped) responses. Useful
- * for UI work without touching Daraja.
+ * AND run in a development/test runtime; the helper will then return
+ * synthetic (but real-shaped) responses. The mock transport is refused
+ * outside `NODE_ENV=development|test` so a production deployment can never
+ * self-approve a payment (INFRA-007).
  */
 
 import crypto from "node:crypto"
@@ -29,13 +44,21 @@ export type DarajaEnv = "sandbox" | "production"
 
 export interface DarajaConfig {
   env: DarajaEnv
+  /** True only when MPESA_ENV is exactly "sandbox". */
+  sandbox: boolean
   baseUrl: string
   consumerKey: string
   consumerSecret: string
   shortCode: string
   passkey: string
   callbackUrl: string
+  /** The synthetic (mock) transport is ACTIVE. */
   mock: boolean
+  /**
+   * MPESA_SANDBOX_MOCK=1 was requested but this runtime does not allow the
+   * mock transport. Every transport call refuses to run in this state.
+   */
+  mockBlocked: boolean
 }
 
 const SANDBOX = "https://sandbox.safaricom.co.ke"
@@ -43,23 +66,79 @@ const PRODUCTION = "https://api.safaricom.co.ke"
 
 let cachedToken: { value: string; expiresAt: number } | null = null
 
+/**
+ * The mock transport only exists in an explicitly non-production runtime.
+ *
+ * `NODE_ENV !== "production"` on its own is not enough: a container image
+ * that never sets NODE_ENV (a self-hosted "production" box) satisfies it,
+ * and that deployment would then approve payments that never happened.
+ * We therefore require an explicit development/test value.
+ */
+export function isMockEnvironment(nodeEnv: string | undefined = process.env.NODE_ENV): boolean {
+  return nodeEnv === "development" || nodeEnv === "test"
+}
+
 function loadConfig(): DarajaConfig {
-  const env = (process.env.MPESA_ENV === "production" ? "production" : "sandbox") as DarajaEnv
+  const requested = (process.env.MPESA_ENV || "").trim().toLowerCase()
+  // INFRA-007: an absent or blank MPESA_ENV must NEVER mean "sandbox".
+  // Only the exact string "sandbox" selects the Daraja sandbox; everything
+  // else (unset, blank, "prod", "Production ", typo) is production.
+  const sandbox = requested === "sandbox"
+  const env: DarajaEnv = sandbox ? "sandbox" : "production"
+  const mockRequested = process.env.MPESA_SANDBOX_MOCK === "1"
+  const mock = mockRequested && isMockEnvironment()
   return {
     env,
-    baseUrl: env === "production" ? PRODUCTION : SANDBOX,
+    sandbox,
+    baseUrl: sandbox ? SANDBOX : PRODUCTION,
     consumerKey: process.env.MPESA_CONSUMER_KEY || "",
     consumerSecret: process.env.MPESA_CONSUMER_SECRET || "",
     shortCode: process.env.MPESA_SHORTCODE || "",
     passkey: process.env.MPESA_PASSKEY || "",
     callbackUrl: process.env.MPESA_CALLBACK_URL || "",
-    mock: process.env.MPESA_SANDBOX_MOCK === "1",
+    mock,
+    mockBlocked: mockRequested && !mock,
+  }
+}
+
+/** The effective Daraja configuration. Exposed for tests and diagnostics. */
+export function darajaConfig(): DarajaConfig {
+  return loadConfig()
+}
+
+/** True when the synthetic (mock) transport is active right now. */
+export function darajaMockMode(): boolean {
+  return loadConfig().mock
+}
+
+/**
+ * Refuse to talk to Daraja when the operator asked for the mock transport in
+ * an environment that must not use it. Failing loudly is the point: a
+ * production deployment must never silently fall back to a fake payment.
+ */
+function assertTransportAllowed(cfg: DarajaConfig): void {
+  if (cfg.mockBlocked) {
+    throw new Error(
+      "M-Pesa sandbox mock mode is disabled: MPESA_SANDBOX_MOCK=1 is only honoured when NODE_ENV is 'development' or 'test'. Remove MPESA_SANDBOX_MOCK from this environment.",
+    )
   }
 }
 
 export function darajaConfigured(): boolean {
   const c = loadConfig()
+  // A misconfigured production deployment (mock flag left on) is NOT
+  // configured — callers must not be told that payments can be taken.
+  if (c.mockBlocked) return false
   return Boolean(c.consumerKey && c.consumerSecret && c.shortCode && c.passkey && c.callbackUrl)
+}
+
+/**
+ * True when the platform is able to take a payment right now: either the
+ * real Daraja credentials are configured, or the mock transport is active
+ * (development/test only).
+ */
+export function darajaPaymentsAvailable(): boolean {
+  return darajaConfigured() || darajaMockMode()
 }
 
 /**
@@ -68,6 +147,7 @@ export function darajaConfigured(): boolean {
  */
 export async function getAccessToken(): Promise<string | null> {
   const cfg = loadConfig()
+  assertTransportAllowed(cfg)
   if (cfg.mock) return null
 
   if (cachedToken && cachedToken.expiresAt > Date.now() + 60_000) {
@@ -128,6 +208,11 @@ export interface StkPushResponse {
   ResponseCode: string
   ResponseDescription: string
   CustomerMessage?: string
+  /**
+   * True when the response was synthesised locally instead of coming from
+   * Safaricom. Callers that grant an entitlement MUST check this.
+   */
+  mocked?: boolean
 }
 
 /**
@@ -138,6 +223,7 @@ export interface StkPushResponse {
  */
 export async function stkPush(req: StkPushRequest): Promise<StkPushResponse> {
   const cfg = loadConfig()
+  assertTransportAllowed(cfg)
   const phone = normalizePhone(req.phone)
 
   if (cfg.mock) {
@@ -147,6 +233,7 @@ export async function stkPush(req: StkPushRequest): Promise<StkPushResponse> {
       ResponseCode: "0",
       ResponseDescription: "Success. Request accepted for processing",
       CustomerMessage: "Success. Mocked STK Push.",
+      mocked: true,
     }
   }
 
@@ -194,6 +281,11 @@ export interface StkQueryResponse {
   CheckoutRequestID?: string
   ResultCode?: string
   ResultDesc?: string
+  /**
+   * True when the status was synthesised locally instead of read back from
+   * Safaricom. A caller that grants a paid entitlement MUST check this.
+   */
+  mocked?: boolean
 }
 
 /**
@@ -201,6 +293,7 @@ export interface StkQueryResponse {
  */
 export async function stkQuery(checkoutRequestId: string): Promise<StkQueryResponse> {
   const cfg = loadConfig()
+  assertTransportAllowed(cfg)
   if (cfg.mock) {
     return {
       ResponseCode: "0",
@@ -209,6 +302,7 @@ export async function stkQuery(checkoutRequestId: string): Promise<StkQueryRespo
       CheckoutRequestID: checkoutRequestId,
       ResultCode: "0",
       ResultDesc: "The service request is processed successfully.",
+      mocked: true,
     }
   }
   const token = await getAccessToken()
@@ -262,24 +356,299 @@ export function isValidKenyanPhone(input: string): boolean {
 }
 
 /**
+ * The Safaricom callback address ranges, as configured by the operator.
+ * Empty when MPESA_ALLOWED_CALLBACK_IPS is unset or blank.
+ */
+export function allowedCallbackIps(): string[] {
+  return (process.env.MPESA_ALLOWED_CALLBACK_IPS || "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean)
+}
+
+/**
  * Validate that the request is coming from Safaricom (callback only).
  * Uses a configured IP allowlist (comma-separated CIDRs or plain IPs).
+ *
+ * INFRA-004: this used to return TRUE for every address when the allowlist
+ * was unset and MPESA_ENV was not "production" — i.e. it failed OPEN and a
+ * deployment that forgot MPESA_ALLOWED_CALLBACK_IPS accepted a forged
+ * callback from anywhere. It now fails CLOSED: an unset or empty allowlist
+ * rejects every address. Callers that also have a shared secret should use
+ * `authenticateMpesaCallback`, which treats the allowlist as defence in
+ * depth.
  */
 export function isFromSafaricom(remoteAddr: string | null): boolean {
-  const list = (process.env.MPESA_ALLOWED_CALLBACK_IPS || "").split(",").map((s) => s.trim()).filter(Boolean)
-  if (list.length === 0) {
-    return process.env.MPESA_ENV !== "production"
-  }
+  const list = allowedCallbackIps()
+  if (list.length === 0) return false
   if (!remoteAddr) return false
+  return ipAllowed(remoteAddr, list)
+}
+
+/** True when `ip` matches one of the allowlist entries (exact IP or CIDR). */
+function ipAllowed(ip: string, list: string[]): boolean {
   for (const allowed of list) {
     if (allowed.includes("/")) {
       // CIDR
-      if (ipInCidr(remoteAddr, allowed)) return true
-    } else if (allowed === remoteAddr) {
+      if (ipInCidr(ip, allowed)) return true
+    } else if (allowed === ip) {
       return true
     }
   }
   return false
+}
+
+/** Minimal shape of a header bag — a `Headers` object satisfies it. */
+export interface HeaderReader {
+  get(name: string): string | null
+}
+
+/**
+ * Headers the HOSTING PLATFORM overwrites on every request. Only these may
+ * be used to decide where a request came from.
+ *
+ * `x-forwarded-for` is deliberately NOT in this list: its first (left-most)
+ * value is chosen by the client, so an attacker can send
+ * `X-Forwarded-For: <safaricom-ip>` and walk straight through an allowlist
+ * check (INFRA-005).
+ */
+const TRUSTED_IP_HEADERS = ["x-vercel-forwarded-for", "cf-connecting-ip", "x-real-ip"]
+
+/**
+ * The client address as observed by the platform, not as claimed by it.
+ * Returns the address and the header it came from (null when the platform
+ * did not provide one).
+ */
+export function trustedClientIp(headers: HeaderReader): { ip: string | null; source: string | null } {
+  for (const name of TRUSTED_IP_HEADERS) {
+    const raw = headers.get(name)
+    if (!raw) continue
+    const value = raw.split(",")[0]?.trim()
+    if (value) return { ip: value, source: name }
+  }
+  return { ip: null, source: null }
+}
+
+/**
+ * Constant-time comparison of the shared callback secret.
+ *
+ * Fails closed: with no MPESA_CALLBACK_SECRET configured nothing verifies,
+ * so a deployment that forgets the secret does not silently accept every
+ * callback.
+ */
+export function verifyCallbackSecret(provided: string | null | undefined): boolean {
+  const expected = process.env.MPESA_CALLBACK_SECRET || ""
+  if (!expected) return false
+  if (!provided) return false
+  const a = Buffer.from(provided)
+  const b = Buffer.from(expected)
+  if (a.length !== b.length) return false
+  return crypto.timingSafeEqual(a, b)
+}
+
+export type CallbackAuthReason =
+  | "ok"
+  | "secret_not_configured"
+  | "bad_secret"
+  | "ip_allowlist_not_configured"
+  | "no_trusted_ip"
+  | "ip_not_allowed"
+
+export interface CallbackAuthResult {
+  ok: boolean
+  reason: CallbackAuthReason
+  ip: string | null
+  ipSource: string | null
+}
+
+export interface CallbackAuthOptions {
+  /**
+   * Require the shared secret to be configured AND correct. Used by the STK
+   * callback, where the secret is the primary control.
+   */
+  requireSecret?: boolean
+  /**
+   * Require the IP allowlist to be configured AND satisfied. Used by the C2B
+   * callbacks: their IP allowlist is the primary control, so an unset
+   * allowlist must reject the callback rather than allow everything.
+   */
+  requireIpAllowlist?: boolean
+}
+
+/**
+ * Authenticate a Daraja callback.
+ *
+ * Two independent factors:
+ *   1. the shared secret (MPESA_CALLBACK_SECRET), compared in constant time;
+ *   2. the Safaricom IP allowlist (MPESA_ALLOWED_CALLBACK_IPS), evaluated
+ *      against the platform-set client address only.
+ *
+ * The secret is enforced whenever it is configured (and is mandatory for the
+ * STK callback). The IP allowlist is enforced whenever it is configured, and
+ * is mandatory for the C2B callbacks.
+ */
+export function authenticateMpesaCallback(
+  headers: HeaderReader,
+  options: CallbackAuthOptions = {},
+): CallbackAuthResult {
+  const { requireSecret = false, requireIpAllowlist = false } = options
+  const secretConfigured = Boolean((process.env.MPESA_CALLBACK_SECRET || "").trim())
+  const { ip, source } = trustedClientIp(headers)
+
+  // 1. Shared secret.
+  if (requireSecret && !secretConfigured) {
+    return { ok: false, reason: "secret_not_configured", ip, ipSource: source }
+  }
+  if (secretConfigured) {
+    if (!verifyCallbackSecret(headers.get("x-mpesa-callback-secret"))) {
+      return { ok: false, reason: "bad_secret", ip, ipSource: source }
+    }
+  }
+
+  // 2. IP allowlist.
+  const list = allowedCallbackIps()
+  if (list.length === 0) {
+    if (requireIpAllowlist) {
+      return { ok: false, reason: "ip_allowlist_not_configured", ip, ipSource: source }
+    }
+    return { ok: true, reason: "ok", ip, ipSource: source }
+  }
+  if (!ip) {
+    return { ok: false, reason: "no_trusted_ip", ip, ipSource: source }
+  }
+  if (!isFromSafaricom(ip)) {
+    return { ok: false, reason: "ip_not_allowed", ip, ipSource: source }
+  }
+  return { ok: true, reason: "ok", ip, ipSource: source }
+}
+
+// ---------------------------------------------------------------------------
+// Amount verification (INFRA-006)
+// ---------------------------------------------------------------------------
+
+/**
+ * Tolerance, in KES, for the settled-amount comparison.
+ *
+ * THE RULE: a settled amount satisfies an invoice when it is EXACTLY the
+ * invoice amount, or within this tolerance of it. M-Pesa settles in whole
+ * shillings while `rent_payments.amount` is numeric(12,2), so a single
+ * shilling of rounding (50000 vs 50000.50) must not be reported as a
+ * mismatch. Anything further apart is a mismatch: the invoice is NOT marked
+ * paid and the transaction is queued for review.
+ */
+export const MPESA_AMOUNT_TOLERANCE_KES = 1
+
+export type AmountComparison = "exact" | "within_tolerance" | "mismatch" | "invalid"
+
+/**
+ * Compare a settled amount with the amount owed. Pure function — no I/O.
+ */
+export function compareSettledAmount(
+  expected: number,
+  settled: number,
+  tolerance: number = MPESA_AMOUNT_TOLERANCE_KES,
+): AmountComparison {
+  if (!Number.isFinite(expected) || !Number.isFinite(settled)) return "invalid"
+  // A non-positive expectation means we have no invoice to compare against,
+  // and a non-positive settlement is not a payment.
+  if (expected <= 0 || settled <= 0) return "invalid"
+  const diff = Math.abs(expected - settled)
+  if (diff === 0) return "exact"
+  if (diff <= tolerance) return "within_tolerance"
+  return "mismatch"
+}
+
+/** True when the settled amount satisfies the invoice (see the rule above). */
+export function amountSatisfiesInvoice(
+  expected: number,
+  settled: number,
+  tolerance: number = MPESA_AMOUNT_TOLERANCE_KES,
+): boolean {
+  const verdict = compareSettledAmount(expected, settled, tolerance)
+  return verdict === "exact" || verdict === "within_tolerance"
+}
+
+export interface AmountCheckInput {
+  /** The amount we asked Daraja to charge. */
+  expected: number
+  /** The amount Daraja reported as settled. */
+  settled: number
+  /** The rent invoice amount, when the push referenced one. */
+  invoiceAmount?: number | null
+}
+
+export interface AmountCheckResult {
+  ok: boolean
+  comparison: AmountComparison
+  /** Human readable explanation, present when `ok` is false. */
+  reason?: string
+}
+
+/**
+ * Decide whether a settled payment may mark the rent invoice as paid.
+ *
+ * The settled amount must satisfy the amount we charged AND — when the push
+ * referenced a rent invoice — that invoice's amount. Anything else is a
+ * mismatch: the invoice stays unpaid and the transaction is recorded for
+ * review.
+ */
+export function checkSettledAmount(
+  input: AmountCheckInput,
+  tolerance: number = MPESA_AMOUNT_TOLERANCE_KES,
+): AmountCheckResult {
+  const { expected, settled, invoiceAmount } = input
+  const comparison = compareSettledAmount(expected, settled, tolerance)
+  if (comparison === "mismatch" || comparison === "invalid") {
+    return {
+      ok: false,
+      comparison,
+      reason: `Amount mismatch: settled ${settled} KES, expected ${expected} KES. Rent payment NOT marked paid — review required.`,
+    }
+  }
+  if (invoiceAmount != null) {
+    const invoiceComparison = compareSettledAmount(invoiceAmount, expected, tolerance)
+    if (invoiceComparison === "mismatch" || invoiceComparison === "invalid") {
+      return {
+        ok: false,
+        comparison: invoiceComparison,
+        reason: `Invoice mismatch: the payment was for ${expected} KES but the invoice is ${invoiceAmount} KES. Rent payment NOT marked paid — review required.`,
+      }
+    }
+  }
+  return { ok: true, comparison }
+}
+
+/** The message recorded against a transaction whose amount did not match. */
+export function amountMismatchMessage(expected: number, settled: number): string {
+  return `Amount mismatch: settled ${settled} KES, expected ${expected} KES. Rent payment NOT marked paid — review required.`
+}
+
+// ---------------------------------------------------------------------------
+// Platform operators (AUTHZ-005)
+// ---------------------------------------------------------------------------
+
+/**
+ * The platform operators allowed to re-point the platform-wide Daraja URLs.
+ *
+ * The app has no admin model of its own — `team_members.role` is stored but
+ * never enforced anywhere in the authorisation path — so the operator list
+ * is explicit: a comma-separated allowlist of e-mail addresses in
+ * MPESA_ADMIN_EMAILS. Unset or empty means NOBODY is an operator (fail
+ * closed); the owner MUST set this variable.
+ */
+export function mpesaAdminEmails(): string[] {
+  return (process.env.MPESA_ADMIN_EMAILS || "")
+    .split(",")
+    .map((s) => s.trim().toLowerCase())
+    .filter(Boolean)
+}
+
+/** True when `email` is on the operator allowlist. */
+export function isMpesaAdminEmail(email: string | null | undefined): boolean {
+  if (!email) return false
+  const list = mpesaAdminEmails()
+  if (list.length === 0) return false
+  return list.includes(email.trim().toLowerCase())
 }
 
 function ipInCidr(ip: string, cidr: string): boolean {
@@ -350,16 +719,20 @@ export interface C2BRegisterResponse {
   ResponseDescription?: string
   OriginatorCoversationID?: string
   ConversationID?: string
+  /** True when the response was synthesised locally (development only). */
+  mocked?: boolean
 }
 
 export async function c2bRegister(req: C2BRegisterRequest): Promise<C2BRegisterResponse> {
   const cfg = loadConfig()
+  assertTransportAllowed(cfg)
   if (cfg.mock) {
     return {
       ResponseCode: "0",
       ResponseDescription: "Success (mocked)",
       OriginatorCoversationID: "mock-conv-" + crypto.randomBytes(4).toString("hex"),
       ConversationID: "mock-conv-" + crypto.randomBytes(4).toString("hex"),
+      mocked: true,
     }
   }
   const token = await getAccessToken()
@@ -474,10 +847,13 @@ export interface C2BStatusResponse {
   FirstName?: string
   MiddleName?: string
   LastName?: string
+  /** True when the status was synthesised locally (development only). */
+  mocked?: boolean
 }
 
 export async function c2bTransactionStatus(transId: string): Promise<C2BStatusResponse> {
   const cfg = loadConfig()
+  assertTransportAllowed(cfg)
   if (cfg.mock) {
     return {
       ResponseCode: "0",
@@ -489,6 +865,7 @@ export async function c2bTransactionStatus(transId: string): Promise<C2BStatusRe
       MSISDN: "254712345678",
       FirstName: "Jane",
       LastName: "Doe",
+      mocked: true,
     }
   }
   const token = await getAccessToken()

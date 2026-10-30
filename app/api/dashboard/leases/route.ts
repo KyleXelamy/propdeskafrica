@@ -1,4 +1,4 @@
-import { withAuth, successResponse, errorResponse, isMissingTableError } from "@/lib/api"
+import { withAuth, successResponse, errorResponse, isMissingTableError, dbError } from "@/lib/api"
 
 /**
  * GET /api/dashboard/leases
@@ -31,7 +31,7 @@ export const GET = withAuth(async (_req, { supabase, userId }) => {
 
   if (error) {
     if (isMissingTableError(error)) return successResponse([])
-    return errorResponse(error.message, 500)
+    return dbError("dashboard/leases", error, 500)
   }
 
   const rows = (data || []).map((t: any) => {

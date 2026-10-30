@@ -1,3 +1,4 @@
+import { timingSafeEqualString } from "@/lib/api/secure-compare"
 import { NextResponse, type NextRequest } from "next/server"
 import { exportBackup, recordBackup } from "@/lib/backup"
 import { createClient } from "@/lib/supabase/server"
@@ -35,7 +36,9 @@ function checkSecret(request: NextRequest): NextResponse | null {
     return null // dev only
   }
   const got = request.headers.get("x-cron-secret") ?? request.headers.get("authorization")?.replace(/^Bearer\s+/i, "")
-  return got === expected ? null : NextResponse.json({ error: "Forbidden" }, { status: 403 })
+  return timingSafeEqualString(got, expected)
+    ? null
+    : NextResponse.json({ error: "Forbidden" }, { status: 403 })
 }
 
 export async function POST(request: NextRequest) {

@@ -1,3 +1,4 @@
+import { timingSafeEqualString } from "@/lib/api/secure-compare"
 import { errorResponse, successResponse, HttpError } from "@/lib/api"
 import { getDb, neonConfigured } from "@/lib/db/neon"
 import { runMigrations } from "@/lib/db/migrate"
@@ -26,7 +27,7 @@ export async function POST(req: Request) {
   if (secret) {
     const auth = req.headers.get("authorization") || ""
     const got = auth.replace(/^Bearer\s+/i, "").trim()
-    if (got !== secret) {
+    if (!timingSafeEqualString(got, secret)) {
       return errorResponse("Forbidden: missing or invalid CRON_SECRET", 403)
     }
   }
@@ -41,7 +42,8 @@ export async function POST(req: Request) {
     try {
       await runMigrations({ silent: true })
     } catch (e: any) {
-      return errorResponse(`Migration failed: ${e?.message || e}`, 500)
+      console.error("[cron] migration run failed", e)
+      return errorResponse("Migration failed", 500)
     }
   }
 

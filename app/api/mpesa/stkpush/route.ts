@@ -1,5 +1,11 @@
 import { withAuth, successResponse, errorResponse, HttpError } from "@/lib/api"
-import { stkPush, darajaConfigured, normalizePhone, isValidKenyanPhone } from "@/lib/mpesa/daraja"
+import {
+  stkPush,
+  darajaPaymentsAvailable,
+  normalizePhone,
+  isValidKenyanPhone,
+  amountSatisfiesInvoice,
+} from "@/lib/mpesa/daraja"
 
 /**
  * POST /api/mpesa/stkpush
@@ -8,6 +14,11 @@ import { stkPush, darajaConfigured, normalizePhone, isValidKenyanPhone } from "@
  * Initiates an M-Pesa STK Push for the given tenant. We pre-create a
  * `mpesa_transactions` row in `initiated` state, then poll for status via
  * /api/mpesa/status/[checkoutRequestId].
+ *
+ * SECURITY (INFRA-006): the amount is NOT taken on trust from the client.
+ * It is compared with the amount owed — the referenced `rent_payments` row,
+ * otherwise the tenant's monthly rent — and a push that does not match is
+ * rejected before a Daraja call is made.
  */
 export const POST = withAuth(async (req, { supabase, userId }) => {
   const body = await req.json().catch(() => null)
@@ -41,7 +52,51 @@ export const POST = withAuth(async (req, { supabase, userId }) => {
   if (tErr) return errorResponse(tErr.message, 500)
   if (!tenant) throw new HttpError("Tenant not found", 404)
 
-  if (!darajaConfigured() && process.env.MPESA_SANDBOX_MOCK !== "1") {
+  // INFRA-006: derive the amount owed server-side. A `payment_id` must
+  // belong to the caller AND to this tenant; otherwise the expected amount
+  // is the tenant's monthly rent.
+  let expectedAmount: number
+  let expectedSource: string
+  if (paymentId) {
+    const { data: payment, error: pErr } = await supabase
+      .from("rent_payments")
+      .select("id, amount, tenant_id")
+      .eq("id", paymentId)
+      .eq("user_id", userId)
+      .maybeSingle()
+    if (pErr) return errorResponse(pErr.message, 500)
+    if (!payment) throw new HttpError("Payment not found", 404)
+    if (payment.tenant_id && payment.tenant_id !== tenantId) {
+      throw new HttpError("Payment does not belong to this tenant", 400)
+    }
+    expectedAmount = Number(payment.amount)
+    expectedSource = "rent payment"
+  } else {
+    expectedAmount = Number(tenant.monthly_rent)
+    expectedSource = "monthly rent"
+  }
+
+  if (!Number.isFinite(expectedAmount) || expectedAmount <= 0) {
+    throw new HttpError(
+      `No ${expectedSource} to charge — set a monthly rent for this tenant, or send a payment_id`,
+      400,
+    )
+  }
+
+  // Tolerance: an exact match, or within MPESA_AMOUNT_TOLERANCE_KES (1 KES)
+  // of it — see lib/mpesa/daraja.ts for the rule.
+  if (!amountSatisfiesInvoice(expectedAmount, amount)) {
+    throw new HttpError(
+      `Amount mismatch: KES ${Math.round(amount)} does not match the amount due (KES ${expectedAmount})`,
+      400,
+    )
+  }
+
+  // INFRA-007: the mock transport is only available in development/test.
+  // `darajaPaymentsAvailable()` is false when MPESA_SANDBOX_MOCK=1 is set in
+  // a production runtime, so a misconfigured deployment refuses payments
+  // instead of pretending they worked.
+  if (!darajaPaymentsAvailable()) {
     return errorResponse(
       "Payments are temporarily unavailable. Please try again later.",
       503,
@@ -58,7 +113,8 @@ export const POST = withAuth(async (req, { supabase, userId }) => {
   }).catch((e) => ({ error: e.message }))
 
   if ((result as any).error) {
-    return errorResponse((result as any).error, 502)
+    console.error("[api] mpesa/stkpush daraja call failed", (result as any).error)
+    return errorResponse("Could not reach the M-Pesa gateway", 502)
   }
 
   const ok = (result as any).ResponseCode === "0"

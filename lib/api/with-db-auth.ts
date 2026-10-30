@@ -102,9 +102,13 @@ export function withDbAuth(handler: DbAuthHandler, opts: Options = {}) {
       if (typeof result === "object" && "ok" in result) return NextResponse.json(result)
       return NextResponse.json({ data: result })
     } catch (e: any) {
+      // DbHttpError carries a message this codebase chose deliberately, so it
+      // is safe to return. Anything else is an unexpected exception whose text
+      // can contain a database host, a schema name or a statement fragment —
+      // it goes to the log, and the client gets a generic message.
       if (e instanceof DbHttpError) return jsonError(e.message, e.status)
       console.error("[propdeskafrica] withDbAuth handler error", e)
-      return jsonError(e?.message || "Internal error", 500)
+      return jsonError("Internal error", 500)
     }
   }
 }

@@ -46,7 +46,8 @@ export const POST = withAuth(async (req, { supabase, userId }) => {
   }).catch((e) => ({ error: e.message }))
 
   if ((result as any).error) {
-    return errorResponse((result as any).error, 502)
+    console.error("[api] subscription/checkout daraja call failed", (result as any).error)
+    return errorResponse("Could not reach the M-Pesa gateway", 502)
   }
 
   const ok = (result as any).ResponseCode === "0"

@@ -62,9 +62,30 @@ ALTER TABLE public.rent_payments
   CHECK (status IN ('pending', 'paid', 'completed', 'late', 'partial', 'failed', 'cancelled'));
 
 -- documents storage bucket
+-- CRYPTO-005 / INFRA-013: the bucket is PRIVATE. Objects are read through
+-- short-lived signed URLs that the API only issues to the owner, so these
+-- policies are enforced on reads as well as writes. `DO UPDATE` (not
+-- `DO NOTHING`) so re-running this script flips an existing public bucket
+-- to private — see audit/deliverable-storage-infra.md -> SECURITY ROLLOUT
+-- NOTE for the required order of operations.
 INSERT INTO storage.buckets (id, name, public)
-VALUES ('documents', 'documents', true)
-ON CONFLICT (id) DO NOTHING;
+VALUES ('documents', 'documents', false)
+ON CONFLICT (id) DO UPDATE SET public = false;
+
+-- Bucket settings only — no schema change. Mirrors 01-create-tables.sql.
+UPDATE storage.buckets
+SET file_size_limit = 10485760,
+    allowed_mime_types = ARRAY[
+      'application/pdf',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'image/jpeg',
+      'image/png',
+      'image/gif',
+      'image/webp',
+      'text/plain'
+    ]::text[]
+WHERE id = 'documents';
 
 DROP POLICY IF EXISTS "Users can upload their own documents" ON storage.objects;
 DROP POLICY IF EXISTS "Users can read their own documents"  ON storage.objects;
@@ -73,19 +94,27 @@ DROP POLICY IF EXISTS "Users can delete their own documents" ON storage.objects;
 
 CREATE POLICY "Users can upload their own documents" ON storage.objects
   FOR INSERT WITH CHECK (
-    bucket_id = 'documents' AND auth.uid()::text = (storage.foldername(name))[1]
+    bucket_id = 'documents'
+    AND auth.uid() IS NOT NULL
+    AND (storage.foldername(name))[1] = auth.uid()::text
   );
 CREATE POLICY "Users can read their own documents" ON storage.objects
   FOR SELECT USING (
-    bucket_id = 'documents' AND auth.uid()::text = (storage.foldername(name))[1]
+    bucket_id = 'documents'
+    AND auth.uid() IS NOT NULL
+    AND (storage.foldername(name))[1] = auth.uid()::text
   );
 CREATE POLICY "Users can update their own documents" ON storage.objects
   FOR UPDATE USING (
-    bucket_id = 'documents' AND auth.uid()::text = (storage.foldername(name))[1]
+    bucket_id = 'documents'
+    AND auth.uid() IS NOT NULL
+    AND (storage.foldername(name))[1] = auth.uid()::text
   );
 CREATE POLICY "Users can delete their own documents" ON storage.objects
   FOR DELETE USING (
-    bucket_id = 'documents' AND auth.uid()::text = (storage.foldername(name))[1]
+    bucket_id = 'documents'
+    AND auth.uid() IS NOT NULL
+    AND (storage.foldername(name))[1] = auth.uid()::text
   );
 
 -- updated_at triggers (only add if missing)

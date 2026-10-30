@@ -41,7 +41,18 @@ const downloadPathBySlug: Record<string, string> = {
  */
 const categories = Array.from(new Set(templates.map((t) => t.category))).sort()
 
-export default function TemplatesPage() {
+export default async function TemplatesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ category?: string }>
+}) {
+  // The category chips link to /templates?category=<c>. The page used to
+  // ignore the parameter and always render every category, so the filter
+  // looked interactive but did nothing.
+  const requested = ((await searchParams).category || "").trim()
+  const activeCategory = categories.find((c) => c.toLowerCase() === requested.toLowerCase())
+  const visibleCategories = activeCategory ? [activeCategory] : categories
+
   return (
     <>
       <section className="relative overflow-hidden bg-primary text-primary-foreground">
@@ -62,17 +73,28 @@ export default function TemplatesPage() {
           <div className="flex flex-wrap items-center gap-2">
             <Link
               href="/templates"
-              className="rounded-full border border-primary bg-primary px-4 py-1.5 text-sm text-primary-foreground"
+              className={
+                "rounded-full border px-4 py-1.5 text-sm transition-colors " +
+                (activeCategory
+                  ? "border-border bg-card text-foreground hover:border-primary hover:text-primary"
+                  : "border-primary bg-primary text-primary-foreground")
+              }
             >
               All ({templates.length})
             </Link>
             {categories.map((c) => {
               const count = templates.filter((t) => t.category === c).length
+              const isActive = activeCategory === c
               return (
                 <Link
                   key={c}
-                  href={`/templates?category=${c}`}
-                  className="rounded-full border border-border bg-card px-4 py-1.5 text-sm text-foreground transition-colors hover:border-primary hover:text-primary"
+                  href={`/templates?category=${encodeURIComponent(c)}`}
+                  className={
+                    "rounded-full border px-4 py-1.5 text-sm transition-colors " +
+                    (isActive
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-border bg-card text-foreground hover:border-primary hover:text-primary")
+                  }
                 >
                   {c} ({count})
                 </Link>
@@ -82,7 +104,7 @@ export default function TemplatesPage() {
         </div>
       </section>
 
-      {categories.map((cat) => {
+      {visibleCategories.map((cat) => {
         const items = templates.filter((t) => t.category === cat)
         if (items.length === 0) return null
         return (

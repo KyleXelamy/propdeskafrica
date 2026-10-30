@@ -1,0 +1,79 @@
+app/(marketing)/templates/page.tsx(104,24): error TS2339: Property 'legalBasis' does not exist on type 'Template'.
+app/(marketing)/templates/page.tsx(106,91): error TS2339: Property 'legalBasis' does not exist on type 'Template'.
+app/api/paybill/route.ts(30,33): error TS18047: 'supabase' is possibly 'null'.
+app/api/paybill/route.ts(50,42): error TS18047: 'supabase' is possibly 'null'.
+app/api/paybill/route.ts(53,38): error TS18047: 'supabase' is possibly 'null'.
+app/api/paybill/route.ts(55,11): error TS18047: 'supabase' is possibly 'null'.
+app/api/paybill/route.ts(58,38): error TS18047: 'supabase' is possibly 'null'.
+app/api/paybill/test-payment/route.ts(13,35): error TS18047: 'supabase' is possibly 'null'.
+app/api/paybill/test-payment/route.ts(15,42): error TS18047: 'supabase' is possibly 'null'.
+app/api/paybill/test-payment/route.ts(19,11): error TS18047: 'supabase' is possibly 'null'.
+app/api/paybill/test-payment/route.ts(20,94): error TS2551: Property 'checkoutRequestId' does not exist on type 'StkPushResponse'. Did you mean 'CheckoutRequestID'?
+app/api/paybill/test-payment/route.ts(22,11): error TS18047: 'supabase' is possibly 'null'.
+app/api/stripe/webhook/route.ts(28,28): error TS2339: Property 'metadata' does not exist on type 'Application | BankAccount | Card | Account | ApplicationFee | FeeRefund | Install | Balance | ... 74 more ... | ReceivedDebit'.
+  Property 'metadata' does not exist on type 'Application'.
+app/api/stripe/webhook/route.ts(29,31): error TS2339: Property 'id' does not exist on type 'Application | BankAccount | Card | Account | ApplicationFee | FeeRefund | Install | Balance | ... 74 more ... | ReceivedDebit'.
+  Property 'id' does not exist on type 'Balance'.
+app/api/stripe/webhook/route.ts(33,50): error TS2339: Property 'payment_intent' does not exist on type 'Application | BankAccount | Card | Account | ApplicationFee | FeeRefund | Install | Balance | ... 74 more ... | ReceivedDebit'.
+  Property 'payment_intent' does not exist on type 'Application'.
+app/api/stripe/webhook/route.ts(33,88): error TS2339: Property 'payment_intent' does not exist on type 'Application | BankAccount | Card | Account | ApplicationFee | FeeRefund | Install | Balance | ... 74 more ... | ReceivedDebit'.
+  Property 'payment_intent' does not exist on type 'Application'.
+app/api/stripe/webhook/route.ts(37,49): error TS2339: Property 'subscription' does not exist on type 'Application | BankAccount | Card | Account | ApplicationFee | FeeRefund | Install | Balance | ... 74 more ... | ReceivedDebit'.
+  Property 'subscription' does not exist on type 'Application'.
+app/api/stripe/webhook/route.ts(37,126): error TS2339: Property 'subscription' does not exist on type 'Application | BankAccount | Card | Account | ApplicationFee | FeeRefund | Install | Balance | ... 74 more ... | ReceivedDebit'.
+  Property 'subscription' does not exist on type 'Application'.
+app/api/templates/[id]/preview/route.ts(31,30): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+app/api/templates/[id]/preview/route.ts(32,28): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+app/api/templates/[id]/preview/route.ts(33,30): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+app/api/templates/[id]/preview/route.ts(36,27): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+app/api/templates/[id]/preview/route.ts(37,25): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+app/api/templates/[id]/preview/route.ts(46,28): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+app/api/templates/[id]/preview/route.ts(47,30): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+app/api/templates/[id]/preview/route.ts(48,28): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+app/api/templates/[id]/preview/route.ts(50,28): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+app/api/templates/[id]/preview/route.ts(51,31): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+app/api/templates/[id]/preview/route.ts(56,28): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+app/api/templates/[id]/preview/route.ts(57,30): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+app/api/templates/[id]/preview/route.ts(58,30): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+app/api/templates/[id]/preview/route.ts(59,30): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+app/api/templates/[id]/preview/route.ts(60,33): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+app/api/templates/[id]/preview/route.ts(61,36): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+app/dashboard/billing/page.tsx(219,36): error TS7006: Parameter 'payment' implicitly has an 'any' type.
+app/dashboard/company/page.tsx(112,51): error TS7006: Parameter 'p' implicitly has an 'any' type.
+app/dashboard/contacts/page.tsx(37,73): error TS7006: Parameter 'contact' implicitly has an 'any' type.
+app/dashboard/damages/page.tsx(28,41): error TS7006: Parameter 'damage' implicitly has an 'any' type.
+app/dashboard/damages/page.tsx(29,49): error TS7006: Parameter 'sum' implicitly has an 'any' type.
+app/dashboard/damages/page.tsx(29,54): error TS7006: Parameter 'damage' implicitly has an 'any' type.
+app/dashboard/damages/page.tsx(31,14): error TS7006: Parameter 'damage' implicitly has an 'any' type.
+app/dashboard/damages/page.tsx(32,14): error TS7006: Parameter 'sum' implicitly has an 'any' type.
+app/dashboard/damages/page.tsx(32,19): error TS7006: Parameter 'damage' implicitly has an 'any' type.
+app/dashboard/damages/page.tsx(33,43): error TS7006: Parameter 'damage' implicitly has an 'any' type.
+app/dashboard/damages/page.tsx(35,42): error TS7006: Parameter 'sum' implicitly has an 'any' type.
+app/dashboard/damages/page.tsx(35,47): error TS7006: Parameter 'damage' implicitly has an 'any' type.
+app/dashboard/damages/page.tsx(117,31): error TS7006: Parameter 'd' implicitly has an 'any' type.
+app/dashboard/reconciliation/page.tsx(148,160): error TS7006: Parameter 'event' implicitly has an 'any' type.
+app/manifest.ts(15,70): error TS2820: Type '"any maskable"' is not assignable to type '"any" | "maskable" | "monochrome" | undefined'. Did you mean '"maskable"'?
+app/manifest.ts(16,64): error TS2820: Type '"any maskable"' is not assignable to type '"any" | "maskable" | "monochrome" | undefined'. Did you mean '"maskable"'?
+components/dashboard-sidebar.tsx(149,70): error TS2339: Property 'avatarUrl' does not exist on type 'SidebarProps'.
+components/dashboard-sidebar.tsx(171,95): error TS2322: Type '{ userEmail: string | undefined; userName: string | undefined; companyName: string | null | undefined; avatarUrl: any; onNavigate: () => void; }' is not assignable to type 'IntrinsicAttributes & SidebarProps & { onNavigate?: (() => void) | undefined; }'.
+  Property 'avatarUrl' does not exist on type 'IntrinsicAttributes & SidebarProps & { onNavigate?: (() => void) | undefined; }'.
+components/dashboard-sidebar.tsx(177,93): error TS2322: Type '{ userEmail: string | undefined; userName: string | undefined; companyName: string | null | undefined; avatarUrl: any; }' is not assignable to type 'IntrinsicAttributes & SidebarProps & { onNavigate?: (() => void) | undefined; }'.
+  Property 'avatarUrl' does not exist on type 'IntrinsicAttributes & SidebarProps & { onNavigate?: (() => void) | undefined; }'.
+components/paybill-account-form.tsx(23,80): error TS7031: Binding element 'data' implicitly has an 'any' type.
+exit=2

@@ -4,36 +4,110 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Plus, ClipboardList, ArrowRight, FileText, CheckCircle2, Clock, XCircle } from "lucide-react"
+import { createClient } from "@/lib/supabase/server"
 
 export const metadata: Metadata = {
   title: "Quotations — PropDesk Africa",
   description: "Track contractor quotes side by side. Approve, convert to invoices, pay.",
 }
 
-const quotations: Array<{
-  id: string
-  title: string
-  property: string
-  contractor: string
-  amount: number
-  status: string
-  variants: number
-}> = []
+export const dynamic = "force-dynamic"
+
+/**
+ * The quotations table stores amounts in minor units (KES cents).
+ * These helpers keep the conversion in one place so the table, the stat
+ * cards and the totals can never disagree.
+ */
+const toKsh = (minorUnits: number | null | undefined): number =>
+  typeof minorUnits === "number" ? minorUnits / 100 : 0
+
+const STATUS_LABEL: Record<string, string> = {
+  draft: "Draft",
+  requested: "Pending",
+  pending: "Pending",
+  approved: "Approved",
+  rejected: "Rejected",
+  paid: "Paid",
+  expired: "Rejected",
+}
 
 const statusIcon: Record<string, React.ComponentType<{ className?: string }>> = {
+  Draft: FileText,
   Pending: Clock,
   Approved: CheckCircle2,
   Rejected: XCircle,
   Paid: CheckCircle2,
 }
 const statusStyle: Record<string, string> = {
+  Draft: "bg-muted text-muted-foreground",
   Pending: "bg-warning/15 text-warning",
   Approved: "bg-success/15 text-success",
   Rejected: "bg-destructive/15 text-destructive",
   Paid: "bg-success/15 text-success",
 }
 
-export default function QuotationsPage() {
+type QuotationRow = {
+  id: string
+  title: string
+  property: string
+  contractor: string
+  amount: number
+  hasAmount: boolean
+  status: string
+  variants: number
+  createdAt: string | null
+}
+
+export default async function QuotationsPage() {
+  const supabase = await createClient()
+  const { data: quoteRows } = await supabase
+    .from("quotations")
+    .select(
+      "id, title, status, amount, property_id, contact_id, contractor_ids, requested_at, created_at, properties(name), contacts(name)",
+    )
+    .order("created_at", { ascending: false })
+
+  const quotations: QuotationRow[] = (quoteRows ?? []).map((row: any): QuotationRow => {
+    const property = Array.isArray(row.properties) ? row.properties[0] : row.properties
+    const contact = Array.isArray(row.contacts) ? row.contacts[0] : row.contacts
+    const status = STATUS_LABEL[row.status] ?? "Pending"
+    return {
+      id: String(row.id ?? ""),
+      title: String(row.title ?? "Quote request"),
+      property: property?.name ?? "Unassigned property",
+      contractor: contact?.name ?? "Contractor not set",
+      amount: toKsh(row.amount),
+      hasAmount: typeof row.amount === "number",
+      status,
+      variants: Array.isArray(row.contractor_ids) ? row.contractor_ids.length : 1,
+      createdAt: row.created_at as string | null,
+    }
+  })
+
+  const pendingApproval = quotations.filter((q: QuotationRow) => q.status === "Pending")
+  const approvedThisMonth = quotations.filter((q: QuotationRow) => {
+    if (q.status !== "Approved") return false
+    if (!q.createdAt) return false
+    const created = new Date(q.createdAt)
+    const now = new Date()
+    return (
+      created.getMonth() === now.getMonth() && created.getFullYear() === now.getFullYear()
+    )
+  })
+
+  const withApprovalTimestamps = quoteRows ?? []
+  const approvalDurations: number[] = withApprovalTimestamps
+    .filter((row: any) => row.requested_at && row.responded_at)
+    .map(
+      (row: any): number =>
+        (new Date(row.responded_at).getTime() - new Date(row.requested_at).getTime()) / 86400000,
+    )
+  const avgTimeToApproval = approvalDurations.length
+    ? Math.round(
+        (approvalDurations.reduce((sum, d) => sum + d, 0) / approvalDurations.length) * 10,
+      ) / 10
+    : null
+
   return (
     <div className="space-y-8">
       <header className="flex flex-wrap items-end justify-between gap-4">
@@ -43,9 +117,11 @@ export default function QuotationsPage() {
             Compare contractor quotes side by side. Approve with one click. Auto-convert to invoices.
           </p>
         </div>
-        <Button className="bg-primary hover:bg-primary/90">
-          <Plus className="mr-2 size-4" />
-          New quote request
+        <Button className="bg-primary hover:bg-primary/90" asChild>
+          <Link href="/dashboard/maintenance">
+            <Plus className="mr-2 size-4" />
+            New quote request
+          </Link>
         </Button>
       </header>
 
@@ -54,28 +130,38 @@ export default function QuotationsPage() {
         <Card>
           <CardHeader className="pb-2">
             <CardDescription>Pending approval</CardDescription>
-            <CardTitle className="text-3xl">0</CardTitle>
+            <CardTitle className="text-3xl">{pendingApproval.length}</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-xs text-muted-foreground">No pending requests</p>
+            <p className="text-xs text-muted-foreground">
+              {pendingApproval.length === 0 ? "No pending requests" : "Awaiting your decision"}
+            </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
             <CardDescription>Approved this month</CardDescription>
-            <CardTitle className="text-3xl">0</CardTitle>
+            <CardTitle className="text-3xl">{approvedThisMonth.length}</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-xs text-muted-foreground">No approvals recorded</p>
+            <p className="text-xs text-muted-foreground">
+              {approvedThisMonth.length === 0 ? "No approvals recorded" : "Approved in the last 30 days"}
+            </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
             <CardDescription>Avg. time to approval</CardDescription>
-            <CardTitle className="text-3xl">—</CardTitle>
+            <CardTitle className="text-3xl">
+              {avgTimeToApproval === null ? "—" : `${avgTimeToApproval}d`}
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-xs text-muted-foreground">Available after your first request</p>
+            <p className="text-xs text-muted-foreground">
+              {avgTimeToApproval === null
+                ? "Available after a contractor responds"
+                : "Average from request to response"}
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -117,8 +203,8 @@ export default function QuotationsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y">
-                {quotations.map((q) => {
-                  const Icon = statusIcon[q.status]
+                {quotations.map((q: QuotationRow) => {
+                  const Icon = statusIcon[q.status] ?? FileText
                   return (
                     <tr key={q.id} className="hover:bg-muted/30">
                       <td className="px-4 py-4">
@@ -128,11 +214,15 @@ export default function QuotationsPage() {
                       <td className="px-4 py-4 text-sm">{q.property}</td>
                       <td className="px-4 py-4 text-sm">{q.contractor}</td>
                       <td className="px-4 py-4 text-right">
-                        <p className="text-sm font-semibold">KES {q.amount.toLocaleString()}</p>
-                        <p className="text-xs text-muted-foreground">{q.variants} quotes</p>
+                        <p className="text-sm font-semibold">
+                          {q.hasAmount ? `KES ${q.amount.toLocaleString()}` : "—"}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {q.variants} {q.variants === 1 ? "quote" : "quotes"}
+                        </p>
                       </td>
                       <td className="px-4 py-4">
-                        <Badge className={statusStyle[q.status]}>
+                        <Badge className={statusStyle[q.status] ?? statusStyle.Draft}>
                           <Icon className="mr-1 size-3" />
                           {q.status}
                         </Badge>

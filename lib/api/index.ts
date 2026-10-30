@@ -92,6 +92,25 @@ export function errorResponse(message: string, status: number, extra: Record<str
   return NextResponse.json({ error: message, ...extra }, { status })
 }
 
+/**
+ * A database failure must not leak its internals to the client.
+ *
+ * A raw driver error can contain the database host, the database name, the
+ * table and column names, and fragments of the statement. The detail goes to
+ * the server log; the client gets a generic message.
+ *
+ * The original pattern was `errorResponse(error.message, 500)` in ~40 places,
+ * which returned the driver's text verbatim to anyone who could reach the
+ * endpoint.
+ */
+export function dbError(context: string, err: unknown, status = 500) {
+  console.error(`[api] ${context}`, err)
+  return errorResponse(
+    status >= 500 ? "Internal server error" : "Could not complete the request",
+    status,
+  )
+}
+
 export function successResponse<T>(data: T, status = 200) {
   return NextResponse.json(data, { status })
 }

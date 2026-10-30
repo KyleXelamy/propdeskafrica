@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server"
 import { withAuth } from "@/lib/api"
-import { exportBackup } from "@/lib/backup"
+import { exportBackup, assertAllowedBackupTable, BackupValidationError } from "@/lib/backup"
 import { BACKUP_TABLES, toCSV, formatSize } from "@/lib/system"
 
 export const runtime = "nodejs"
@@ -10,8 +10,16 @@ export const runtime = "nodejs"
  * Export one table as CSV. The CSV is downloaded as `propdeskafrica-{table}-{date}.csv`.
  */
 export const GET = withAuth(async (_request, { userId, supabase }, { table }) => {
-  if (!table || !(BACKUP_TABLES as readonly string[]).includes(table)) {
-    return NextResponse.json({ error: "Unknown table", allowed: BACKUP_TABLES }, { status: 400 })
+  // The table name is an SQL identifier — it must be allowlisted before it
+  // reaches the export. Both checks are kept: the allowlist is the security
+  // control, the explicit list is what tells the user which tables exist.
+  try {
+    assertAllowedBackupTable(table)
+  } catch (err) {
+    if (err instanceof BackupValidationError) {
+      return NextResponse.json({ error: err.message, allowed: BACKUP_TABLES }, { status: 400 })
+    }
+    throw err
   }
   const {
     data: { user },

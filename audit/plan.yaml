@@ -1,0 +1,1119 @@
+version: 1
+plan:
+  name: 'PropDesk Africa — pre-launch security, leak, feature-completion and hardening audit'
+  max_concurrency: 6
+  max_consecutive_failures: 3
+  max_cycles: 8
+tasks:
+  # =========================================================================
+  # CYCLE 1 — PARALLEL READ-ONLY AUDIT TRACKS
+  # Every track writes ONLY into /workspace/propdesk/audit/findings/
+  # so the five tracks never touch the same file.
+  # =========================================================================
+
+  - id: audit-authz
+    title: 'Audit authentication, authorization and tenant isolation'
+    assigned_to: General
+    verified_by: Verifier
+    timeout_ms: 1800000
+    prompt: |
+      You are performing a READ-ONLY security audit of the PropDesk Africa codebase
+      located at /workspace/propdesk. Do NOT modify any application source file. You
+      may only create files under /workspace/propdesk/audit/findings/.
+
+      ## Architecture you must reason against (verify it yourself, do not trust it blindly)
+      - Next.js 16 App Router, React 19, TypeScript strict, Tailwind v4.
+      - Auth: Supabase (cookie based, @supabase/ssr). Server validation uses
+        supabase.auth.getUser() — NOT getSession().
+      - Primary DB: Neon Postgres over the @neondatabase/serverless HTTP driver
+        (lib/db/neon.ts). There is NO row-level security on Neon. Every query must be
+        scoped by the authenticated user's id in application code. lib/api/with-db-auth.ts
+        documents this: "The handler must explicitly scope every query by userId".
+      - Storage (avatars, documents, property photos): Supabase Storage.
+      - Billing: Stripe. Mobile money: Safaricom Daraja M-Pesa (lib/mpesa/daraja.ts).
+      - ~90 route handlers under app/api/**/route.ts, plus lib/actions.ts and
+        lib/actions/settings.ts server actions, plus 85 page.tsx files.
+
+      ## Your scope: ONLY auth, authz, tenancy and IDOR
+      1. Enumerate EVERY app/api/**/route.ts. For each, determine:
+         - Is authentication enforced? (withDbAuth / withAuth / getUser / service-role path)
+         - Which routes are intentionally public (marketing content, health, webhooks)
+           and which are NOT intentionally public but are unauthenticated?
+         - Is the authenticated user id used to scope every SELECT / UPDATE / DELETE?
+         - For routes taking an id from path or body (properties, tenants, payments,
+           notes, maintenance, documents, expenses, quotations, backups, templates,
+           reconciliation, notifications, damages): can user A pass user B's id and
+           read or mutate B's data? Check the ownership predicate on EVERY query.
+         - Service-role Supabase client usage (lib/supabase/service.ts): which routes
+           use it, and do they correctly re-implement the ownership check that RLS
+           would normally provide? A service-role key bypasses RLS — every such route
+           needs an explicit owner check, and any that lacks one is CRITICAL.
+         - Role/privilege model: is there a role column (landlord/tenant/admin)? Can a
+           normal user escalate to admin by setting a role/company_id field in a
+           request body? Check tenant portal routes (tenant-pay-rent, tenant invite,
+           tenant paybill) — can a landlord's tenant see other tenants?
+         - Mass assignment: do POST/PATCH handlers spread the raw request body into a
+           database insert/update, allowing overwriting user_id, role, status, or
+           organization_id?
+         - Server actions in lib/actions.ts and lib/actions/settings.ts: same checks.
+         - Middleware (middleware.ts, lib/supabase/middleware.ts): does the matcher
+           actually cover the routes that need protection? Is email verification
+           enforced where required? Can the middleware be bypassed by a path that
+           does not match the pattern (e.g. trailing slash, encoded slash, case)?
+      2. For each finding, prove exploitability by quoting the exact file and line
+         range and tracing the request from entry point to the un-scoped query.
+
+      ## Output — write BOTH files
+      A) /workspace/propdesk/audit/findings/authz.md
+         Human-readable report. Per finding: ID, severity, title, file:line, the
+         vulnerable code quoted, the attack path, impact, and the concrete fix
+         (with a short code sketch that matches the repo's existing style).
+      B) /workspace/propdesk/audit/findings/authz.json
+         Machine-readable, exactly this shape:
+         {
+           "task": "audit-authz",
+           "findings": [
+             {
+               "id": "AUTHZ-001",
+               "severity": "CRITICAL|HIGH|MEDIUM|LOW",
+               "category": "missing-auth|missing-ownership-check|privilege-escalation|mass-assignment|service-role-bypass|middleware-bypass|auth-bypass",
+               "title": "...",
+               "file": "app/api/.../route.ts",
+               "lines": "10-42",
+               "evidence": "the exact vulnerable code",
+               "impact": "what an attacker can do",
+               "fix": "concrete remediation",
+               "status": "OPEN"
+             }
+           ]
+         }
+      Severity rules: CRITICAL = unauthenticated access to tenant data, auth bypass,
+      cross-tenant read/write of another landlord's data, or privilege escalation to
+      admin. HIGH = authenticated IDOR / missing ownership check. MEDIUM = missing
+      defence-in-depth (no ownership check on a non-sensitive table). LOW = nit.
+      If you find zero findings in a category, say so explicitly in authz.md — do not
+      pad the report. Accuracy over volume. Every finding must cite file:line.
+    verify_prompt: |
+      Read-only verification. Do NOT modify any file under /workspace/propdesk except
+      nothing at all — you must not edit project files.
+      Independently audit the auth/authz surface of /workspace/propdesk. Do NOT trust
+      /workspace/propdesk/audit/findings/authz.md or authz.json — re-derive from source.
+      Pick the 8 most security-relevant route handlers yourself (include at least one
+      app/api/backup/*, one app/api/documents/*, one app/api/tenants/*, one app/api/payments/*,
+      one app/api/migrations/*, one app/api/cron/*, one app/api/stripe/webhook/*, one
+      app/api/backup/csv/* route) and for each independently determine: is auth
+      enforced, is every query scoped to the caller, can a caller pass another
+      tenant's id, and does a service-role key bypass the ownership check.
+      Then reconcile against authz.json: every finding you independently confirm must
+      appear with correct severity and a valid file:line reference; every CRITICAL/HIGH
+      claim in authz.json that you CANNOT independently confirm from source is a
+      fabricated or overstated finding and must be flagged.
+      Also check for findings the report MISSED in those same files.
+      FAIL if: any file:line reference does not resolve to the quoted code; any
+      CRITICAL/HIGH finding cannot be independently re-derived; the JSON shape does
+      not match the required schema; or there are missed CRITICAL/HIGH authz issues in
+      the routes you audited. PASS if the report is accurate, complete for its scope,
+      and the JSON is schema-valid. List precisely what is wrong when you FAIL.
+
+  - id: audit-leaks
+    title: 'Hunt secrets, PII leaks, placeholder and mock data shipped to production'
+    assigned_to: General
+    verified_by: Verifier
+    timeout_ms: 1800000
+    prompt: |
+      READ-ONLY audit of /workspace/propdesk. Do NOT modify application source. You may
+      only create files under /workspace/propdesk/audit/findings/.
+
+      Context: PropDesk Africa is a property-management SaaS for landlords and tenants
+      (Kenya-focused, M-Pesa + Stripe). It is about to be launched publicly. The owner
+      suspects the codebase is full of placeholders, mock data and half-finished
+      wiring, and wants leaks identified.
+
+      ## Scope A — secrets and credentials
+      1. Search the whole repo (including scripts/, db/, supabase/, supabase-setup/,
+         public/, .v0-assets/, docs, CSV/DOCX/SQL assets, next.config.mjs) for:
+         - hardcoded API keys, tokens, passwords, connection strings, private keys
+         - Supabase service-role keys, anon keys, JWTs
+         - Neon / Postgres URLs, Stripe secret keys, M-Pesa passkey / consumer secret /
+           business shortcode / security credential
+         - real customer data, real emails, real phone numbers, national ID numbers
+         - anything that looks like a production credential committed to the repo
+         - .env files or .env.example containing real values instead of placeholders
+         - credentials embedded in the committed package-lock/pnpm-lock or in the
+           public/ folder or in a built asset
+      2. For each env var read in the code (grep process.env), report whether it is
+         read on the server only or exposed to the browser via NEXT_PUBLIC_*. Flag any
+         secret that is NEXT_PUBLIC_, and any secret that is logged, echoed in an API
+         response, or sent to the client.
+      3. Check .gitignore and .gitattributes — is .env actually ignored? Are any
+         files that SHOULD be ignored (backups, dumps, .docx templates with data,
+         csv exports) currently tracked?
+
+      ## Scope B — data leaks in responses and logs
+      1. Do any API routes return full user/tenant/landlord records when the caller
+         only needs a subset? Specifically hunt for national ID / ID number, phone,
+         email, address, M-Pesa phone numbers, bank/transaction identifiers being
+         returned where they are not needed.
+      2. Do any routes return raw database error messages, stack traces, SQL text, or
+         internal identifiers (table names, column names, uuids of other users) to the
+         client? Check the catch blocks — a common pattern is
+         NextResponse.json({ error: e.message }, 500).
+      3. Do server logs (console.log / console.error) print PII, tokens, session
+         cookies, Authorization headers, or full request bodies? List the specific
+         call sites.
+      4. Do error responses or analytics (next.config.mjs has @vercel/analytics)
+         capture identifiable user data?
+
+      ## Scope C — placeholder / mock / demo data that will ship
+      1. Find every mock / demo / sample / fake / hardcoded dataset used in a code
+      path that a real user can reach: hardcoded arrays of properties, tenants,
+      payments, testimonials, company names, currency amounts, stats, charts.
+      2. Find UI text that promises functionality that is not implemented: "coming
+         soon", "TODO", "not implemented", disabled buttons with no handler, empty
+         onClick, "this is a demo", lorem ipsum.
+      3. Find features whose write path is fake: a form that POSTs to a stub, an
+         "Export" button that returns a static file, a "Send" that only logs.
+      4. Find sample credentials shipped to the user: demo logins, default passwords,
+         seed scripts that run in production, "admin/admin" defaults.
+      5. Check public/ and .v0-assets/ for real internal assets, exported data files,
+         backup dumps, or documents that should not be public.
+
+      ## Output — write BOTH files
+      A) /workspace/propdesk/audit/findings/leaks.md — human-readable, grouped by
+         Scope A / B / C, each finding with ID, severity, file:line, quoted evidence,
+         impact, and concrete fix.
+      B) /workspace/propdesk/audit/findings/leaks.json — same schema as the authz
+         one, with "task": "audit-leaks", ids prefixed LEAK-, and category one of
+         hardcoded-secret|secret-exposed-to-client|pii-in-response|pii-in-logs|verbose-error|placeholder-data|mock-feature|shipped-sample-data|gitignore-gap|public-asset-leak.
+      Severity: CRITICAL = live credential or service-role key in the repo, or real
+      customer PII exposed. HIGH = placeholder/mock data reachable in a production
+      path, or PII returned/logged beyond need. MEDIUM = verbose errors, internal
+      identifiers, missing .gitignore entries. LOW = copy/demo text.
+      Every finding must cite file:line. Do not pad — if a section is clean, say so.
+    verify_prompt: |
+      Read-only verification. Do not modify any project file.
+      Independently verify /workspace/propdesk/audit/findings/leaks.md and leaks.json
+      against the source. Do not re-read the producer's reasoning as evidence.
+      Independently run your own greps for hardcoded credentials (Supabase service
+      role keys, Stripe sk_/whsec, M-Pesa credentials, Neon connection strings,
+      JWTs, private keys), for PII fields (national id, phone, email) being returned
+      in API responses, for console logging of sensitive values, and for mock/demo
+      datasets in reachable code paths. Spot-check 6 of the producer's findings by
+      opening the cited file:line and confirming the quoted evidence is really there.
+      Confirm every claimed credential is genuinely a secret and not a placeholder
+      string like "your-key-here" or a public anon key.
+      FAIL if: any cited file:line does not contain the quoted evidence; a claimed
+      credential is actually a placeholder/public value; a claimed PII field is not
+      actually PII; the JSON shape is invalid; or you independently find a
+      CRITICAL/HIGH leak the report missed. PASS if accurate, scoped, and
+      schema-valid. State exactly what is wrong when you FAIL.
+
+  - id: audit-infra
+    title: 'Audit infrastructure exposure, hardening posture and data-plane attack surface'
+    assigned_to: General
+    verified_by: Verifier
+    timeout_ms: 1800000
+    prompt: |
+      READ-ONLY audit of /workspace/propdesk. Do NOT modify application source. Only
+      create files under /workspace/propdesk/audit/findings/.
+
+      Context: Next.js 16 App Router deployed on Vercel. Database is Neon Postgres
+      (HTTP driver). Supabase is used for auth + storage. Stripe and Safaricom Daraja
+      M-Pesa handle money. The owner explicitly asked about "cases where we have
+      exposed our infrastructure" and about "design flaws". This track is the
+      infrastructure-exposure track.
+
+      ## Scope
+      1. ROUTE EXPOSURE — enumerate every app/api/**/route.ts and classify it as
+         public-by-design, authenticated, or admin/internal. Flag:
+         - destructive or privileged endpoints reachable without authentication or
+           without an admin check: app/api/migrations/run, /reset, /rollback,
+           app/api/cron/run, app/api/system/*, app/api/backup/*, app/api/export,
+           app/api/backup/csv/[table], app/api/reconciliation/bulk
+         - whether MIGRATION_SECRET, CRON_SECRET, BACKUP_CRON_SECRET are actually
+           required and compared in constant time, or only mentioned in a comment
+         - whether a secret is accepted via query string (which lands in logs and
+           referrers) instead of a header
+         - the CSV export route's table parameter — is it an allowlist or does it
+           interpolate a user-supplied table name into SQL? Trace it.
+      2. SQL INJECTION — hunt for string concatenation / template interpolation of
+         user input into SQL passed to the Neon sql`` template. The Neon driver
+         parameterises `` `...` `` tagged templates, so the real risk is
+         ${ } interpolation building the SQL STRING rather than binding a value.
+         Look for `sql`SELECT ... ${table}``, `sql`... ${id} ...``, ORDER BY
+         ${sort}, LIKE patterns, and any `+` concatenation. Also check lib/db/migrate.ts
+         and db/migrations/*.sql for the same. Every hit must show the exact
+         interpolation and whether the value is validated/allowlisted first.
+      3. SSRF — look at app/api/geocode/route.ts, app/api/properties/[id]/geocode/route.ts,
+         any URL fetching (lib/content, blog/feed fetchers, changelog, roadmaps, news,
+         any image proxy). Can a user supply a URL that the server fetches? Is there
+         an allowlist, a private-IP block, a redirect-following block?
+      4. FILE UPLOAD — app/api/documents/upload/route.ts and property photos.
+         Check: content-type and magic-byte validation, size limits, filename
+         sanitisation, path traversal in the stored name, whether uploads land in a
+         public bucket, and whether the Supabase Storage bucket policies restrict
+         who can read a file by path.
+      5. WEBHOOK VERIFICATION — app/api/stripe/webhook/route.ts and the M-Pesa
+         callbacks (app/api/mpesa/callback/route.ts, c2b/*). Is the Stripe
+         signature verified with the raw request body? Is the M-Pesa callback
+         authenticated (IP allowlist / shared secret / signature)? What happens if
+         the callback says "payment succeeded" — can it mark an invoice paid without
+         real money having moved? Is the amount validated against the invoice?
+      6. HEADERS AND BROWSER SECURITY — next.config.mjs sets some headers. Assess
+         what is MISSING: Content-Security-Policy (report-only at minimum, then
+         enforced), X-Frame-Options vs frame-ancestors, HSTS preload +
+         includeSubDomains, X-XSS-Protection, Cross-Origin-Opener-Policy,
+         Cross-Origin-Resource-Policy, Referrer-Policy value, Permissions-Policy
+         completeness. Also check for a missing/incomplete CSP allowing unsafe-inline
+         script, and whether react is used dangerouslySetInnerHTML anywhere
+         (grep dangerouslySetInnerHTML) — that is a stored-XSS vector.
+      7. RATE LIMITING AND ABUSE — is there ANY rate limiting on auth endpoints,
+         password reset, sign-up, contact forms, newsletter, M-Pesa STK push,
+         checkout, and the free-tier lead forms? Public marketing forms with no rate
+         limit = spam/DoS and email-bombing.
+      8. SESSION AND COOKIE POSTURE — cookie flags (httpOnly, secure, sameSite),
+         session refresh behaviour in lib/supabase/middleware.ts, session fixation,
+         absence of session revocation, token lifetime.
+      9. CONFIG AND SUPPLY CHAIN — next.config.mjs has
+         `typescript.ignoreBuildErrors: true` (report it: real type errors will ship
+         silently). `images.unoptimized: true`. `poweredByHeader: false` is good.
+         Check for a missing "Content-Security-Policy" report, non-HTTPS redirect
+         enforcement, and whether a `vercel.json` or equivalent exists. Check
+         package.json for dependencies with known critical advisories (npm audit if
+         network allows; otherwise flag the ones you can reason about: next ^16.3.8,
+         @supabase/supabase-js ^2.116.0, stripe ^23.0.0, ws ^8.22.0, docx ^9.9.0,
+         next-auth is NOT used).
+      10. DESIGN FLAWS — architectural issues that create risk: the dual
+          Neon/Supabase database fallback (lib/db/neon.ts returns DATABASE_URL ||
+          POSTGRES_URL || POSTGRES_PRISMA_URL, and lib/supabase/server.ts is a
+          fallback path) meaning two sources of truth and two different security
+          models; the fact that the app enforces tenancy in application code with no
+          RLS as a safety net; the "backup" feature exporting the whole database to
+          CSV; the MIGRATION_SECRET pattern; and the fact that marketing and
+          dashboard share one Next app and one middleware matcher.
+
+      ## Output — write BOTH files
+      A) /workspace/propdesk/audit/findings/infra.md — human-readable, grouped by
+         the numbered scope above, each finding with ID, severity, file:line, quoted
+         evidence, impact, and concrete fix.
+      B) /workspace/propdesk/audit/findings/infra.json — schema:
+         { "task": "audit-infra", "findings": [ { "id": "INFRA-001", "severity":
+         "CRITICAL|HIGH|MEDIUM|LOW", "category": "unauth-admin-endpoint|secret-handling|sql-injection|ssrf|file-upload|webhook-verification|missing-security-header|xss|rate-limiting|session-cookie|config|supply-chain|design-flaw",
+         "title", "file", "lines", "evidence", "impact", "fix", "status": "OPEN" } ] }
+      Severity: CRITICAL = unauthenticated destructive access, live secret exposure,
+      confirmed SQLi, unauthenticated payment-mutation. HIGH = SSRF, unverified
+      webhook with financial impact, upload bypass, missing auth on sensitive
+      route. MEDIUM = missing header, missing rate limit, config weakness.
+      LOW = nit. Every finding cites file:line. Do not pad.
+    verify_prompt: |
+      Read-only verification. Do not modify any project file.
+      Independently verify the infra findings in /workspace/propdesk/audit/findings/.
+      Do not accept the producer's conclusion — re-derive. Specifically:
+      1. Open app/api/migrations/run/route.ts, app/api/migrations/reset/route.ts,
+         app/api/migrations/rollback/route.ts, app/api/cron/run/route.ts,
+         app/api/backup/csv/[table]/route.ts, app/api/export/route.ts and determine
+         for each: what authenticates the caller, what secret is checked, and whether
+         the secret comparison is constant-time. Then TRY to call one of these
+         routes unauthenticated and report the actual response.
+      2. Open app/api/stripe/webhook/route.ts and app/api/mpesa/callback/route.ts
+         and independently determine whether the payload is authenticated and whether
+         the amount is bound to an invoice.
+      3. Grep for real SQL string interpolation and independently confirm or refute
+         the SQLi claims.
+      4. Grep for dangerouslySetInnerHTML and independently check the XSS claim.
+      5. Check next.config.mjs for the headers actually present vs claimed missing.
+      6. Spot-check 5 findings by file:line.
+      FAIL if: a claimed vulnerability does not exist in the code; a cited file:line
+      does not resolve; a CRITICAL claim is overstated (e.g. the route IS
+      authenticated and you did not notice); the JSON shape is invalid; or you
+      independently find a CRITICAL/HIGH infra issue the report missed.
+      PASS if accurate, scoped and schema-valid. State exactly what is wrong on FAIL.
+
+  - id: audit-features
+    title: 'Inventory half-done features, dead UI and incomplete wiring'
+    assigned_to: General
+    verified_by: Verifier
+    timeout_ms: 1800000
+    prompt: |
+      READ-ONLY audit of /workspace/propdesk. Do NOT modify application source. Only
+      create files under /workspace/propdesk/audit/findings/.
+
+      Context: PropDesk Africa is a property-management SaaS (Next.js 16 App Router,
+      React 19) that is about to go live. The owner says the app is "missing too
+      much" and has "half-done features" and wants them COMPLETED, not just listed.
+      This track produces the authoritative completion backlog AND, where a feature
+      is self-contained and low-risk, actually implements the simplest ones.
+
+      ## Phase 1 — inventory (read-only)
+      1. Walk the full route tree. List every page under app/(marketing) and
+         app/dashboard. For each, determine: is it a real page with a real data
+         source, a static shell, a stub, or a redirect?
+      2. Grep the whole repo for: TODO, FIXME, XXX, HACK, "not implemented",
+         "coming soon", "coming soon!", "under construction", "placeholder",
+         "mock", "dummy", "sample", "demo", "dummy data", "hardcoded", "temporary",
+         "for now", "will be", "in the future", "lorem", "TBD", "WIP".
+         Produce a classified list — a TODO inside a comment that describes work
+         genuinely NOT done is a finding; a TODO about a code style nit is not.
+      3. Trace the UI-to-API wiring. For every form component in components/
+         (contact-form, document-upload-form, expense-form, login-form,
+         maintenance-form, marketing-sales-form, mpesa-pay-button, newsletter-form,
+         note-form, paybill-account-form, payment-form, property-form,
+         reconciliation-review-queue, submit-idea-form, tenant-form, tenant-pay-rent,
+         feedback-board, backup-manager, expense-recurring-control, recurring-expenses-panel,
+         property-photo-gallery, property-map, search-input, resource-search,
+         subscription-controls, system-info, notifications-bell, trial-banner,
+         live-paybill-feed, delete-button, tenant-invite-card, dashboard-widgets):
+         does it POST/PUT to a real route that persists to the DB, or is the handler
+         a stub / console.log / local state only?
+      4. For every dashboard page, check the data path: does it read real rows, or
+         does it render hardcoded arrays? Check app/dashboard/finances/payments/new,
+         app/dashboard/reconciliation, app/dashboard/quotations, app/dashboard/reports,
+         app/dashboard/notes, app/dashboard/maintenance, app/dashboard/paybill,
+         app/dashboard/contacts, app/dashboard/settings/system, app/dashboard/settings/backup,
+         app/dashboard/templates, app/dashboard/properties/map.
+      5. Find UI that navigates to a non-existent route, or a route that exists but
+         renders nothing. Find buttons with no handler, forms with no action, and
+         tables with a permanent "coming soon" empty state where a real API exists.
+      6. Find error handling that silently swallows failures (empty catch blocks,
+         catch that returns [] or null), which is how "half-done" hides in production.
+      7. Check the auth pages for completeness: forgot-password, reset-password,
+         verify-email, sign-up, callback. Do they actually call Supabase and handle
+         the error states?
+      8. Check lib/actions.ts and lib/actions/settings.ts — server actions that are
+         defined but never called, or called but not defined.
+      9. Check lib/reconcile.ts + lib/reconcile.test.ts — is reconciliation logic
+         complete and actually wired to the API routes?
+      10. Check lib/templates/, lib/backup.ts, lib/system.ts, lib/brand.ts,
+         lib/pricing.ts — which are complete and which are partial?
+
+      ## Phase 2 — complete the low-risk, self-contained ones
+      You MAY implement fixes, but ONLY for findings you classify as
+      "small" (LOW effort): a static page that should show real content from an
+      existing data source, a form that should post to an existing endpoint, a
+      dead link, a missing "use client" that breaks a component, an obviously
+      wrong empty state, a TODO that is a one-line fix.
+      You MUST NOT implement anything that touches authentication, payments,
+      database schema, or anything marked CRITICAL/HIGH. Leave those to the
+      security hardening track.
+      Only edit files under /workspace/propdesk/app, /workspace/propdesk/components,
+      /workspace/propdesk/hooks and /workspace/propdesk/lib. Do NOT create or edit
+      any file under /workspace/propdesk/audit/ except your own two findings files.
+      Do NOT run `git commit`.
+
+      ## Output — write BOTH files
+      A) /workspace/propdesk/audit/findings/features.md — human-readable: a table of
+         every incomplete feature with ID, area, file:line, what's missing, effort
+         (SMALL/MEDIUM/LARGE), risk (LOW/MEDIUM/HIGH), and the recommended
+         completion approach. Then a section "Completed in this track" listing what
+         you actually implemented, with files changed and the behaviour change.
+      B) /workspace/propdesk/audit/findings/features.json — schema:
+         { "task": "audit-features", "findings": [ { "id": "FEAT-001", "severity":
+         "HIGH|MEDIUM|LOW", "category": "stub-page|mock-data|dead-ui|unwired-form|broken-link|empty-catch|missing-error-state|unwired-action|incomplete-logic",
+         "title", "file", "lines", "evidence", "impact", "fix", "effort": "SMALL|MEDIUM|LARGE", "status": "OPEN" } ] }
+      Every finding cites file:line. Do not pad. Distinguish genuinely unfinished
+      work from intentional marketing copy.
+    verify_prompt: |
+      Read-only verification of the feature-completion work. Do not modify project files.
+      Independently verify /workspace/propdesk/audit/findings/features.json and
+      features.md against the code. Do not take the producer's word for it.
+      1. Spot-check 8 findings by opening the cited file:line and confirming the
+         feature really is incomplete (a static page with no data source, a form
+         with no endpoint, a dead link target that does not exist).
+      2. Independently look for at least 5 features that the report MISSED — search
+         the dashboard tree for pages that render hardcoded arrays, grep for forms
+         with no fetch/action, and grep for catch blocks that swallow errors.
+      3. For everything the producer claims it implemented (the "Completed in this
+         track" section), verify the change actually exists in the working tree and
+         that it is correct — in particular that it did NOT touch auth, payments,
+         DB schema, or anything CRITICAL/HIGH, and that it did not break the build.
+         Run `npx tsc --noEmit` if node_modules is present in /workspace/propdesk and
+         report the result. If the repo has pre-existing type errors, compare against
+         the baseline and report only NEW errors.
+      4. Check for regressions: did any "completed" feature break a real API contract
+         or remove working behaviour?
+      FAIL if: a claimed incomplete feature is actually complete; a cited file:line
+         does not resolve; the implemented changes touched auth/payments/schema or
+         introduced new type errors; the JSON shape is invalid; or you found
+         significant missed features. PASS if accurate, scoped, and the implemented
+         changes are safe. State exactly what is wrong when you FAIL.
+
+  - id: audit-crypto
+    title: 'Design encryption-at-rest, key management and data-protection hardening'
+    assigned_to: General
+    verified_by: Verifier
+    timeout_ms: 1800000
+    prompt: |
+      READ-ONLY design track for /workspace/propdesk. Do NOT modify application source
+      in this track. Only create files under /workspace/propdesk/audit/findings/ and
+      /workspace/propdesk/audit/design/.
+
+      Context: PropDesk Africa handles sensitive data for Kenyan landlords and
+      tenants: national ID numbers, phone numbers, emails, physical addresses, bank
+      and M-Pesa account identifiers, lease agreements, invoices, payment records,
+      uploaded identity documents and property photos. The platform stores this in
+      Neon Postgres (HTTP driver, @neondatabase/serverless) with Supabase Storage
+      for files. The owner asked for "code hardening and encryption etc etc".
+      Your job is to produce the concrete, implementable encryption + data-protection
+      design that the next cycle will build.
+
+      ## What to determine
+      1. DATA INVENTORY — which tables/columns hold what class of data? Read
+         db/migrations/001-core.sql, db/migrations/002-support.sql and the query
+         code in app/api/**. Produce a table of: table.column, data class
+         (public / internal / PII / sensitive PII / financial / credential),
+         whether it is currently stored in plaintext, and whether it is already
+         protected by application-layer tenant scoping.
+      2. ENCRYPTION DESIGN — design application-layer encryption at rest for the
+         sensitive PII columns (at minimum: tenant national ID number, tenant phone
+         number, any M-Pesa/bank account identifiers, any document metadata that
+         leaks identity). Specify concretely:
+         - Node's built-in `node:crypto` AES-256-GCM (authenticated encryption) —
+           why it is the right choice here (no new native dependency, works on
+           Vercel serverless, no WASM/build breakage) and how it compares to
+           libsodium, AWS KMS and pgcrypto.
+         - The exact envelope: iv (12 random bytes) + authTag + ciphertext, stored
+           as a single base64 string with a version prefix, e.g. `v1:<iv>:<tag>:<ct>`
+           so the scheme can be rotated later.
+         - Key material: a master key from an env var (e.g. PROPDESK_ENCRYPTION_KEY),
+           32 bytes base64, NEVER hardcoded, NEVER logged, NEVER sent to the client.
+         - A key registry supporting multiple active key ids (for rotation) and a
+           decrypt-with-fallback decrypts-then-reencrypts pattern.
+         - Deterministic vs randomised: which columns need deterministic encryption
+           (search/lookup, e.g. a searchable phone number) and how to do it safely
+           — recommend a blind index (HMAC-SHA256 with a separate key) rather than
+           a deterministic cipher, and explain the trade-off.
+         - Where the crypto helper lives (e.g. lib/crypto/field-encryption.ts),
+           its exact exported API, and the code shape for encrypt/decrypt/blind-index.
+         - A safe search/filter strategy for encrypted columns.
+      3. PASSWORD AND AUTH CRYPTO — check how passwords and OTP codes are handled
+         (Supabase auth handles password hashing — confirm and say so rather than
+         inventing a scheme). Identify anything the app itself hashes or compares:
+         M-Pesa callback secrets, CRON_SECRET, MIGRATION_SECRET, Stripe webhook
+         signature verification. Check every secret comparison for TIMING-SAFE
+         comparison (crypto.timingSafeEqual) and for string === comparisons, and
+         for length-leak issues with timingSafeEqual (it throws on unequal
+         lengths — show the correct guarded pattern).
+      4. STORAGE PROTECTION — Supabase Storage policies for property photos,
+         avatars and tenant documents. Can a signed-in user read another landlord's
+         file by guessing a path? Is the bucket public? Should documents be
+         served via short-lived signed URLs? Propose the concrete policy change.
+      5. DATA RETENTION AND DELETION — the legal pages in app/(marketing)/legal
+         (privacy, dpa, terms) make claims. Check whether the app can actually
+         honour them: is there a user-deletion path that removes a user's data
+         across ALL tables? Is there a tenant offboarding path that removes their
+         PII? Does the backup/export feature keep exporting deleted users' data?
+         Note: PropDesk's own privacy page makes promises — read it and report
+         gaps between claim and implementation. This is a legal-risk finding.
+      6. AUDIT LOGGING — is there any record of who read/changed sensitive data?
+         Propose a minimal, privacy-preserving audit log design (table shape,
+         what to log, retention, and how to avoid logging PII itself).
+
+      ## Output — write THREE files
+      A) /workspace/propdesk/audit/findings/crypto.md — the findings and data
+         inventory, each with ID, severity, file:line, impact, and fix.
+      B) /workspace/propdesk/audit/findings/crypto.json — schema:
+         { "task": "audit-crypto", "findings": [ { "id": "CRYPTO-001", "severity":
+         "CRITICAL|HIGH|MEDIUM|LOW", "category": "plaintext-pii|weak-compare|
+         missing-storage-policy|retention-gap|missing-audit-log|key-management|legal-claim-gap",
+         "title", "file", "lines", "evidence", "impact", "fix", "status": "OPEN" } ] }
+      C) /workspace/propdesk/audit/design/encryption-design.md — the implementation
+         spec the next cycle will follow. It MUST contain: the exact TypeScript
+         source of the proposed lib/crypto/field-encryption.ts (real, compilable
+         TypeScript, using node:crypto), the exact env var names and how to
+         generate the keys (`openssl rand -base64 32`), the key-rotation procedure,
+         the blind-index helper, the per-column encryption plan table (column,
+         class, mode = deterministic/randomised, lookup strategy), the read-path
+         and write-path migration steps, the backfill script outline, and the
+         rollout order. It must be specific enough that an implementer can code
+         from it without asking questions.
+
+      Do not implement anything in this track. Design only. Every finding cites
+      file:line. Do not pad.
+    verify_prompt: |
+      Read-only verification. Do not modify project files.
+      Verify /workspace/propdesk/audit/design/encryption-design.md and
+      /workspace/propdesk/audit/findings/crypto.{md,json}.
+      1. Check the design's TypeScript for correctness: does the AES-256-GCM usage
+         match Node's actual API (createCipheriv with a 12-byte IV, authTag
+         retrieval, correct tag length)? Is the encode/decode of the `v1:` envelope
+         unambiguous? Are there buffer/encoding bugs (e.g. mixing base64 of
+         concatenated buffers without fixed offsets)? Is key length validated?
+      2. Check the design's claims against the actual repo: does the table it
+         names actually exist in db/migrations/*.sql? Are the columns it says are
+         plaintext actually stored plaintext? Open the cited file:line.
+      3. Check the timingSafeEqual guidance is correct about the equal-length
+         requirement.
+      4. Independently verify the legal-claim gap finding: open the privacy/DPA
+         pages under app/(marketing)/legal and confirm the specific claim that is
+         not implemented by the code.
+      5. Check the design does not propose storing keys in the repo, logging
+         secrets, or sending plaintext to the client after "encryption".
+      FAIL if: the proposed code would not compile or is cryptographically wrong;
+      the data inventory contradicts the migrations; a cited file:line does not
+      resolve; the JSON shape is invalid; or you find a plaintext-PII column the
+      design missed. PASS if the design is implementable, correct, and grounded
+      in the real schema. State exactly what is wrong when you FAIL.
+
+  # =========================================================================
+  # CYCLE 2 — IMPLEMENTATION CHAIN (each verified adversarially)
+  # =========================================================================
+
+  - id: fix-critical-security
+    title: 'Implement fixes for all CRITICAL and HIGH security findings'
+    assigned_to: Coder
+    depends_on: [audit-authz, audit-leaks, audit-infra]
+    verified_by: Verifier
+    timeout_ms: 1800000
+    prompt: |
+      You are the implementing engineer for PropDesk Africa at /workspace/propdesk.
+      The audit tracks have completed. You must now FIX the code.
+
+      ## READ FIRST: /workspace/propdesk/audit/ENVIRONMENT.md
+      It records the already-completed environment setup (node_modules installed, the
+      54 pre-existing tsc errors that are the BASELINE and not yours to fix, the
+      3 passing baseline tests, the architecture cheat-sheet, the severity ladder,
+      and the global ground rules: no git commit, do not touch audit/findings/
+      except your own files, zero NEW type errors, suite must stay green).
+
+      ## Inputs — read these first
+      - /workspace/propdesk/audit/findings/authz.md + authz.json
+      - /workspace/propdesk/audit/findings/leaks.md + leaks.json
+      - /workspace/propdesk/audit/findings/infra.md + infra.json
+      Every finding you act on must have a real file:line you have personally opened
+      and confirmed. If you believe a finding is wrong, do not silently skip it —
+      mark it WONT_FIX in the JSON with a one-line justification and report it.
+
+      ## Scope — implement fixes for
+      - ALL CRITICAL findings (must be 100% fixed — these are launch blockers)
+      - ALL HIGH findings (fix them all; if one genuinely cannot be fixed without
+        a product decision, mark it WONT_FIX with the exact question for the owner)
+      Do NOT implement MEDIUM/LOW in this task — a later task handles those, and
+      doing them here risks breaking the build. Exception: if a MEDIUM fix is a
+      one-liner that is clearly coupled to a HIGH fix you are already making, do it
+      and note it.
+
+      ## Non-negotiable constraints
+      1. Do NOT change the public API contract of any existing route (request
+         shape, response shape, status codes) unless the fix requires it. If you
+         must, document it loudly in your report and in a CHANGELOG-style section.
+      2. Do NOT change the database schema. No new migrations in this task. If a
+         finding genuinely requires a schema change, mark it WONT_FIX and explain.
+      3. Preserve the existing code style: TypeScript strict, 2-space indent,
+         no semicolon-style churn, zod for validation, `withDbAuth`/`withAuth`
+         wrappers for authenticated routes, `jsonError`/`DbHttpError` for errors.
+      4. Keep the app buildable. The repo has `typescript.ignoreBuildErrors: true`
+         in next.config.mjs — that does NOT excuse introducing new type errors.
+         Run `npx tsc --noEmit` in /workspace/propdesk if node_modules is present
+         and make sure you introduce NO new type errors relative to the baseline
+         (capture the baseline first with `git stash`/restore or by noting the
+         pre-existing error list before you start). Report the baseline count and
+         the post-fix count.
+      5. Do NOT run `git commit`. Leave everything in the working tree.
+      6. Do NOT create files outside /workspace/propdesk (except under
+         /workspace/propdesk/audit/ for your own report).
+      7. Do not weaken a fix by simply returning 403 where a real fix is required.
+
+      ## Expected shape of the fixes
+      - Missing authentication → wrap the handler in the existing auth helper, or
+        add an explicit session check matching the pattern already used elsewhere
+        in the repo. Look at how a correctly-protected route does it and match it.
+      - Missing ownership check → add the owner predicate to EVERY affected query,
+        not just the one named in the finding. Re-read the whole handler.
+      - Mass assignment → build an explicit allowlisted payload object instead of
+        spreading the request body. Use zod where the repo already uses it.
+      - Secret comparison → use crypto.timingSafeEqual with an equal-length guard.
+      - SQL string interpolation → convert to a bound parameter, or to a
+        strict allowlist when the value is an identifier (e.g. a table name).
+      - Verbose errors → return a generic message to the client and log the detail
+        server-side only.
+      - Secret in NEXT_PUBLIC_* or logged → move it server-side and stop logging it.
+      - Missing security header → add it in next.config.mjs `headers()` alongside
+        the existing ones.
+      - Missing auth on admin route → enforce the admin role check the app already
+        models (check how a role is stored and read before you use it).
+
+      ## Output
+      1. Update the findings JSON files you acted on: for each finding, set
+         "status" to "FIXED" or "WONT_FIX", and add a "fix_notes" field
+         describing the change and naming the file:line you changed.
+      2. Write /workspace/propdesk/audit/deliverable-fix-security.md listing:
+         every finding acted on with its ID, severity, status, files changed, a
+         one-line description of the change, and the verification you performed
+         (command + result). Also list, prominently, anything left WONT_FIX and
+         why. Also state the tsc baseline vs post-fix error count.
+      3. Also write the fixed code — the verifier will try to break it.
+    verify_prompt: |
+      You are an adversarial security verifier. READ-ONLY on project files: you must
+      NOT edit, create or delete any file under /workspace/propdesk except nothing.
+      Do not fix anything yourself.
+
+      Your job: try to BREAK the fixes that were just made, and independently
+      confirm the audit findings are genuinely closed.
+
+      1. Get the changed file set: run `git -C /workspace/propdesk status --porcelain`
+         and `git -C /workspace/propdesk diff --stat` against the baseline commit
+         (baseline commit id 467c500). For each changed file, read the actual diff.
+      2. For every finding in authz.json, leaks.json and infra.json with severity
+         CRITICAL or HIGH, independently verify the fix by reading the current
+         source at the cited location and reasoning about the attack. Do not
+         re-read the producer's deliverable as evidence — go to the source.
+      3. ACTIVE PROBING — where you can, exercise the code. If node_modules exists
+         you may write throwaway probe scripts ONLY under /tmp (never inside the
+         repo) or use `npx tsx -e '...'` to import route modules and call the
+         exported handler directly with a forged NextRequest. Try:
+         - calling a protected route handler with no session and asserting it
+           returns 401/403
+         - calling a protected route with a session whose user id differs from the
+           resource id in the path, asserting it returns 404/403 and NOT the other
+           user's data
+         - posting an extra field like `user_id`, `role`, `organization_id`,
+           `status` in the body and asserting it is ignored
+         - calling the migrations/cron/export/backup-csv routes with no secret
+         - replaying a forged Stripe webhook without a valid signature
+         Confirm the actual observed response, and quote it.
+      4. Check for OVER-FIXING and REGRESSIONS: did a fix break a legitimate
+         public route (marketing content, health, newsletter, contact, the
+         M-Pesa callback, the Stripe webhook)? Did any fix change a response
+         shape that the frontend still depends on? Did any fix introduce a new
+         type error? Run `npx tsc --noEmit` in /workspace/propdesk and compare
+         against the baseline error list.
+      5. Confirm no secrets were introduced into the client bundle: grep the diff
+         for NEXT_PUBLIC_ additions and for any literal key material.
+      6. Confirm the producer did not simply widen scope: check that no MEDIUM/LOW
+         finding was silently "fixed" in a way that changes unrelated behaviour.
+
+      FAIL if: any CRITICAL or HIGH finding is NOT actually closed; any fix can be
+      bypassed (e.g. a check on a different field than the one the attacker
+      controls); a legit public route now 401s; a response contract changed
+      without need; a new type error was introduced; a secret was exposed to the
+      client; or the producer claimed a fix that is not in the code.
+      PASS only if every CRITICAL/HIGH finding is demonstrably closed, regressions
+      are absent, and no new type errors exist. On FAIL, list each problem with
+      file:line and the exact probe output that demonstrates it.
+
+  - id: security-regression-tests
+    title: 'Add regression tests and typecheck evidence for the security fixes'
+    assigned_to: Coder
+    depends_on: [fix-critical-security]
+    verified_by: Verifier
+    timeout_ms: 1800000
+    prompt: |
+      Add automated regression coverage for the security fixes in /workspace/propdesk.
+
+      ## READ FIRST: /workspace/propdesk/audit/ENVIRONMENT.md
+      It records the already-completed environment setup (node_modules installed, the
+      54 pre-existing tsc errors that are the BASELINE and not yours to fix, the
+      3 passing baseline tests, the architecture cheat-sheet, the severity ladder,
+      and the global ground rules: no git commit, do not touch audit/findings/
+      except your own files, zero NEW type errors, suite must stay green).
+
+      ## Inputs
+      - /workspace/propdesk/audit/deliverable-fix-security.md (what was changed)
+      - /workspace/propdesk/audit/findings/authz.json, leaks.json, infra.json
+        (the CRITICAL/HIGH findings, now with status FIXED)
+      - The repo uses vitest 5.0.1 (`npm test` → `vitest run`). The only existing
+        test file is lib/reconcile.test.ts — use it as the style reference.
+
+      ## What to build
+      1. Unit tests for every NEW pure helper introduced by the security fixes
+         (e.g. ownership predicates, allowlist validators, secret comparators,
+         sanitised payload builders, any crypto helper). Name them by the finding
+         they protect, and put a comment above each referencing the finding ID
+         (e.g. `// protects AUTHZ-002`).
+      2. Route-level tests for the highest-value guards, using vitest with the
+         Next route handlers imported directly. Mock the auth layer and the Neon
+         `sql` template function so you can assert:
+         - unauthenticated request to a protected route → 401
+         - authenticated user A requesting user B's resource id → 404 or 403 and
+           the response body does NOT contain B's data
+         - a request body containing a forged `user_id` / `role` / `organization_id`
+           → those fields are not persisted (assert on the mocked sql parameters)
+      3. A test that asserts the secret-comparison helper rejects a wrong secret
+         and accepts the right one, and that it does not throw on a length mismatch
+         (the classic timingSafeEqual length bug).
+      4. If the repo has a natural place, a test that asserts the security headers
+         in next.config.mjs include the expected set. If next.config.mjs is not
+         importable in a unit test, skip this and say so rather than hacking it.
+      5. Keep tests FAST and OFFLINE. No network calls, no real database, no real
+         Supabase. Mock everything. If a test cannot be made hermetic, do not
+         write it — write a clearly-labelled manual-test checklist instead.
+
+      ## Constraints
+      - Do NOT modify application behaviour. If a test exposes a real bug in the
+        security fixes, do NOT fix it here — report it in your deliverable so the
+        owner can route it.
+      - Do NOT weaken any test to make it pass.
+      - Do NOT `git commit`.
+      - The test command is `npm test` (vitest run) from /workspace/propdesk.
+        Also run `npx tsc --noEmit` and report the error count vs baseline.
+
+      ## Output
+      - The test file(s), colocated sensibly (e.g. lib/security/__tests__/ or
+        alongside the module).
+      - /workspace/propdesk/audit/deliverable-security-tests.md: the exact test
+        command and its FULL output, the list of finding IDs now covered and by
+        which test, the tsc baseline vs post-fix error count, and an explicit
+        list of any guards that could NOT be covered automatically with a
+        step-by-step manual verification procedure for each.
+    verify_prompt: |
+      READ-ONLY verification. Do not modify any project file.
+      Independently verify the regression tests for /workspace/propdesk.
+      1. Run `npm test` in /workspace/propdesk YOURSELF and report the real output
+         and pass/fail counts. Do not trust the producer's quoted output.
+      2. For the route-level tests, confirm they are genuinely hermetic: no
+         network, no real DB, no real Supabase. Check that the mocks actually
+         assert something — a test that mocks the handler under test and then
+         asserts the mock was called is a vacuous test and must be flagged.
+      3. Delete-nothing check: confirm no test file weakens an existing assertion
+         (compare lib/reconcile.test.ts against the baseline commit 467c500 with
+         `git -C /workspace/propdesk diff 467c500 -- lib/reconcile.test.ts`).
+      4. Coverage honesty: for the CRITICAL/HIGH findings in authz.json, leaks.json
+         and infra.json, check which have a corresponding test. Any CRITICAL with
+         NO test coverage at all must be listed as a coverage gap.
+      5. Run `npx tsc --noEmit` and confirm no new type errors.
+      FAIL if: the test suite does not pass, tests are non-hermetic, any test is
+      vacuous, existing assertions were weakened, or a CRITICAL finding has no
+      coverage and no manual procedure. PASS if the suite passes, the tests are
+      meaningful, and the coverage story is honest. State exactly what is wrong on FAIL.
+
+  - id: fix-features-complete
+    title: 'Complete the medium and large half-done features'
+    assigned_to: Coder
+    depends_on: [fix-critical-security, security-regression-tests]
+    verified_by: Verifier
+    timeout_ms: 1800000
+    prompt: |
+      Implement the remaining feature-completion work for /workspace/propdesk.
+
+      ## READ FIRST: /workspace/propdesk/audit/ENVIRONMENT.md
+      It records the already-completed environment setup (node_modules installed, the
+      54 pre-existing tsc errors that are the BASELINE and not yours to fix, the
+      3 passing baseline tests, the architecture cheat-sheet, the severity ladder,
+      and the global ground rules: no git commit, do not touch audit/findings/
+      except your own files, zero NEW type errors, suite must stay green).
+
+      ## Inputs
+      - /workspace/propdesk/audit/findings/features.md + features.json
+        (the authoritative backlog; entries the audit track already implemented
+        are marked as done in the md — do not redo them)
+      - /workspace/propdesk/audit/deliverable-fix-security.md — do not undo any
+        security fix, and respect the new invariants it introduced
+      - The current state of the code
+
+      ## Scope — implement, in priority order
+      1. Every remaining finding with effort SMALL and risk LOW.
+      2. Every finding with effort MEDIUM and risk LOW.
+      3. MEDIUM effort / MEDIUM risk — implement if you can do it without a
+         schema change and without touching auth or payment logic.
+      4. Do NOT implement anything requiring a database schema change, anything
+         touching payment flows, M-Pesa, or Stripe checkout, and anything touching
+         authentication. Mark those as "NEEDS-PRODUCT-DECISION" with a precise
+         description of the decision the owner must make.
+      5. LARGE effort features: do not attempt. Write a concrete, step-by-step
+         implementation plan for each into /workspace/propdesk/audit/design/
+         feature-plans/<FEAT-ID>.md so the owner can schedule them.
+
+      ## Implementation standards
+      - Reuse the existing patterns in the repo: zod validation, withDbAuth/
+        withAuth for authenticated writes, the existing Supabase/Neon data access
+        helpers, the existing UI components in components/ui, sonner for toasts,
+        react-hook-form + @hookform/resolvers for forms.
+      - A completed feature must be wired END TO END: the UI calls the real API,
+        the API persists to the DB, errors surface to the user, and empty and
+        loading states are handled. A feature that renders real-looking mock data
+        is NOT complete — replace the mock with the real query.
+      - Never fake persistence. If a route cannot persist without a schema change,
+          do not implement it — escalate it instead.
+      - Match the existing code style. No drive-by refactors of unrelated files.
+      - Run `npx tsc --noEmit` (if node_modules is present) and ensure you add NO
+        new type errors vs the baseline. Report baseline and post counts.
+      - Do NOT `git commit`.
+
+      ## Output
+      1. Update features.json: set "status" to "DONE", "PARTIAL", or
+         "NEEDS-PRODUCT-DECISION" for each finding, and add "fix_notes" with the
+         files changed.
+      2. /workspace/propdesk/audit/deliverable-feature-completion.md: for each
+         feature, the ID, what was missing, what you implemented, the files
+         changed, and how a user can now exercise it end to end. List prominently
+         everything left as NEEDS-PRODUCT-DECISION and everything left as a plan
+         only. Include the tsc baseline vs post-fix error count.
+    verify_prompt: |
+      READ-ONLY verification. Do not modify any project file.
+      Independently verify the feature-completion work in /workspace/propdesk.
+      1. For every finding the producer marked DONE, open the cited file:line and
+         confirm the feature is genuinely wired end to end — the UI calls a real
+         endpoint, the endpoint persists, and mock data was removed. Pick at least
+         6 DONE findings across different areas and check each. A "done" feature
+         that still renders a hardcoded array is a FAIL.
+      2. For every finding marked PARTIAL, confirm the producer did not overstate
+         partial completion.
+      3. Confirm no security fix was reverted: run
+         `git -C /workspace/propdesk diff 467c500 -- lib/api lib/supabase lib/db middleware.ts next.config.mjs`
+         and check nothing weakened the security work. Also confirm no schema
+         change was introduced: `git -C /workspace/propdesk diff --stat -- db/`.
+      4. Run `npx tsc --noEmit` and confirm no new type errors vs baseline.
+      5. Run `npm test` and confirm the suite still passes.
+      6. Independently look for at least 3 features the producer marked DONE that
+         are still broken on close reading (e.g. the form submits but the API
+         ignores the payload; the page loads but the query filters everything out;
+         the endpoint returns 200 with a hardcoded array).
+      FAIL if: any DONE feature is not actually wired; a security fix was weakened;
+         a schema change slipped in; new type errors appeared; the test suite
+         broke; or the producer overstated completion. PASS if the completion is
+         real and the codebase is still green. State exactly what is wrong on FAIL.
+
+  - id: harden-crypto
+    title: 'Implement encryption at rest, secret hygiene, storage policies and audit logging'
+    assigned_to: Coder
+    depends_on: [fix-features-complete]
+    verified_by: Verifier
+    timeout_ms: 1800000
+    prompt: |
+      Implement the data-protection hardening for /workspace/propdesk.
+
+      ## READ FIRST: /workspace/propdesk/audit/ENVIRONMENT.md
+      It records the already-completed environment setup (node_modules installed, the
+      54 pre-existing tsc errors that are the BASELINE and not yours to fix, the
+      3 passing baseline tests, the architecture cheat-sheet, the severity ladder,
+      and the global ground rules: no git commit, do not touch audit/findings/
+      except your own files, zero NEW type errors, suite must stay green).
+
+      ## Inputs — read these FIRST
+      - /workspace/propdesk/audit/design/encryption-design.md  ← the exact spec to
+        build from. It contains the proposed TypeScript source, env var names,
+        key-rotation procedure, the per-column encryption plan, and the rollout
+        order. FOLLOW IT.
+      - /workspace/propdesk/audit/findings/crypto.md + crypto.json
+      - /workspace/propdesk/audit/deliverable-fix-security.md (do not undo it)
+
+      ## Scope — implement
+      1. **lib/crypto/field-encryption.ts** — the encrypted-field helper exactly as
+         specified in the design: AES-256-GCM via node:crypto, random 12-byte IV,
+         authTag, a `v1:` versioned base64 envelope, multiple active key ids for
+         rotation, encrypt / decrypt / blindIndex (HMAC-SHA256 with a separate
+         key) / needsMigration helpers, and a strict key-length and config check
+         that fails loudly if the key env var is missing or malformed. Support
+         the case where a ciphertext was written under an older key id.
+      2. **Key management** — read the master key from env only. Never hardcode.
+         Never log. Never return it to the client. Provide a clear, actionable
+         error message when it is absent. Add the required env var names to a
+         committed `.env.example` (NEW FILE, with placeholder values only — never
+         real keys) and document the generation command in the deliverable.
+      3. **Apply encryption to the sensitive columns** named in the design's
+         per-column plan, on BOTH the read path and the write path. Where a column
+         is used for lookup, use the blind-index strategy from the design.
+         Do NOT invent columns that are not in db/migrations/*.sql.
+      4. **Secret comparisons** — replace every `secret === provided` style
+         comparison (MIGRATION_SECRET, CRON_SECRET, BACKUP_CRON_SECRET,
+         MPESA_CALLBACK_SECRET, any others) with a timing-safe comparison using
+         crypto.timingSafeEqual with a correct equal-length guard.
+      5. **Supabase Storage policies** — implement the tighter policies from the
+         design: private buckets for tenant documents, ownership-scoped access,
+         short-lived signed URLs instead of public URLs for sensitive files.
+         Put the SQL in a new file under db/migrations/ (numbered after the
+         existing ones) and ALSO document it — do not silently change an applied
+         migration.
+      6. **Security headers** — add the missing headers to next.config.mjs
+         `headers()` alongside the existing ones: a Content-Security-Policy
+         (report-only is acceptable if you also explain the enforcement path),
+         includeSubDomains + preload on HSTS, and a complete Permissions-Policy.
+         Do not break the existing header set.
+      7. **Rate limiting** — implement a small, dependency-free in-memory rate
+         limiter (a fixed-window counter with a Map and a periodic sweep) in
+         lib/api/rate-limit.ts and apply it to the abuse-prone public endpoints
+         that the infra audit named: sign-up, forgot-password, contact, newsletter,
+         feedback, customer-requests, the M-Pesa STK push, and checkout. Apply it
+         via the existing route wrappers. Document the limitation clearly (it is
+         per-instance and does not work across serverless instances) and note that
+         a Redis/Upstash-backed store is the production follow-up.
+      8. **Audit log** — implement the minimal audit-log design: table shape in a
+         new db/migrations file, a helper to record who accessed or changed
+         sensitive records, and a hook it into the most sensitive read/write
+         paths. Never log PII into the audit log itself.
+
+      ## Constraints
+      - The encryption MUST be backward compatible with existing plaintext rows:
+         the decrypt helper must detect a plaintext value and return it as-is
+         (so the app keeps working before the backfill runs). The backfill script
+         must be provided as a standalone script under scripts/ (e.g.
+         scripts/backfill-encryption.ts) that is idempotent and dry-run capable.
+         Include it in package.json as `db:encrypt-backfill`.
+      - Do NOT change any existing route's public contract.
+      - Do NOT drop or rename any existing column. Additive-only migrations.
+       Never edit an already-applied migration file — add new numbered ones.
+      - Run `npx tsc --noEmit` and ensure NO new type errors vs baseline. The
+         Node crypto types come from @types/node — verify they resolve.
+      - Run `npm test` and ensure the suite still passes.
+      - Do NOT `git commit`.
+
+      ## Output
+      1. Update crypto.json statuses (FIXED / WONT_FIX) with fix_notes.
+      2. /workspace/propdesk/audit/deliverable-hardening.md: every change, the
+         files added and changed, the env vars now required and how to generate
+         them, the migration order to run, the backfill command and its dry-run
+         usage, the rate-limiter limitation, the tsc baseline vs post-fix error
+         count, and the test output.
+      3. A runnable smoke check that proves encryption round-trips
+         (encrypt → decrypt equals the original; blindIndex is stable for equal
+         inputs and differs for different inputs; a ciphertext under a rotated
+         key id still decrypts). Make it a real vitest test file so it runs in
+         `npm test` — e.g. lib/crypto/field-encryption.test.ts.
+    verify_prompt: |
+      READ-ONLY adversarial verification. Do not modify any project file.
+      Verify the hardening work in /workspace/propdesk independently.
+      1. Read lib/crypto/field-encryption.ts line by line. Check the AES-256-GCM
+         usage is cryptographically correct: 12-byte random IV, correct key
+         length, authTag retrieved and verified, no IV reuse across calls, and
+         the envelope encoding is unambiguous (fixed offsets, no delimiter
+         ambiguity). Verify authTag verification actually happens — a decrypt
+         that ignores the tag and silently returns garbage is a FAIL.
+      2. Run the crypto tests yourself: `npm test` in /workspace/propdesk, and
+         specifically `npx vitest run lib/crypto/field-encryption.test.ts`.
+         Verify a round-trip, a blind-index stability check, and the key-rotation
+         case actually pass. Write any throwaway probe ONLY under /tmp.
+      3. Verify the backward-compatibility path: a plaintext legacy value must
+         decrypt to itself without throwing, and must be flagged as needing
+         migration. Test it yourself with a throwaway script in /tmp.
+      4. Verify the key handling: grep the whole repo for the key env var name
+         and confirm it is never hardcoded, never in a NEXT_PUBLIC_ var, never
+         logged, and never returned in an API response. Also confirm the .env.example
+         you were told to add contains ONLY placeholders, and that it does not
+         overwrite a pre-existing file.
+      5. Verify the rate limiter: it must actually reject (not just count), it
+         must not accidentally block legitimate distinct users sharing a header,
+         and its Map must not grow without bound. Test it directly.
+      6. Verify the migrations: only NEW numbered files were added, no existing
+         migration was edited (`git -C /workspace/propdesk diff 467c500 -- db/`),
+         and every statement is additive (no DROP / RENAME / destructive ALTER).
+      7. Verify the storage policy SQL would actually deny cross-tenant reads —
+         read it as a Postgres/Supabase policy expert and reason about the USING
+         clause. A policy that permits all authenticated users is a FAIL.
+      8. Run `npx tsc --noEmit` and `npm test` yourself; report the real results.
+      FAIL if: the crypto is subtly wrong (IV reuse, missing tag verification,
+         ambiguous encoding, plaintext legacy values throwing), the key is exposed
+         anywhere, the rate limiter does not actually block, a migration is
+         destructive, the storage policy permits cross-tenant reads, or new type
+         errors/tests failures exist. PASS only if you personally confirmed all of
+         the above. State exactly what is wrong on FAIL.
+
+  - id: final-audit-report
+    title: 'Synthesize the launch-readiness audit report and remediation guide'
+    assigned_to: General
+    depends_on: [harden-crypto]
+    verified_by: Verifier
+    timeout_ms: 1800000
+    prompt: |
+      Write the final deliverable for the PropDesk Africa pre-launch audit.
+
+      ## READ FIRST: /workspace/propdesk/audit/ENVIRONMENT.md
+      It records the already-completed environment setup (node_modules installed, the
+      54 pre-existing tsc errors that are the BASELINE and not yours to fix, the
+      3 passing baseline tests, the architecture cheat-sheet, the severity ladder,
+      and the global ground rules: no git commit, do not touch audit/findings/
+      except your own files, zero NEW type errors, suite must stay green).
+
+      ## Inputs — read ALL of these
+      - /workspace/propdesk/audit/findings/*.md and *.json (authz, leaks, infra,
+        features, crypto)
+      - /workspace/propdesk/audit/deliverable-*.md (fix-security,
+        security-tests, feature-completion, hardening)
+      - /workspace/propdesk/audit/design/encryption-design.md and
+        /workspace/propdesk/audit/design/feature-plans/*.md
+      - The actual current code and the diff against the baseline commit 467c500
+        (`git -C /workspace/propdesk diff 467c500 --stat`)
+
+      ## Output — write these files at the repo root
+      1. **AUDIT_REPORT.md** — the document the owner reads to decide whether to
+         launch. Structure:
+         - **Launch verdict**: one of NO-GO / GO-WITH-CONDITIONS / GO. State the
+           conditions explicitly. Be decisive — do not hedge into uselessness.
+         - **Executive summary** — what the platform is, its risk profile, and the
+           5 most important things the owner must know, in plain language a
+           non-engineer founder can act on. Mention anything that must happen
+           BEFORE the site goes public.
+         - **What was fixed** — table of every closed finding: ID, severity,
+           area, one-line description, file(s) changed, verification performed.
+         - **What remains open** — table of every open finding: ID, severity, area,
+           impact, recommended action, and effort. Be honest about anything left.
+         - **By-category breakdown** — authz, leaks, infra, features, crypto: how
+           many findings, how many fixed, the residual risk, and what the residual
+           risk means in practice.
+         - **Infrastructure exposure assessment** — a direct, specific answer to
+           the owner's question "where have we exposed our infrastructure?":
+           which endpoints, which secrets, which surfaces, what an attacker could
+           reach before the fixes and what they can reach now.
+         - **Feature completeness assessment** — direct answer to "which features
+           are half done?", with a clear table of shipped vs stubbed vs pending,
+           and a realistic shipping recommendation.
+         - **Known limitations & residual risk** — the per-instance rate limiter,
+           the application-level tenancy without RLS, the Neon/Supabase dual
+           database, the unencrypted legacy rows pending backfill, and anything
+           else a future reader must know. Be candid.
+         - **Appendix**: the full finding list and a file-by-file change manifest.
+      2. **HARDENING_RUNBOOK.md** — the operational guide, in order:
+         - **Pre-launch checklist** — every step that must be done before going
+           live, as a checkbox list, with the exact command where one exists
+           (env vars to set, migrations to run, `npm run db:encrypt-backfill`
+           dry-run then real run, `npm run db:migrate`, `npm test`, `npx tsc --noEmit`,
+           `npm run build`).
+         - **Required environment variables** — a table of every env var the app
+           now needs, whether it is server-only or NEXT_PUBLIC, a safe placeholder
+           value, and how to generate the secret ones.
+         - **Database migration order** — the numbered migration files, what each
+           does, and how to apply them.
+         - **Data backfill procedure** — the encryption backfill, idempotency,
+           dry-run, verification queries, and rollback.
+         - **Key rotation procedure** — step by step, with the commands.
+         - **Deployment checklist** — the order of operations for a safe release,
+           including what to verify in production and what to roll back.
+         - **Ongoing maintenance** — what to review monthly, and the checks to add
+           to CI.
+      3. **CHANGELOG.md** — a conventional-changelog style file listing every
+         change made during this hardening pass, grouped as
+         [Security], [Fixed], [Added], [Changed]. Reference finding IDs.
+      4. Update /workspace/propdesk/.env.example if it does not exist — create it
+         with placeholder values only for every env var the app reads.
+
+      ## Style
+      - The owner is the founder, not a security engineer. Lead with impact and
+        action, not with CVE jargon. Keep the technical detail in the tables.
+      - Every claim in the report must trace to a finding ID, a changed file, or
+        a command output. Do not invent numbers, counts, or status.
+      - Do not run `git commit`.
+      - Do not modify application source code in this task. You are writing
+        documentation only.
+    verify_prompt: |
+      READ-ONLY verification of the final deliverable. Do not modify any project file.
+      Verify the documents in /workspace/propdesk (AUDIT_REPORT.md,
+      HARDENING_RUNBOOK.md, CHANGELOG.md, .env.example).
+      1. FACT-CHECK EVERY COUNT AND CLAIM. Recount the findings in
+         /workspace/propdesk/audit/findings/*.json by status and severity and
+         confirm every number, table count and verdict in AUDIT_REPORT.md matches.
+         A report claiming 12 fixed findings when the JSON says 9 is a FAIL.
+      2. VERIFY THE CHANGELOG against reality: run
+         `git -C /workspace/propdesk diff 467c500 --stat` and confirm every
+         changed file named in the CHANGELOG actually changed, and that no
+         significant changed file is missing from it.
+      3. VERIFY THE RUNBOOK IS EXECUTABLE. Check every command it lists actually
+         exists: the npm scripts in package.json, the migration files in
+         db/migrations/, the backfill script in scripts/. If a runbook step
+         references a script or file that does not exist, that is a FAIL — a
+         runbook that fails on step 3 is worthless.
+      4. VERIFY .env.example: it must contain a placeholder (never a real
+         secret) for every env var the code reads (grep process.env across lib/
+         and app/), and must not contain any value that looks like a real
+         credential. Confirm it does not overwrite a pre-existing file with
+         different content.
+      5. CHECK THE VERDICT IS CONSISTENT: if any CRITICAL finding is still OPEN
+         in the JSON, the launch verdict must not be a plain GO.
+      6. Check the documents do not overstate: no claim of "encrypted at rest"
+         unless the code and backfill support it; no claim of "tests pass" unless
+         the suite passes — run `npm test` yourself in /workspace/propdesk and
+         report the real result.
+      FAIL if: any count or status in the report is wrong; a runbook step
+         references a non-existent script or file; the changelog does not match
+         the real diff; .env.example is missing a var or contains a real secret;
+         the verdict contradicts the open findings; or a factual claim is
+         unsupported. PASS if every claim is traceable and every command works.
+         State exactly what is wrong when you FAIL.

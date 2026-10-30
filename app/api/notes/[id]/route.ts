@@ -1,4 +1,4 @@
-import { withAuth, successResponse, errorResponse, pickFields, blankToNull, toBool, HttpError } from "@/lib/api"
+import { withAuth, successResponse, errorResponse, pickFields, blankToNull, toBool, HttpError, dbError } from "@/lib/api"
 
 const NOTE_FIELDS = [
   "title",
@@ -43,7 +43,7 @@ export const PUT = withAuth(async (req, { supabase, userId }, params) => {
     .select("*, properties(name, address), tenants(full_name)")
     .single()
 
-  if (error) return errorResponse(error.message, 500)
+  if (error) return dbError("notes/[id]", error, 500)
   if (!data) return errorResponse("Note not found", 404)
   return successResponse(data)
 })
@@ -55,7 +55,7 @@ export const DELETE = withAuth(async (_req, { supabase, userId }, params) => {
     .eq("id", params.id)
     .eq("user_id", userId)
 
-  if (error) return errorResponse(error.message, 500)
+  if (error) return dbError("notes/[id]", error, 500)
   if (!count) return errorResponse("Note not found", 404)
   return successResponse({ success: true })
 })

@@ -1,3 +1,4 @@
+import { timingSafeEqualString } from "@/lib/api/secure-compare"
 import { NextResponse, type NextRequest } from "next/server"
 import { z } from "zod"
 import { readFile } from "node:fs/promises"
@@ -32,7 +33,7 @@ async function checkSecret(request: NextRequest) {
   // "allow everyone", which put an unauthenticated schema-rollback endpoint
   // on the public internet whenever the env var was missing or mistyped.
   const got = request.headers.get("x-migration-secret") ?? request.headers.get("authorization")?.replace(/^Bearer\s+/i, "")
-  if (expected && got === expected) return null
+  if (expected && timingSafeEqualString(got, expected)) return null
   if (process.env.NODE_ENV === "production") {
     return NextResponse.json(
       { error: expected ? "Forbidden" : "MIGRATION_SECRET must be configured in production" },

@@ -1,4 +1,4 @@
-import { withAuth, successResponse, errorResponse, blankToNull, HttpError } from "@/lib/api"
+import { withAuth, successResponse, errorResponse, blankToNull, HttpError, dbError } from "@/lib/api"
 import type { NextRequest } from "next/server"
 
 export const GET = withAuth(async (_req, { supabase, userId }) => {
@@ -9,7 +9,7 @@ export const GET = withAuth(async (_req, { supabase, userId }) => {
     .single()
 
   if (error && error.code !== "PGRST116") {
-    return errorResponse(error.message, 500)
+    return dbError("profile", error, 500)
   }
   return successResponse(data || { user_id: userId })
 })
@@ -46,6 +46,6 @@ export const PUT = withAuth(async (req: NextRequest, { supabase, userId }) => {
     .select()
     .single()
 
-  if (error) return errorResponse(error.message, 500)
+  if (error) return dbError("profile", error, 500)
   return successResponse(data)
 })
