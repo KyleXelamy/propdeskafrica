@@ -36,6 +36,7 @@ import Image from "next/image"
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: Home },
   { name: "Properties", href: "/dashboard/properties", icon: Building2 },
+  { name: "Property map", href: "/dashboard/properties/map", icon: Map },
   { name: "Tenants", href: "/dashboard/tenants", icon: Users },
   { name: "Contacts", href: "/dashboard/contacts", icon: Contact },
   { name: "Finances", href: "/dashboard/finances", icon: DollarSign },
