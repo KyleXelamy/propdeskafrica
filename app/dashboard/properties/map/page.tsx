@@ -3,8 +3,9 @@ import Link from "next/link"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ArrowLeft, MapPin, RefreshCw } from "lucide-react"
+import { ArrowLeft, MapPin } from "lucide-react"
 import { PropertyMap, type MapProperty } from "@/components/property-map"
+import { RegeocodeButton } from "@/components/regeocode-button"
 import { getDb, neonConfigured } from "@/lib/db/neon"
 import { createClient } from "@/lib/supabase/server"
 
@@ -94,9 +95,7 @@ export default async function PropertiesMapPage({ searchParams }: { searchParams
         </div>
         <form className="flex gap-2" method="get"><Input name="q" defaultValue={query} placeholder="Search city, county, or property" aria-label="Search locations" /><Button type="submit" variant="outline" size="sm">Search</Button></form>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm">
-            <RefreshCw className="mr-2 size-3.5" /> Re-geocode all
-          </Button>
+          <RegeocodeButton />
         </div>
       </header>
 
