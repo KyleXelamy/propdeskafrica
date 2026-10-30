@@ -84,12 +84,20 @@ export default function PropertiesPage() {
               : `${filtered.length} of ${properties.length} properties`}
           </p>
         </div>
-        <Button asChild className="bg-primary hover:bg-primary/90 w-full sm:w-auto">
-          <Link href="/dashboard/properties/new">
-            <Plus className="h-4 w-4 mr-2" />
-            Add Property
-          </Link>
-        </Button>
+        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+          <Button asChild variant="outline" className="w-full sm:w-auto">
+            <Link href="/dashboard/properties/map">
+              <MapPin className="mr-2 h-4 w-4" />
+              View property map
+            </Link>
+          </Button>
+          <Button asChild className="bg-primary hover:bg-primary/90 w-full sm:w-auto">
+            <Link href="/dashboard/properties/new">
+              <Plus className="h-4 w-4 mr-2" />
+              Add Property
+            </Link>
+          </Button>
+        </div>
       </div>
 
       {properties.length > 0 && (
