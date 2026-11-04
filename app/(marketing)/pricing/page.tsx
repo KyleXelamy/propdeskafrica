@@ -39,7 +39,7 @@ export default function PricingPage() {
     <main className="min-h-screen bg-background text-foreground">
       {/* Hero */}
       <section className="relative overflow-hidden bg-primary text-primary-foreground">
-        <div className="absolute inset-0 opacity-[0.06] bg-[radial-gradient(circle_at_50%_120%,#d9f45b,transparent_60%)]" />
+        <div className="absolute inset-0 opacity-[0.06] bg-[radial-gradient(circle_at_50%_120%,#b58a45,transparent_60%)]" />
         <div className="container-x relative pt-40 pb-20 lg:pt-56 lg:pb-28">
           <div className="mx-auto max-w-3xl text-center">
             <p className="text-xs font-semibold uppercase tracking-[0.25em] text-accent">Pricing</p>

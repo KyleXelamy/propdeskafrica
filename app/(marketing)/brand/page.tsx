@@ -9,11 +9,11 @@ export const metadata: Metadata = {
 }
 
 const colors = [
-  { name: "Brand ink", hex: "#15231d", bg: "bg-[#15231d]" },
-  { name: "Brand lime", hex: "#d9f45b", bg: "bg-[#d9f45b]" },
-  { name: "Brand cream", hex: "#f4f3ed", bg: "bg-[#f4f3ed]" },
-  { name: "Sage deep", hex: "#45604d", bg: "bg-[#45604d]" },
-  { name: "Sage", hex: "#5d6a5f", bg: "bg-[#5d6a5f]" },
+  { name: "Brand ink", hex: "#173b4d", bg: "bg-[#173b4d]" },
+  { name: "Brand lime", hex: "#b58a45", bg: "bg-[#b58a45]" },
+  { name: "Brand cream", hex: "#f5f6f4", bg: "bg-[#f5f6f4]" },
+  { name: "Sage deep", hex: "#5f8f87", bg: "bg-[#5f8f87]" },
+  { name: "Sage", hex: "#60717a", bg: "bg-[#60717a]" },
   { name: "Sage mist", hex: "#9aa59b", bg: "bg-[#9aa59b]" },
 ]
 
@@ -22,7 +22,7 @@ export default function BrandPage() {
   return (
     <>
       <section className="relative overflow-hidden bg-primary text-primary-foreground">
-        <div className="absolute inset-0 opacity-[0.07] bg-[radial-gradient(circle_at_50%_30%,#d9f45b,transparent_55%)]" />
+        <div className="absolute inset-0 opacity-[0.07] bg-[radial-gradient(circle_at_50%_30%,#b58a45,transparent_55%)]" />
         <div className="container-x relative pt-32 pb-16 lg:pt-44">
           <p className="text-xs font-semibold uppercase tracking-[0.25em] text-accent">Brand</p>
           <h1 className="mt-6 text-5xl font-medium leading-[0.98] tracking-[-0.05em] sm:text-7xl">

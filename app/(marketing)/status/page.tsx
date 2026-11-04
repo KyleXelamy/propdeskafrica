@@ -20,7 +20,7 @@ export default async function StatusPage() {
   return (
     <main className="min-h-screen bg-background text-foreground">
       <section className="relative overflow-hidden bg-primary text-primary-foreground">
-        <div className="absolute inset-0 opacity-[0.07] bg-[radial-gradient(circle_at_20%_30%,#d9f45b,transparent_55%)]" />
+        <div className="absolute inset-0 opacity-[0.07] bg-[radial-gradient(circle_at_20%_30%,#b58a45,transparent_55%)]" />
         <div className="container-x relative pt-40 pb-16 lg:pt-52">
           <p className="text-xs font-semibold uppercase tracking-[0.25em] text-accent">System status</p>
           <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-5">

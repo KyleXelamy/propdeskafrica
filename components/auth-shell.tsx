@@ -27,8 +27,8 @@ export function AuthShell({
     <div className="grid min-h-screen grid-cols-1 lg:grid-cols-2">
       {/* Pitch side */}
       <aside className="relative hidden overflow-hidden bg-primary text-primary-foreground lg:flex">
-        <div className="absolute inset-0 opacity-[0.06] bg-[radial-gradient(circle_at_20%_20%,#d9f45b,transparent_55%)]" />
-        <div className="absolute inset-0 opacity-[0.06] bg-[radial-gradient(circle_at_90%_90%,#d9f45b,transparent_45%)]" />
+        <div className="absolute inset-0 opacity-[0.06] bg-[radial-gradient(circle_at_20%_20%,#b58a45,transparent_55%)]" />
+        <div className="absolute inset-0 opacity-[0.06] bg-[radial-gradient(circle_at_90%_90%,#b58a45,transparent_45%)]" />
 
         <div className="relative z-10 flex h-full flex-col p-10">
           <BrandWordmark href="/" showSubtitle={false} size="lg" className="text-primary-foreground" />

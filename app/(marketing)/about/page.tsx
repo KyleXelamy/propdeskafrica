@@ -42,7 +42,7 @@ export default function AboutPage() {
     <main className="min-h-screen bg-background text-foreground">
       {/* Hero */}
       <section className="relative overflow-hidden bg-primary text-primary-foreground">
-        <div className="absolute inset-0 opacity-[0.07] bg-[radial-gradient(circle_at_top_right,#d9f45b,transparent_55%)]" />
+        <div className="absolute inset-0 opacity-[0.07] bg-[radial-gradient(circle_at_top_right,#b58a45,transparent_55%)]" />
         <div className="container-x relative pt-36 pb-24 lg:pt-48 lg:pb-32">
           <p className="mb-7 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.25em] text-accent">
             <span className="h-px w-10 bg-accent" />

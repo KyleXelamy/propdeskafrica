@@ -21,7 +21,7 @@ export default function GlobalError({
   return (
     <div className="min-h-screen bg-background">
       <section className="relative overflow-hidden bg-primary text-primary-foreground">
-        <div className="absolute inset-0 opacity-[0.08] bg-[radial-gradient(circle_at_50%_50%,#d9f45b,transparent_55%)]" />
+        <div className="absolute inset-0 opacity-[0.08] bg-[radial-gradient(circle_at_50%_50%,#b58a45,transparent_55%)]" />
         <div className="container-x relative flex min-h-[60vh] flex-col items-start justify-center pt-24 pb-16">
           <p className="text-xs font-semibold uppercase tracking-[0.25em] text-accent">Error</p>
           <h1 className="mt-6 max-w-3xl text-5xl font-medium leading-[0.98] tracking-[-0.05em] sm:text-7xl">
