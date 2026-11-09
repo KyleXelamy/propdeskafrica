@@ -81,7 +81,7 @@ export default async function DashboardLayout({
     .maybeSingle()
 
   return (
-    <div className="min-h-screen flex bg-background">
+    <div className="dashboard-shell min-h-screen flex bg-background">
       <DashboardSidebar
         userEmail={user.email || "user@example.com"}
         userName={(profile as any)?.full_name || undefined}
@@ -91,9 +91,9 @@ export default async function DashboardLayout({
       <div className="flex flex-col flex-1 min-w-0 md:ml-64">
         {/* Top header — notification bell */}
         <header className="sticky top-0 z-30 flex min-h-14 items-center gap-3 border-b bg-background/90 px-3 py-2 backdrop-blur sm:px-4 md:px-6">
-          <div className="relative hidden max-w-md flex-1 sm:block">
+          <div className="relative hidden max-w-xl flex-1 sm:block">
             <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input aria-label="Search workspace" placeholder="Search properties, tenants, payments…" className="h-9 border-border/80 bg-card pl-9 text-sm shadow-none focus-visible:ring-1" />
+            <Input aria-label="Search workspace" placeholder="Search properties, tenants, payments…" className="h-10 rounded-xl border-border/80 bg-card/80 pl-9 text-sm shadow-none transition-shadow focus-visible:ring-2 focus-visible:ring-ring/50" />
           </div>
           <div className="ml-auto flex items-center gap-2">
             <PwaInstallPrompt />
@@ -101,8 +101,8 @@ export default async function DashboardLayout({
           </div>
         </header>
 
-        <main className="flex-1 relative overflow-y-auto focus:outline-none">
-          <div className="py-4 md:py-6">
+        <main className="relative flex-1 overflow-y-auto focus:outline-none">
+          <div className="dashboard-content py-4 md:py-6">
             <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
               <TrialBanner />
               {children}

@@ -114,6 +114,20 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
+@layer components {
+  .dashboard-shell {
+    background-image: radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--accent) 32%, transparent), transparent 32rem);
+  }
+  .dashboard-content .rounded-lg.border,
+  .dashboard-content .rounded-xl.border,
+  .dashboard-content .rounded-2xl.border {
+    box-shadow: 0 1px 2px color-mix(in srgb, var(--foreground) 5%, transparent);
+  }
+  .dashboard-content table thead {
+    background: color-mix(in srgb, var(--muted) 58%, transparent);
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
