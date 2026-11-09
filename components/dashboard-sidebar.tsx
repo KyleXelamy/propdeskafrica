@@ -147,7 +147,7 @@ function SidebarContent({ userEmail, userName, companyName, onNavigate }: Sideba
   )
 }
 
-export function DashboardSidebar({ userEmail, userName, companyName, avatarUrl }: SidebarProps) {
+export function DashboardSidebar({ userEmail, userName, companyName }: SidebarProps) {
   const [open, setOpen] = useState(false)
 
   const handleNavigate = () => {
@@ -169,7 +169,7 @@ export function DashboardSidebar({ userEmail, userName, companyName, avatarUrl }
           </Button>
         </SheetTrigger>
         <SheetContent side="left" className="p-0 w-72 sm:w-80">
-          <SidebarContent userEmail={userEmail} userName={userName} companyName={companyName} avatarUrl={avatarUrl} onNavigate={handleNavigate} />
+          <SidebarContent userEmail={userEmail} userName={userName} companyName={companyName} onNavigate={handleNavigate} />
         </SheetContent>
       </Sheet>
 

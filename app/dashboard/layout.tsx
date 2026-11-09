@@ -7,6 +7,8 @@ import { PwaInstallPrompt } from "@/components/pwa-install-prompt"
 import { TrialBanner } from "@/components/trial-banner"
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
+import { Input } from "@/components/ui/input"
+import { Search } from "lucide-react"
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -88,9 +90,15 @@ export default async function DashboardLayout({
 
       <div className="flex flex-col flex-1 min-w-0 md:ml-64">
         {/* Top header — notification bell */}
-        <header className="sticky top-0 z-30 flex h-14 items-center justify-end gap-3 border-b bg-background/80 px-3 backdrop-blur sm:px-4 md:px-6">
-          <PwaInstallPrompt />
-          <NotificationsBell />
+        <header className="sticky top-0 z-30 flex min-h-14 items-center gap-3 border-b bg-background/90 px-3 py-2 backdrop-blur sm:px-4 md:px-6">
+          <div className="relative hidden max-w-md flex-1 sm:block">
+            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Input aria-label="Search workspace" placeholder="Search properties, tenants, payments…" className="h-9 border-border/80 bg-card pl-9 text-sm shadow-none focus-visible:ring-1" />
+          </div>
+          <div className="ml-auto flex items-center gap-2">
+            <PwaInstallPrompt />
+            <NotificationsBell />
+          </div>
         </header>
 
         <main className="flex-1 relative overflow-y-auto focus:outline-none">
