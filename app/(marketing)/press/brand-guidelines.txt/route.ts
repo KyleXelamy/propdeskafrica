@@ -11,11 +11,11 @@
 import { BRAND } from "@/lib/brand"
 
 const COLORS: Array<{ name: string; hex: string }> = [
-  { name: "Brand ink", hex: "#15231d" },
-  { name: "Brand lime", hex: "#d9f45b" },
-  { name: "Brand cream", hex: "#f4f3ed" },
-  { name: "Sage deep", hex: "#45604d" },
-  { name: "Sage", hex: "#5d6a5f" },
+  { name: "Brand ink", hex: "#173b4d" },
+  { name: "Brand lime", hex: "#b58a45" },
+  { name: "Brand cream", hex: "#f5f6f4" },
+  { name: "Sage deep", hex: "#5f8f87" },
+  { name: "Sage", hex: "#60717a" },
   { name: "Sage mist", hex: "#9aa59b" },
 ]
 

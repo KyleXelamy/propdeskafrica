@@ -8,8 +8,8 @@ const siteUrl = "https://propdeskafrica.com"
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f4f3ed" },
-    { media: "(prefers-color-scheme: dark)", color: "#15231d" },
+    { media: "(prefers-color-scheme: light)", color: "#f5f6f4" },
+    { media: "(prefers-color-scheme: dark)", color: "#173b4d" },
   ],
   width: "device-width",
   initialScale: 1,

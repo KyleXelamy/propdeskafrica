@@ -118,8 +118,8 @@ export default function DashboardPage() {
         <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
           {statCards.map((stat) => (
             <Link key={stat.name} href={stat.href}>
-              <Card className="h-full cursor-pointer border-border/80 transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-primary/25 hover:shadow-md focus-within:ring-2 focus-within:ring-ring">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <Card className="group h-full cursor-pointer overflow-hidden border-border/80 bg-card/90 transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 focus-within:ring-2 focus-within:ring-ring">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 border-b border-border/60 pb-3">
                   <CardTitle className="text-xs md:text-sm font-medium text-muted-foreground truncate pr-2">
                     {stat.name}
                   </CardTitle>

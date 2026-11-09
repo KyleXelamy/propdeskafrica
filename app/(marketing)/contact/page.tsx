@@ -47,7 +47,7 @@ export default function ContactPage() {
     <main className="min-h-screen bg-background text-foreground">
       {/* Hero */}
       <section className="relative overflow-hidden bg-primary text-primary-foreground">
-        <div className="absolute inset-0 opacity-[0.07] bg-[radial-gradient(circle_at_20%_80%,#d9f45b,transparent_55%)]" />
+        <div className="absolute inset-0 opacity-[0.07] bg-[radial-gradient(circle_at_20%_80%,#b58a45,transparent_55%)]" />
         <div className="container-x relative pt-40 pb-20 lg:pt-56 lg:pb-28">
           <div className="max-w-3xl">
             <p className="text-xs font-semibold uppercase tracking-[0.25em] text-accent">Contact</p>

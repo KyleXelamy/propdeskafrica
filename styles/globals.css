@@ -12,7 +12,7 @@
  */
 :root {
   /* surfaces */
-  --background: oklch(0.972 0.006 95);            /* #f4f3ed */
+  --background: oklch(0.972 0.006 95);            /* #f5f6f4 */
   --foreground: oklch(0.22 0.035 255);              /* deep navy */
 
   --card: oklch(1 0 0);
@@ -30,7 +30,7 @@
   --secondary-foreground: oklch(0.234 0.018 155);
 
   --muted: oklch(0.94 0.012 145);
-  --muted-foreground: oklch(0.485 0.014 155);      /* #5d6a5f */
+  --muted-foreground: oklch(0.485 0.014 155);      /* #60717a */
 
   --accent: oklch(0.68 0.14 45);                   /* warm copper */
   --accent-foreground: oklch(0.234 0.018 155);
@@ -49,7 +49,7 @@
   --ring: oklch(0.46 0.05 155);
 
   /* brand charts */
-  --chart-1: oklch(0.46 0.05 155);                 /* #45604d sage deep */
+  --chart-1: oklch(0.46 0.05 155);                 /* #5f8f87 sage deep */
   --chart-2: oklch(0.68 0.14 45);                  /* copper */
   --chart-3: oklch(0.234 0.018 155);               /* ink */
   --chart-4: oklch(0.62 0.07 155);                 /* sage mid */

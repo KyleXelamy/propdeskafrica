@@ -40,7 +40,7 @@ export default async function FeaturePage({
     <>
       {/* Hero */}
       <section className="relative overflow-hidden bg-primary text-primary-foreground">
-        <div className="absolute inset-0 opacity-[0.07] bg-[radial-gradient(circle_at_30%_30%,#d9f45b,transparent_55%)]" />
+        <div className="absolute inset-0 opacity-[0.07] bg-[radial-gradient(circle_at_30%_30%,#b58a45,transparent_55%)]" />
         <div className="container-x relative pt-32 pb-16 lg:pt-44 lg:pb-24">
           <Link
             href="/features"

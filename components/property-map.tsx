@@ -26,7 +26,7 @@ type SearchResult = { display_name: string; lat: string; lon: string }
 
 const propertyIcon = L.divIcon({
   className: "property-map-marker",
-  html: '<div style="display:grid;place-items:center;width:34px;height:34px;border:3px solid white;border-radius:999px;background:#45604d;color:white;box-shadow:0 3px 10px rgba(0,0,0,.25)"><span style="font-size:14px;font-weight:700">P</span></div>',
+  html: '<div style="display:grid;place-items:center;width:34px;height:34px;border:3px solid white;border-radius:999px;background:#5f8f87;color:white;box-shadow:0 3px 10px rgba(0,0,0,.25)"><span style="font-size:14px;font-weight:700">P</span></div>',
   iconSize: [34, 34],
   iconAnchor: [17, 17],
 })

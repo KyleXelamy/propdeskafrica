@@ -70,7 +70,7 @@ function SidebarContent({ userEmail, userName, companyName, onNavigate }: Sideba
   const pathname = usePathname()
 
   return (
-    <div className="flex h-full min-h-0 flex-col border-r border-sidebar-border bg-sidebar">
+    <div className="flex h-full min-h-0 flex-col border-r border-sidebar-border bg-sidebar shadow-[8px_0_32px_-28px_hsl(var(--foreground)/0.4)]">
       {/* Logo */}
       <div className="flex min-h-16 items-center gap-3 border-b border-sidebar-border px-4 md:px-5">
         <span className="size-9 shrink-0 overflow-hidden rounded-xl bg-transparent">
@@ -91,7 +91,7 @@ function SidebarContent({ userEmail, userName, companyName, onNavigate }: Sideba
 
       {/* Navigation */}
       <ScrollArea className="min-h-0 flex-1 px-2 py-3 md:px-3 md:py-4">
-        <nav className="flex flex-col gap-1">
+        <nav aria-label="Dashboard navigation" className="flex flex-col gap-1">
           {navigation.map((item) => {
             const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(`${item.href}/`))
             return (
@@ -147,7 +147,7 @@ function SidebarContent({ userEmail, userName, companyName, onNavigate }: Sideba
   )
 }
 
-export function DashboardSidebar({ userEmail, userName, companyName, avatarUrl }: SidebarProps) {
+export function DashboardSidebar({ userEmail, userName, companyName }: SidebarProps) {
   const [open, setOpen] = useState(false)
 
   const handleNavigate = () => {
@@ -169,7 +169,7 @@ export function DashboardSidebar({ userEmail, userName, companyName, avatarUrl }
           </Button>
         </SheetTrigger>
         <SheetContent side="left" className="p-0 w-72 sm:w-80">
-          <SidebarContent userEmail={userEmail} userName={userName} companyName={companyName} avatarUrl={avatarUrl} onNavigate={handleNavigate} />
+          <SidebarContent userEmail={userEmail} userName={userName} companyName={companyName} onNavigate={handleNavigate} />
         </SheetContent>
       </Sheet>
 

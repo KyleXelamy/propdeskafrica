@@ -68,8 +68,8 @@ export function LeaseExpiryAlerts() {
   }
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className="border-border/80 bg-card/90">
+      <CardHeader className="border-b border-border/60">
         <CardTitle className="text-lg flex items-center gap-2">
           <CalendarClock className="h-4 w-4" />
           Lease Expiry Alerts
@@ -158,8 +158,8 @@ export function ActivityFeed() {
   }, [])
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className="border-border/80 bg-card/90">
+      <CardHeader className="border-b border-border/60">
         <CardTitle className="text-lg flex items-center gap-2">
           <Activity className="h-4 w-4" />
           Recent Activity

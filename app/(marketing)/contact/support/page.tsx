@@ -12,7 +12,7 @@ export default function ContactSupportPage() {
   return (
     <>
       <section className="relative overflow-hidden bg-primary text-primary-foreground">
-        <div className="absolute inset-0 opacity-[0.07] bg-[radial-gradient(circle_at_70%_30%,#d9f45b,transparent_55%)]" />
+        <div className="absolute inset-0 opacity-[0.07] bg-[radial-gradient(circle_at_70%_30%,#b58a45,transparent_55%)]" />
         <div className="container-x relative pt-32 pb-16 lg:pt-44">
           <p className="text-xs font-semibold uppercase tracking-[0.25em] text-accent">Support</p>
           <h1 className="mt-6 max-w-3xl text-5xl font-medium leading-[0.98] tracking-[-0.05em] sm:text-7xl">
