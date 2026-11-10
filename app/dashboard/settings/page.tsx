@@ -56,7 +56,7 @@ export default async function SettingsPage() {
   ])
 
   return (
-    <div className="space-y-6 pt-2 md:pt-0">
+    <div className="dashboard-route space-y-6 pt-2 md:pt-0">
       <div className="rounded-2xl border bg-gradient-to-br from-card to-muted/30 p-5 md:p-7">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Workspace control</p>
         <h1 className="mt-2 text-2xl font-semibold tracking-tight text-foreground md:text-3xl">Settings</h1>

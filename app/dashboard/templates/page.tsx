@@ -149,7 +149,7 @@ export default function TemplatesPage() {
   }
 
   return (
-    <div className="space-y-6 pt-2 md:pt-0">
+    <div className="dashboard-route space-y-6 pt-2 md:pt-0">
       <div>
         <h1 className="text-2xl md:text-3xl font-bold text-foreground flex items-center gap-2">
           <FileText className="h-6 w-6" /> Templates

@@ -81,7 +81,7 @@ export default function FinancesPage() {
   }
 
   return (
-    <div className="space-y-6 pt-2 md:pt-0">
+    <div className="dashboard-route space-y-6 pt-2 md:pt-0">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-foreground">Finances</h1>
@@ -158,9 +158,9 @@ export default function FinancesPage() {
         </TabsList>
 
         <TabsContent value="payments" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Rent Payments</CardTitle>
+<Card className="border-border/80 bg-card/90">
+          <CardHeader className="border-b border-border/60">
+            <CardTitle>Recent Rent Payments</CardTitle>
               <CardDescription>Current month rent payment status</CardDescription>
             </CardHeader>
             <CardContent>
@@ -201,9 +201,9 @@ export default function FinancesPage() {
         </TabsContent>
 
         <TabsContent value="expenses" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Expenses</CardTitle>
+<Card className="border-border/80 bg-card/90">
+          <CardHeader className="border-b border-border/60">
+            <CardTitle>Recent Expenses</CardTitle>
               <CardDescription>Current month property expenses</CardDescription>
             </CardHeader>
             <CardContent>

@@ -78,8 +78,10 @@ export function LeaseExpiryAlerts() {
       </CardHeader>
       <CardContent>
         {!items || items.length === 0 ? (
-          <div className="text-sm text-muted-foreground text-center py-6">
-            No leases expiring soon.
+          <div className="flex flex-col items-center rounded-xl border border-dashed border-border/80 bg-muted/20 px-4 py-8 text-center">
+            <CalendarClock className="mb-2 size-5 text-muted-foreground" />
+            <p className="text-sm font-medium">No lease actions due soon</p>
+            <p className="mt-1 text-xs text-muted-foreground">Your next 60 days are clear.</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -174,8 +176,10 @@ export function ActivityFeed() {
             ))}
           </div>
         ) : !items || items.length === 0 ? (
-          <div className="text-sm text-muted-foreground text-center py-6">
-            No recent activity. Start by adding properties and tenants.
+          <div className="flex flex-col items-center rounded-xl border border-dashed border-border/80 bg-muted/20 px-4 py-8 text-center">
+            <Activity className="mb-2 size-5 text-muted-foreground" />
+            <p className="text-sm font-medium">No activity yet</p>
+            <p className="mt-1 text-xs text-muted-foreground">Your workspace events will appear here.</p>
           </div>
         ) : (
           <div className="space-y-2">
