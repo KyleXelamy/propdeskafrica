@@ -175,7 +175,7 @@ export function DashboardSidebar({ userEmail, userName, companyName }: SidebarPr
 
       {/* Desktop sidebar */}
       <div className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0">
-        <SidebarContent userEmail={userEmail} userName={userName} companyName={companyName} avatarUrl={avatarUrl} />
+        <SidebarContent userEmail={userEmail} userName={userName} companyName={companyName} />
       </div>
     </>
   )
