@@ -103,7 +103,7 @@ export default async function NotesPage() {
   )
 
   return (
-    <div className="space-y-6 pt-2 md:pt-0">
+    <div className="dashboard-route space-y-6 pt-2 md:pt-0">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-foreground">Notes</h1>

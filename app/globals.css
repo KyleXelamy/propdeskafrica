@@ -118,6 +118,11 @@
   .dashboard-shell {
     background-image: radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--accent) 32%, transparent), transparent 32rem);
   }
+  .dashboard-route > .flex:first-child,
+  .dashboard-route > div:first-child {
+    border-bottom: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+    padding-bottom: 1rem;
+  }
   .dashboard-content .rounded-lg.border,
   .dashboard-content .rounded-xl.border,
   .dashboard-content .rounded-2xl.border {

@@ -80,7 +80,7 @@ export default async function BillingPage({
   const plans: Plan[] = PLANS
 
   return (
-    <div className="space-y-6 pt-2 md:pt-0">
+    <div className="dashboard-route space-y-6 pt-2 md:pt-0">
       <div>
         <h1 className="text-2xl md:text-3xl font-bold text-foreground">Billing</h1>
         <p className="text-sm md:text-base text-muted-foreground">

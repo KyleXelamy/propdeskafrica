@@ -92,7 +92,7 @@ export default async function ReportsPage() {
   const formatPercentage = (value: number) => `${value >= 0 ? "+" : ""}${value.toFixed(1)}%`
 
   return (
-    <div className="space-y-6 pt-2 md:pt-0">
+    <div className="dashboard-route space-y-6 pt-2 md:pt-0">
       <div>
         <h1 className="text-2xl md:text-3xl font-bold text-foreground">Reports & Analytics</h1>
         <p className="text-sm md:text-base text-muted-foreground">Financial performance and property management insights</p>
